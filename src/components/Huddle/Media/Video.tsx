@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { useStudioState } from '@/store/studioState';
+import React, { useEffect, useRef } from "react";
+import { useStudioState } from "@/store/studioState";
 
 interface VideoProps {
   stream: MediaStream | null;
@@ -29,7 +29,7 @@ const Video = ({ stream, name }: VideoProps) => {
   return (
     <>
       <video
-        className='h-full w-full rounded-lg'
+        className="h-full w-full rounded-lg"
         ref={videoRef}
         autoPlay
         muted

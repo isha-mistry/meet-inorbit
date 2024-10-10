@@ -64,12 +64,15 @@ interface StudioState {
   setIsScreenShared: (val: boolean) => void;
   isRoomClosed: boolean;
   setIsRoomClosed: (val: boolean) => void;
+  meetingRecordingStatus: boolean | undefined;
+  setMeetingRecordingStatus: (val: boolean) => void;
 }
 
 export const useStudioState = create<StudioState>((set) => ({
   name: "",
   setName: (name) => set({ name }),
-  avatarUrl: "/avatars/avatars/0.png",
+  avatarUrl:
+    "https://gateway.lighthouse.storage/ipfs/bafkreifr3lnl4mpiedaxwzibjbszwf7zosptwt5oqpfydwun33a6ujsjau",
   setAvatarUrl: (val: string) => {
     set(() => ({
       avatarUrl: val,
@@ -163,4 +166,7 @@ export const useStudioState = create<StudioState>((set) => ({
   setIsScreenShared: (val: boolean) => set({ isScreenShared: val }),
   isRoomClosed: false,
   setIsRoomClosed: (val: boolean) => set({ isRoomClosed: val }),
+  meetingRecordingStatus: undefined,
+  setMeetingRecordingStatus: (val: boolean) =>
+    set({ meetingRecordingStatus: val }),
 }));
