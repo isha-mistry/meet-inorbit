@@ -49,6 +49,7 @@ import PopupSlider from "@/components/FeedbackPopup/PopupSlider";
 import MeetingRecordingModal from "@/components/ComponentUtils/MeetingRecordingModal";
 import toast from "react-hot-toast";
 import { handleCloseMeeting } from "@/components/Huddle/HuddleUtils";
+import { BASE_URL } from "@/config/constants";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -140,7 +141,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         };
 
         const response = await fetch(
-          "/api/feedback/get-feedback-status",
+          `${BASE_URL}/api/feedback/get-feedback-status`,
           requestOptions
         );
 
@@ -316,7 +317,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           body: raw,
           redirect: "follow",
         };
-        const response = await fetch("/api/verify-meeting-id", requestOptions);
+        const response = await fetch(`${BASE_URL}/api/verify-meeting-id`, requestOptions);
         const result = await response.json();
 
         if (result.success) {
@@ -434,7 +435,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       };
 
       const status = await fetch(
-        `/api/startRecording/${params.roomId}`,
+        `${BASE_URL}/api/startRecording/${params.roomId}`,
         requestOptions
       );
       if (!status.ok) {

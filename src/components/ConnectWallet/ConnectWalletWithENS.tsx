@@ -8,6 +8,7 @@ import { useAccount } from "wagmi";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import user from "@/assets/images/user/user2.svg"
+import { BASE_URL } from "@/config/constants";
 
 function ConnectWalletWithENS() {
   const [displayAddress, setDisplayAddress] = useState<any>();
@@ -33,7 +34,7 @@ function ConnectWalletWithENS() {
             redirect: "follow",
           };
 
-          const res = await fetch(`/api/profile/${address}`, requestOptions);
+          const res = await fetch(`${BASE_URL}/api/profile/${address}`, requestOptions);
           const dbResponse = await res.json();
           console.log("data",dbResponse)
 
