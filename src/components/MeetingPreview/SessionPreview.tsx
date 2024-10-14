@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import WatchSessionVideo from "../WatchMeeting/WatchSessionVideo";
-import WatchSession from "../WatchMeeting/WatchSession";
+import WatchSessionVideo from "@/components/WatchMeeting/WatchSessionVideo";
+import WatchSession from "@/components/WatchMeeting/WatchSession";
 
 function SessionPreview({
   data,

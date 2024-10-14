@@ -7,12 +7,12 @@ import { Time } from "@internationalized/date";
 import { ThreeDots } from "react-loader-spinner";
 import { useAccount } from "wagmi";
 import { useRouter } from "next-nprogress-bar";
-import UpdateSessionDetailsSkeletonLoader from "../SkeletonLoader/UpdateSessionDetailsSkeletonLoader";
-import not_found from "@/assets/images/daos/404.png";
+import UpdateSessionDetailsSkeletonLoader from "@/components/SkeletonLoader/UpdateSessionDetailsSkeletonLoader";
+// import not_found from "@/assets/images/daos/404.png";
 import Image from "next/image";
 import PageNotFound from "../PageNotFound/PageNotFound";
 import { IoClose } from "react-icons/io5";
-import SessionHostedModal from "../ComponentUtils/SessionHostedModal";
+import SessionHostedModal from "@/components/ComponentUtils/SessionHostedModal";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // useEffect(() => {
