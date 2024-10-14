@@ -1,5 +1,4 @@
 import { isAddress } from "viem";
-import { cache } from "react";
 import { truncateAddress } from "./text";
 import { ethers } from "ethers";
 import { getEnsAvatar } from "@wagmi/core";
