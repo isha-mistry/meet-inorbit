@@ -2,26 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.noScrollbar::-webkit-scrollbar {
+  width: 0px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.maskAvatar {
+  /* -webkit-mask-image: url("/images/Mask.svg"); */
+  /* mask-image: url("/images/Mask.svg"); */
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+body::-webkit-scrollbar {
+  width: 0.5em;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+body::-webkit-scrollbar-track {
+  background-color: #e3e5e9;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #5d6069;
+  border-radius: 5rem;
 }

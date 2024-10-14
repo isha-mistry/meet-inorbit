@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 import { PiLinkSimpleBold } from "react-icons/pi";
+import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import ReactionBar from "../ReactionBar";
 import {
   DropdownMenu,
@@ -30,18 +31,22 @@ import {
 } from "../../ui/dropdown-menu";
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
-import { handleCloseMeeting, handleStopRecording } from "../HuddleUtils";
+import { handleRecording, handleStopRecording } from "../HuddleUtils";
+import { BASE_URL } from "@/config/constants";
+import { uploadFile } from "@/actions/uploadFile";
 
 const BottomBar = ({
   daoName,
   hostAddress,
-  meetingStatus,
+  // meetingStatus,
+  // currentRecordingStatus,
   meetingData,
   meetingCategory,
 }: {
   daoName: string;
   hostAddress: string;
-  meetingStatus: boolean | undefined;
+  // meetingStatus: boolean | undefined;
+  // currentRecordingStatus: boolean | undefined;
   meetingData?: SessionInterface;
   meetingCategory: string;
 }) => {
@@ -75,6 +80,8 @@ const BottomBar = ({
     isUploading,
     isScreenShared,
     setIsScreenShared,
+    meetingRecordingStatus,
+    setMeetingRecordingStatus,
   } = useStudioState();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
@@ -144,8 +151,8 @@ const BottomBar = ({
   const handleEndCall = async (endMeet: string) => {
     setIsLoading(true);
 
-    if (role === "host" && meetingStatus === true) {
-      await handleStopRecording(roomId, address);
+    if (role === "host" && meetingRecordingStatus === true) {
+      await handleStopRecording(roomId, address, setIsRecording);
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -156,6 +163,31 @@ const BottomBar = ({
       setShowLeaveDropDown(false);
     } else if (endMeet === "close") {
       if (role === "host") {
+        let nft_image;
+        try {
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          const requestOptions = {
+            method: "GET",
+            headers: myHeaders,
+          };
+          const imageResponse = await fetch(
+            `${BASE_URL}/api/images/og/nft?daoName=${daoName}&meetingId=${roomId}`,
+            requestOptions
+          );
+
+          try {
+            const arrayBuffer = await imageResponse.arrayBuffer();
+            const result = await uploadFile(arrayBuffer, daoName, roomId);
+            console.log("Upload result:", result);
+            console.log("Hash:", result.Hash);
+            nft_image = `ipfs://` + result.Hash;
+          } catch (error) {
+            console.error("Error in uploading file:", error);
+          }
+        } catch (error) {
+          console.log("Error in generating OG image:::", error);
+        }
         try {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
@@ -168,8 +200,9 @@ const BottomBar = ({
             body: JSON.stringify({
               meetingId: roomId,
               meetingType: meetingCategory,
-              recordedStatus: meetingStatus,
-              meetingStatus: meetingStatus === true ? "Recorded" : "Finished",
+              recordedStatus: isRecording,
+              meetingStatus: isRecording === true ? "Recorded" : "Finished",
+              nft_image: nft_image,
             }),
           };
 
@@ -273,8 +306,8 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                (shareStream !== null || isScreenShared) && "bg-blue-shade-100"
+              `bg-gray-500/80 hover:bg-gray-600 ${
+                (shareStream !== null || isScreenShared) && "bg-gray-500/80"
               }`
             )}
           >
@@ -291,8 +324,8 @@ const BottomBar = ({
               });
             }}
             className={clsx(
-              `bg-blue-shade-100 hover:bg-blue-shade-200 ${
-                metadata?.isHandRaised && "bg-blue-shade-100"
+              `bg-gray-500/80 hover:bg-gray-600 ${
+                metadata?.isHandRaised && "bg-gray-500/80"
               }`
             )}
           >
@@ -330,6 +363,23 @@ const BottomBar = ({
         </div>
 
         <div className="flex space-x-3">
+          {role === "host" && (
+            <Button
+              className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+              onClick={() =>
+                handleRecording(
+                  roomId,
+                  address,
+                  isRecording,
+                  setIsRecording,
+                  setMeetingRecordingStatus
+                )
+              }
+            >
+              {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
+              {meetingRecordingStatus ? "Stop Recording" : "Record"}
+            </Button>
+          )}
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
