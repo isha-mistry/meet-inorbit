@@ -257,7 +257,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       <BottomBar
         daoName={daoName}
         hostAddress=""
-        meetingStatus
         meetingCategory=""
       />
     </div>

@@ -14,10 +14,10 @@ import Link from "next/link";
 import VideoJS from "@/components/ComponentUtils/VideoJs";
 import videojs from "video.js";
 // import { parseISO } from "date-fns";
-import ReportOptionModal from "./ReportOptionModal";
+// import ReportOptionModal from "./ReportOptionModal";
 import { useRouter } from "next-nprogress-bar";
 import "./WatchSession.module.css";
-import ShareMediaModal from "./ShareMediaModal";
+// import ShareMediaModal from "./ShareMediaModal";
 import { BASE_URL } from "@/config/constants";
 import toast, { Toaster } from "react-hot-toast";
 import { Tooltip } from "@nextui-org/react";
@@ -30,6 +30,7 @@ import {
 import { UserProfileInterface } from "@/types/UserProfileTypes";
 import { usePathname } from "next/navigation";
 import { formatTimeAgo } from "@/utils/getRelativeTime";
+import ShareMediaModal from "./ShareMediaModal";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -171,9 +172,9 @@ function WatchSession({
                     <Link
                       href={
                         data.uid_host
-                          ? data.dao_name === ("optimism" || "Optimism")
+                          ? data.dao_name.toLowerCase() === "optimism"
                             ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            : data.dao_name.toLowerCase() === "arbitrum"
                             ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                             : ""
                           : "#"
@@ -211,9 +212,9 @@ function WatchSession({
                     <Link
                       href={
                         data.onchain_host_uid
-                          ? data.dao_name === ("optimism" || "Optimism")
+                          ? data.dao_name.toLowerCase() === "optimism"
                             ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
-                            : data.dao_name === ("arbitrum" || "Arbitrum")
+                            : data.dao_name.toLowerCase() === "arbitrum"
                             ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                             : ""
                           : "#"
@@ -291,15 +292,6 @@ function WatchSession({
                 <>
                   <div
                     className="flex items-center gap-1 cursor-pointer"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    <div>
-                      <PiFlagFill color="#FF0000" size={20} />
-                    </div>
-                    <div className="text-[#FF0000]">Report</div>
-                  </div>
-                  <div
-                    className="flex items-center gap-1 cursor-pointer"
                     onClick={() => setShareModal(true)}
                   >
                     <div className="scale-x-[-1]">
@@ -370,9 +362,9 @@ function WatchSession({
                         >
                           <Link
                             href={
-                              data.dao_name === ("optimism" || "Optimism")
+                              data.dao_name.toLowerCase() === "optimism"
                                 ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                                : data.dao_name === ("arbitrum" || "Arbitrum")
+                                : data.dao_name.toLowerCase() === "arbitrum"
                                 ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                                 : ""
                             }
@@ -407,9 +399,9 @@ function WatchSession({
                         >
                           <Link
                             href={
-                              data.dao_name === ("optimism" || "Optimism")
+                              data.dao_name.toLowerCase() === "optimism"
                                 ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
-                                : data.dao_name === ("arbitrum" || "Arbitrum")
+                                : data.dao_name.toLowerCase() === "arbitrum"
                                 ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                                 : ""
                             }
@@ -478,14 +470,14 @@ function WatchSession({
         )}
       </div>
 
-      {modalOpen && (
+      {/* {modalOpen && (
         <ReportOptionModal
           data={data}
           collection={collection}
           isOpen={modalOpen}
           onClose={handleModalClose}
         />
-      )}
+      )} */}
 
       {shareModal && (
         <ShareMediaModal
