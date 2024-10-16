@@ -32,7 +32,7 @@ import {
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
 import { handleRecording, handleStopRecording } from "../HuddleUtils";
-import { BASE_URL } from "@/config/constants";
+import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 
 const BottomBar = ({
@@ -207,7 +207,7 @@ const BottomBar = ({
           };
 
           const response = await fetch(
-            "/api/update-recording-status",
+            `${APP_BASE_URL}/api/update-recording-status`,
             requestOptions
           );
           console.log("Response: ", response);
@@ -229,7 +229,7 @@ const BottomBar = ({
         myHeaders.append("x-wallet-address", address);
       }
       try {
-        const res = await fetch(`/api/update-office-hours/${hostAddress}`, {
+        const res = await fetch(`${APP_BASE_URL}/api/update-office-hours/${hostAddress}`, {
           method: "PUT",
           headers: myHeaders,
         });

@@ -37,6 +37,7 @@ import { fetchEnsName } from "@/utils/ENSUtils";
 import { truncateAddress } from "@/utils/text";
 import { useSession } from "next-auth/react";
 import { useConnection } from "@/app/hooks/useConnection";
+import { APP_BASE_URL } from "@/config/constants";
 
 type lobbyProps = {};
 
@@ -199,7 +200,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         };
 
         const response = await fetch(
-          `/api/update-meeting-status/${params.roomId}`,
+          `${APP_BASE_URL}/api/update-meeting-status/${params.roomId}`,
           requestOptions
         );
         const responseData = await response.json();

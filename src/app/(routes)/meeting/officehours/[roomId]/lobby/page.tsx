@@ -32,7 +32,7 @@ import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithENS";
 import { useStudioState } from "@/store/studioState";
-import { BASE_URL } from "@/config/constants";
+import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 
 type lobbyProps = {};
 
@@ -146,7 +146,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             redirect: "follow",
           };
           const response = await fetch(
-            `${BASE_URL}/api/update-meeting-status/${params.roomId}`,
+            `${APP_BASE_URL}/api/update-meeting-status/${params.roomId}`,
             requestOptions
           );
           const responseData = await response.json();
@@ -185,7 +185,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
     async function verifyMeetingId() {
       try {
-        const response = await fetch(`${BASE_URL}/api/verify-meeting-id`, requestOptions);
+        const response = await fetch(
+          `${BASE_URL}/api/verify-meeting-id`,
+          requestOptions
+        );
         const result = await response.json();
 
         if (result.success) {
@@ -248,7 +251,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <button
                   onClick={() => setIsOpen((prev) => !prev)}
                   type="button"
-                  className="text-white absolute bottom-0 right-0 z-10">
+                  className="text-white absolute bottom-0 right-0 z-10"
+                >
                   {BasicIcons.edit}
                 </button>
                 <FeatCommon
@@ -257,7 +261,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     isOpen
                       ? "absolute top-4 block"
                       : "absolute top-1/2 -translate-y-1/2 hidden "
-                  }>
+                  }
+                >
                   <div className="relative mt-5">
                     <div className="grid-cols-3 grid h-full w-full place-items-center gap-6  px-6 ">
                       {Array.from({ length: 20 }).map((_, i) => {
@@ -269,7 +274,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                             isActive={avatarUrl === url}
                             onClick={() => {
                               setAvatarUrl(url);
-                            }}>
+                            }}
+                          >
                             <Image
                               src={url}
                               alt={`avatar-${i}`}
@@ -315,7 +321,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             <div className="flex items-center w-full">
               <button
                 className="flex items-center justify-center bg-blue-shade-100 text-slate-100 rounded-md p-2 mt-2 w-full"
-                onClick={() => handleStartSpaces()}>
+                onClick={() => handleStartSpaces()}
+              >
                 {isJoining ? "Joining Spaces..." : "Start meeting"}
                 {!isJoining && (
                   <Image
@@ -354,7 +361,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
                   href={`/profile/${address}?active=info`}
-                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out">
+                  className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
+                >
                   Back to Profile
                 </Link>
               </div>

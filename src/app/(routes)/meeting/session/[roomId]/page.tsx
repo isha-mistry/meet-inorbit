@@ -52,6 +52,7 @@ import {
   handleCloseMeeting,
   startRecording,
 } from "@/components/Huddle/HuddleUtils";
+import { APP_BASE_URL } from "@/config/constants";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -301,9 +302,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const handleModalClose = () => {
     setModalOpen(false);
     if (address === hostAddress) {
-      push(`/profile/${address}?active=sessions&session=hosted`);
+      push(`${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`);
     } else {
-      push(`/profile/${address}?active=sessions&session=attended`);
+      push(
+        `${APP_BASE_URL}/profile/${address}?active=sessions&session=attended`
+      );
     }
   };
 

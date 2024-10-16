@@ -13,6 +13,7 @@ import Image from "next/image";
 import PageNotFound from "../PageNotFound/PageNotFound";
 import { IoClose } from "react-icons/io5";
 import SessionHostedModal from "@/components/ComponentUtils/SessionHostedModal";
+import { APP_BASE_URL } from "@/config/constants";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // useEffect(() => {
@@ -49,7 +50,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           redirect: "follow",
         };
         const response = await fetch(
-          `/api/get-watch-data/${roomId}`,
+          `${APP_BASE_URL}/api/get-watch-data/${roomId}`,
           requestOptions
         );
         // if (!response.ok) {
@@ -111,7 +112,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           redirect: "follow",
         };
         const response = await fetch(
-          `/api/update-recorded-session`,
+          `${APP_BASE_URL}/api/update-recorded-session`,
           requestOptions
         );
         if (response) {
@@ -200,7 +201,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
-                          `/profile/${address}?active=sessions&session=hosted`
+                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
                         )
                       }
                     >
