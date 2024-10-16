@@ -52,3 +52,8 @@ export const ATTESTATION_ARB_URL =
   process.env.NODE_ENV == "development"
     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
+
+export const APP_BASE_URL =
+  process.env.NODE_ENV == "development"
+    ? process.env.NEXT_PUBLIC_LOCAL_APP_URL
+    : process.env.NEXT_PUBLIC_HOSTED_APP_URL;
