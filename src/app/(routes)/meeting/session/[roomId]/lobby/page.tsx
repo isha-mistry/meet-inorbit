@@ -442,9 +442,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           }`}
         >
           <main className="flex h-screen flex-col bg-lobby text-slate-100 font-poppins backdrop-blur-md">
-            <div className="text-4xl font-semibold font-quanty tracking-wide px-10 pt-4">
-              <span className="text-black">Chora</span>
-              <span className="text-blue-shade-100">Club</span>
+            <div className="flex justify-between px-10 pt-4">
+              <div className="text-4xl font-semibold font-quanty tracking-wide ">
+                <span className="text-black">Chora</span>
+                <span className="text-blue-shade-100">Club</span>
+              </div>
               <ConnectWalletWithENS />
             </div>
             <div className="flex w-full items-center justify-center my-auto">
