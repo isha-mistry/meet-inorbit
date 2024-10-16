@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 async function AccountCreate(user: any, token: any, referrer: string | null) {
   try {
     // const referrer = sessionStorage.getItem("referrer");
-    const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
+    const res = await fetch(`/api/auth/accountcreate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -207,7 +207,7 @@ const BottomBar = ({
           };
 
           const response = await fetch(
-            `${APP_BASE_URL}/api/update-recording-status`,
+            `/api/update-recording-status`,
             requestOptions
           );
           console.log("Response: ", response);
@@ -229,10 +229,13 @@ const BottomBar = ({
         myHeaders.append("x-wallet-address", address);
       }
       try {
-        const res = await fetch(`${APP_BASE_URL}/api/update-office-hours/${hostAddress}`, {
-          method: "PUT",
-          headers: myHeaders,
-        });
+        const res = await fetch(
+          `${APP_BASE_URL}/api/update-office-hours/${hostAddress}`,
+          {
+            method: "PUT",
+            headers: myHeaders,
+          }
+        );
         const res_data = await res.json();
 
         // if (res_data.success) {

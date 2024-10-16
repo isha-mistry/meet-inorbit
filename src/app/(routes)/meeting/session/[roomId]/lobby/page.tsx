@@ -200,7 +200,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         };
 
         const response = await fetch(
-          `${APP_BASE_URL}/api/update-meeting-status/${params.roomId}`,
+          `/api/update-meeting-status/${params.roomId}`,
           requestOptions
         );
         const responseData = await response.json();
@@ -445,6 +445,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             <div className="text-4xl font-semibold font-quanty tracking-wide px-10 pt-4">
               <span className="text-black">Chora</span>
               <span className="text-blue-shade-100">Club</span>
+              <ConnectWalletWithENS />
             </div>
             <div className="flex w-full items-center justify-center my-auto">
               <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
@@ -533,7 +534,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   </FeatCommon> */}
                   </div>
                 </div>
-                {!isConnected ? <ConnectWalletWithENS /> : null}
+
                 <div className="flex items-center w-full flex-col">
                   <div
                     className={`flex flex-col justify-center w-full gap-1 ${

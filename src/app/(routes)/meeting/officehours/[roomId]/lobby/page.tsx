@@ -91,7 +91,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             if (address) {
               myHeaders.append("x-wallet-address", address);
             }
-            const response = await fetch(`${BASE_URL}/api/new-token`, {
+            const response = await fetch(`/api/new-token`, {
               method: "POST",
               headers: myHeaders,
               body: JSON.stringify(requestBody),
@@ -146,7 +146,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             redirect: "follow",
           };
           const response = await fetch(
-            `${APP_BASE_URL}/api/update-meeting-status/${params.roomId}`,
+            `/api/update-meeting-status/${params.roomId}`,
             requestOptions
           );
           const responseData = await response.json();
@@ -186,7 +186,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     async function verifyMeetingId() {
       try {
         const response = await fetch(
-          `${BASE_URL}/api/verify-meeting-id`,
+          `/api/verify-meeting-id`,
           requestOptions
         );
         const result = await response.json();

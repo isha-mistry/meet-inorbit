@@ -1,3 +1,4 @@
+import { APP_BASE_URL } from "@/config/constants";
 import { SessionInterface } from "@/types/MeetingTypes";
 import toast from "react-hot-toast";
 
@@ -119,7 +120,10 @@ export const handleCloseMeeting = async (
       }),
     };
 
-    const response = await fetch("/api/end-call", requestOptions);
+    const response = await fetch(
+      `/api/end-call`,
+      requestOptions
+    );
     const result = await response.json();
     console.log("result in end call::", result);
 
