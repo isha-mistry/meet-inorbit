@@ -52,7 +52,7 @@ import {
   handleCloseMeeting,
   startRecording,
 } from "@/components/Huddle/HuddleUtils";
-import { APP_BASE_URL } from "@/config/constants";
+import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -471,6 +471,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //   }
   // }, [isRecording]);
 
+
   return (
     <>
       {isAllowToEnter ? (
@@ -524,14 +525,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       <div className="flex space-x-2">
                         <span className="p-2 bg-gray-200 rounded-lg text-black">
                           {typeof window !== "undefined" &&
-                            `https://${window.location.host}${path}`}
+                            `${BASE_URL}/${path}`}
                         </span>
                         <Button
                           className="bg-gray-200 hover:bg-gray-300 text-gray-900"
                           onClick={() => {
                             if (typeof window === "undefined") return;
                             navigator.clipboard.writeText(
-                              `https://${window.location.host}${path}/lobby`
+                              `${BASE_URL}/${path}/lobby`
                             );
                             setIsCopied(true);
                             setTimeout(() => {

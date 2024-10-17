@@ -46,6 +46,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       hostAddress: string;
     } = await req.json();
 
+    console.log(
+      "inside end call::: ",
+      roomId,
+      meetingType,
+      dao_name,
+      hostAddress
+    );
     if (!roomId) {
       return NextResponse.json(
         { success: false, error: "roomId parameter is required" },

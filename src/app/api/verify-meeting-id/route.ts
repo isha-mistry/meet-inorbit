@@ -28,13 +28,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Find document based on roomId
     const meeting = await collection.findOne({ meetingId: roomId });
+    console.log("verify meeting data :: ", meeting)
 
     // Check if meeting exists
     if (!meeting) {
       // Meeting does not exist
       return NextResponse.json(
-        { success: true, message: "Meeting does not exist" },
-        { status: 200 }
+        { success: false, message: "Meeting does not exist" },
+        { status: 404 }
       );
     } else {
       console.log("meeting data:", meeting);

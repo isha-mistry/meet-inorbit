@@ -25,7 +25,7 @@ import {
   useRoom,
 } from "@huddle01/react/hooks";
 import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
@@ -77,10 +77,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { data: session } = useSession();
   const { isConnected, isPageLoading, isSessionLoading, isReady } =
     useConnection();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     console.log("meetingStatus", meetingStatus);
   }, [meetingStatus]);
+
+  useEffect(() => {
+    if (!isConnected && openConnectModal) {
+      openConnectModal();
+    }
+  }, []);
 
   const handleStartSpaces = async () => {
     console.log("in start spaces");
@@ -300,6 +307,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       try {
         const response = await fetch("/api/verify-meeting-id", requestOptions);
         const result = await response.json();
+        console.log("Resulttt of verify id:::: ", result);
 
         if (result.success) {
           setMeetingData(result.data);
@@ -361,39 +369,43 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         myHeaders.append("Content-Type", "application/json");
         if (address) {
           myHeaders.append("x-wallet-address", address);
-        }
 
-        const raw = JSON.stringify({
-          address: address,
-          // daoName: dao,
-        });
-
-        const requestOptions: any = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
-        console.log("Req OPTIONS", requestOptions);
-        const response = await fetch(`/api/profile/${address}`, requestOptions);
-        const result = await response.json();
-        const resultData = await result.data;
-        console.log("result data: ", resultData);
-
-        if (Array.isArray(resultData)) {
-          const filtered: any = resultData.filter((data) => {
-            return data.displayName !== "";
+          const raw = JSON.stringify({
+            address: address,
+            // daoName: dao,
           });
-          console.log("filtered profile: ", filtered);
-          setProfileDetails(filtered[0]);
-          const imageCid = filtered[0]?.image;
-          if (imageCid) {
-            setAvatarUrl(`https://gateway.lighthouse.storage/ipfs/${imageCid}`);
-          }
 
-          if (address) {
+          const requestOptions: any = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+          console.log("Req OPTIONS", requestOptions);
+          const response = await fetch(
+            `/api/profile/${address}`,
+            requestOptions
+          );
+          const result = await response.json();
+          const resultData = await result.data;
+          console.log("result data: ", resultData);
+
+          if (Array.isArray(resultData)) {
+            const filtered: any = resultData.filter((data) => {
+              return data.displayName !== "";
+            });
+            console.log("filtered profile: ", filtered);
+            setProfileDetails(filtered[0]);
+            const imageCid = filtered[0]?.image;
+            if (imageCid) {
+              setAvatarUrl(
+                `https://gateway.lighthouse.storage/ipfs/${imageCid}`
+              );
+            }
+
+            // if (address) {
             const getName = await fetchEnsName(address?.toString());
-            const getEnsNameOfAddress = await getName?.ensName;
+            const getEnsNameOfAddress = getName?.ensName;
             console.log("formattedAddress ", getEnsNameOfAddress);
             if (getEnsNameOfAddress) {
               setName(getEnsNameOfAddress);
@@ -401,33 +413,18 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               const formattedAddress = await truncateAddress(address);
               setName(formattedAddress);
             }
+            // }
+            setIsLoading(false);
+          } else if (!isConnected && openConnectModal) {
+            openConnectModal();
           }
-          setIsLoading(false);
         }
-
-        // if (resultData.length === 0) {
-        // const res = await fetch(
-        //   `https://api.karmahq.xyz/api/dao/find-delegate?dao=${dao}&user=${address}`
-        // );
-        // const result = await response.json();
-        // const resultData = await result.data.delegate;
-
-        // setProfileDetails(resultData);
-        // setIsLoading(false);
-
-        // if (resultData.ensName !== null) {
-        //   setName(resultData.ensName);
-        // } else {
-
-        // setName(formattedAddress);
-        // }
-        // }
       } catch (error) {
         console.log("Error in catch: ", error);
       }
     };
     fetchData();
-  }, [address]);
+  }, [address, isConnected]);
 
   return (
     <>
@@ -644,7 +641,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
-                  href={`/profile/${address}?active=info`}
+                  href={`/`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile
