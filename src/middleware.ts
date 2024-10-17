@@ -5,12 +5,20 @@ import { getToken } from "next-auth/jwt";
 const normalizeOrigin = (url: string) => url?.replace(/\/$/, "");
 
 const allowedOrigins = [
-  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_APP_URL!),
-  normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_APP_URL!),
+  process.env.NEXT_PUBLIC_LOCAL_BASE_URL!,
+  process.env.NEXT_PUBLIC_HOSTED_BASE_URL!,
+  process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!,
+  process.env.NEXT_PUBLIC_LOCAL_APP_URL!,
+  process.env.NEXT_PUBLIC_HOSTED_APP_URL!,
 ].filter(Boolean);
+
+// const allowedOrigins = [
+//   normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_BASE_URL!),
+//   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_BASE_URL!),
+//   normalizeOrigin(process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!),
+//   normalizeOrigin(process.env.NEXT_PUBLIC_LOCAL_APP_URL!),
+//   normalizeOrigin(process.env.NEXT_PUBLIC_HOSTED_APP_URL!),
+// ].filter(Boolean);
 
 const publicApis = ["/api/update-recording-status/:path*", "/api/end-call"];
 

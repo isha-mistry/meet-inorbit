@@ -275,7 +275,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error retrieving data:", error);
+    console.error("Error retrieving data in end call:", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }
