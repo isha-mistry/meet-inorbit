@@ -94,7 +94,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
-    console.error("Error retrieving data:", error);
+    console.error("Error retrieving data in getting attest data:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
       { status: 500 }
