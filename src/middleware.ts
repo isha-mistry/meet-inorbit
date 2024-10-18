@@ -11,8 +11,9 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 export async function middleware(request: NextRequest) {
-  const origin = request.headers.get("origin");
-
+  const origin = request.nextUrl.origin;
+  // const origin = request.headers.get("origin");
+  console.log("request:::", request.nextUrl.origin);
   console.log("Allowed Origins:", allowedOrigins);
   console.log("Origin from request:", origin);
 

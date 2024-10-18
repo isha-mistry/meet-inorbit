@@ -1,13 +1,27 @@
-import { APP_BASE_URL } from "@/config/constants";
+import { APP_BASE_URL, BASE_URL } from "@/config/constants";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 // export const revalidate = 0;
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const { meetingId, host_address, title, description, thumbnail_image } =
       await req.json();
-    // console.log("additionalData::", additionalData);
+    console.log(meetingId, host_address, title, description, thumbnail_image);
 
+    const token = await getToken({
+      req: req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    console.log("token::::", token?.accessToken);
+    const authorizationToken: any = token?.accessToken;
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (host_address) {
+      myHeaders.append("x-wallet-address", host_address);
+      myHeaders.append("Authorization", authorizationToken);
+    }
     const raw = JSON.stringify({
       meetingId: meetingId,
       host_address: host_address,
@@ -18,8 +32,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const requestOptions: any = {
       method: "PUT",
+      headers: myHeaders,
       body: raw,
-      redirect: "follow",
+      // redirect: "follow",
     };
     const response = await fetch(
       `${APP_BASE_URL}/api/update-recorded-session`,

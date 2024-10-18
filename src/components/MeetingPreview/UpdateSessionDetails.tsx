@@ -236,7 +236,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
-                          `/profile/${address}?active=sessions&session=hosted`
+                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
                         )
                       }
                     >
