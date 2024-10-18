@@ -375,6 +375,7 @@ const BottomBar = ({
                   address,
                   isRecording,
                   setIsRecording,
+                  meetingRecordingStatus,
                   setMeetingRecordingStatus
                 )
               }

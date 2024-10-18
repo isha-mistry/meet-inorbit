@@ -110,15 +110,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
 
-  let meetingType;
+  // let meetingType;
 
-  if (meetingCategory === "officehours") {
-    meetingType = 2;
-  } else if (meetingCategory === "session") {
-    meetingType = 1;
-  } else {
-    meetingType = 0;
-  }
+  // if (meetingCategory === "officehours") {
+  //   meetingType = 2;
+  // } else if (meetingCategory === "session") {
+  //   meetingType = 1;
+  // } else {
+  //   meetingType = 0;
+  // }
+  console.log("path: ", path);
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
@@ -470,7 +471,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //     }
   //   }
   // }, [isRecording]);
-
 
   return (
     <>

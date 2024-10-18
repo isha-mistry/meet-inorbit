@@ -367,54 +367,56 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       try {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
+        if (isAllowToEnter) {
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
 
-          const raw = JSON.stringify({
-            address: address,
-            // daoName: dao,
-          });
-
-          const requestOptions: any = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
-          console.log("Req OPTIONS", requestOptions);
-          const response = await fetch(
-            `/api/profile/${address}`,
-            requestOptions
-          );
-          const result = await response.json();
-          const resultData = await result.data;
-          console.log("result data: ", resultData);
-
-          if (Array.isArray(resultData)) {
-            const filtered: any = resultData.filter((data) => {
-              return data.displayName !== "";
+            const raw = JSON.stringify({
+              address: address,
+              // daoName: dao,
             });
-            console.log("filtered profile: ", filtered);
-            setProfileDetails(filtered[0]);
-            const imageCid = filtered[0]?.image;
-            if (imageCid) {
-              setAvatarUrl(
-                `https://gateway.lighthouse.storage/ipfs/${imageCid}`
-              );
-            }
 
-            // if (address) {
-            const getName = await fetchEnsName(address?.toString());
-            const getEnsNameOfAddress = getName?.ensName;
-            console.log("formattedAddress ", getEnsNameOfAddress);
-            if (getEnsNameOfAddress) {
-              setName(getEnsNameOfAddress);
-            } else {
-              const formattedAddress = await truncateAddress(address);
-              setName(formattedAddress);
+            const requestOptions: any = {
+              method: "POST",
+              headers: myHeaders,
+              body: raw,
+              redirect: "follow",
+            };
+            console.log("Req OPTIONS", requestOptions);
+            const response = await fetch(
+              `/api/profile/${address}`,
+              requestOptions
+            );
+            const result = await response.json();
+            const resultData = await result.data;
+            console.log("result data: ", resultData);
+
+            if (Array.isArray(resultData)) {
+              const filtered: any = resultData.filter((data) => {
+                return data.displayName !== "";
+              });
+              console.log("filtered profile: ", filtered);
+              setProfileDetails(filtered[0]);
+              const imageCid = filtered[0]?.image;
+              if (imageCid) {
+                setAvatarUrl(
+                  `https://gateway.lighthouse.storage/ipfs/${imageCid}`
+                );
+              }
+
+              // if (address) {
+              const getName = await fetchEnsName(address?.toString());
+              const getEnsNameOfAddress = getName?.ensName;
+              console.log("formattedAddress ", getEnsNameOfAddress);
+              if (getEnsNameOfAddress) {
+                setName(getEnsNameOfAddress);
+              } else {
+                const formattedAddress = await truncateAddress(address);
+                setName(formattedAddress);
+              }
+              // }
+              setIsLoading(false);
             }
-            // }
-            setIsLoading(false);
           } else if (!isConnected && openConnectModal) {
             openConnectModal();
           }
@@ -424,7 +426,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
     fetchData();
-  }, [address, isConnected]);
+  }, [address, isConnected, isAllowToEnter]);
 
   return (
     <>

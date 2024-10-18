@@ -120,10 +120,7 @@ export const handleCloseMeeting = async (
       }),
     };
 
-    const response = await fetch(
-      `/api/end-call`,
-      requestOptions
-    );
+    const response = await fetch(`/api/end-call`, requestOptions);
     const result = await response.json();
     console.log("result in end call::", result);
 
@@ -179,9 +176,10 @@ export const handleRecording = async (
   address: string | undefined,
   isRecording: boolean | null,
   setIsRecording: (val: boolean | null) => void,
+  meetingRecordingStatus: boolean,
   setMeetingRecordingStatus: (val: boolean) => void
 ) => {
-  if (isRecording) {
+  if (meetingRecordingStatus) {
     setMeetingRecordingStatus(false);
     handleStopRecording(roomId, address, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
