@@ -109,13 +109,13 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         });
 
         const requestOptions: any = {
-          method: "PUT",
+          method: "POST",
           headers: myHeaders,
           body: raw,
           redirect: "follow",
         };
         const response = await fetch(
-          `${APP_BASE_URL}/api/update-recorded-session`,
+          `/api/update-recorded-session`,
           requestOptions
         );
         if (response) {
