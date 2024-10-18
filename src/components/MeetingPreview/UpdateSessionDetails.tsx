@@ -14,6 +14,7 @@ import PageNotFound from "../PageNotFound/PageNotFound";
 import { IoClose } from "react-icons/io5";
 import SessionHostedModal from "@/components/ComponentUtils/SessionHostedModal";
 import { APP_BASE_URL } from "@/config/constants";
+import { getToken } from "next-auth/jwt";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // useEffect(() => {
@@ -45,18 +46,20 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   useEffect(() => {
     async function fetchData() {
       try {
+        const params = new URLSearchParams({
+          roomId: roomId,
+        });
         const requestOptions: any = {
           method: "GET",
           redirect: "follow",
         };
         const response = await fetch(
-          `${APP_BASE_URL}/api/get-watch-data/${roomId}`,
+          `/api/get-watch-data?${params.toString()}`,
           requestOptions
         );
-        // if (!response.ok) {
-        //   throw new Error("Network response was not ok");
-        // }
+
         const result = await response.json();
+        console.log("result in get watch data::", result);
         setData(result.data[0]);
         setCollection(result.collection);
         setShowPopup(true);
