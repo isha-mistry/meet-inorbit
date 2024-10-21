@@ -4,6 +4,7 @@ import { ImCross } from "react-icons/im";
 import { Oval } from "react-loader-spinner";
 import { popups } from "./FeedbackPrompts";
 import PopupContent from "./PopupContent";
+import { fetchApi } from "@/utils/api";
 
 function PopupSlider({
   role,
@@ -84,8 +85,8 @@ function PopupSlider({
         redirect: "follow",
       };
 
-      const response = await fetch(
-        "/api/feedback/store-feedback",
+      const response = await fetchApi(
+        "/feedback/store-feedback",
         requestOptions
       );
 

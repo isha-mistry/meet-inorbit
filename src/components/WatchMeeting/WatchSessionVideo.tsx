@@ -7,6 +7,7 @@ import {
   SessionInterface,
 } from "@/types/MeetingTypes";
 import { UserProfileInterface } from "@/types/UserProfileTypes";
+import { fetchApi } from "@/utils/api";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -123,8 +124,8 @@ function WatchSessionVideo({
         body: raw,
         redirect: "follow",
       };
-      const response = await fetch("/api/counting-views", requestOptions);
-      const data = await response.json();
+      // const response = await fetchApi("/counting-views", requestOptions);
+      // const data = await response.json();
       // console.log("Response from API", data);
     } catch (error) {
       console.error("Error in views:", error);

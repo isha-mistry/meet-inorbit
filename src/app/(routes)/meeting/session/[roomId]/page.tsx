@@ -53,6 +53,7 @@ import {
   startRecording,
 } from "@/components/Huddle/HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -144,8 +145,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
             redirect: "follow",
           };
 
-          const response = await fetch(
-            "/api/feedback/get-feedback-status",
+          const response = await fetchApi(
+            "/feedback/get-feedback-status",
             requestOptions
           );
 
@@ -331,7 +332,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           body: raw,
           redirect: "follow",
         };
-        const response = await fetch("/api/verify-meeting-id", requestOptions);
+        const response = await fetchApi("/verify-meeting-id", requestOptions);
         const result = await response.json();
 
         if (result.success) {

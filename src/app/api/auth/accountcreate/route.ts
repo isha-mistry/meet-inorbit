@@ -36,6 +36,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       // console.log("Decoded", decoded);
       UserAddress = decoded.address;
     } catch (error) {
+      console.log("Invalid token:", error);
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 

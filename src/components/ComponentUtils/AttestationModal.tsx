@@ -8,6 +8,7 @@ import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 import { useAccount } from "wagmi";
 import StarRating from "../FeedbackPopup/RatingTypes/StarRating";
+import { fetchApi } from "@/utils/api";
 
 function AttestationModal({
   isOpen,
@@ -99,8 +100,8 @@ function AttestationModal({
         redirect: "follow",
       };
 
-      const response = await fetch(
-        "/api/feedback/store-feedback",
+      const response = await fetchApi(
+        "/feedback/store-feedback",
         requestOptions
       );
 

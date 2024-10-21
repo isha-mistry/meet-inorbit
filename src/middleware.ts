@@ -99,6 +99,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [
+    "/api/proxy/:path",
     "/api/end-call/:path*",
     "/api/update-meeting-status/:path*",
     "/api/update-recorded-session/:path*",

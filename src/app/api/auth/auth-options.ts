@@ -7,8 +7,11 @@ import jwt from "jsonwebtoken";
 
 async function AccountCreate(user: any, token: any, referrer: string | null) {
   try {
+    console.log(user);
+    console.log(token);
+    console.log(referrer);
     // const referrer = sessionStorage.getItem("referrer");
-    const res = await fetch(`/api/auth/accountcreate`, {
+    const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,8 +74,8 @@ export const authOptions: NextAuthOptions = {
           const result = await siwe.verify({
             signature: credentials?.signature || "",
             domain: nextAuthUrl.host,
-            // nonce: await getCsrfToken({ req }),
-            nonce: await getCsrfToken({ req: { headers: req.headers } }),
+            nonce: await getCsrfToken({ req }),
+            // nonce: await getCsrfToken({ req: { headers: req.headers } }),
           });
           console.log(result);
           if (result.success) {

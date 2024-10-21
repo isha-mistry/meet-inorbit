@@ -15,6 +15,7 @@ import { IoClose } from "react-icons/io5";
 import SessionHostedModal from "@/components/ComponentUtils/SessionHostedModal";
 import { APP_BASE_URL } from "@/config/constants";
 import { getToken } from "next-auth/jwt";
+import { fetchApi } from "@/utils/api";
 
 function UpdateSessionDetails({ roomId }: { roomId: string }) {
   // useEffect(() => {
@@ -53,8 +54,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           method: "GET",
           redirect: "follow",
         };
-        const response = await fetch(
-          `/api/get-watch-data?${params.toString()}`,
+        const response = await fetchApi(
+          `/get-watch-data?${params.toString()}`,
           requestOptions
         );
 
@@ -114,8 +115,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           body: raw,
           redirect: "follow",
         };
-        const response = await fetch(
-          `/api/update-recorded-session`,
+        const response = await fetchApi(
+          `/update-recorded-session`,
           requestOptions
         );
         if (response) {

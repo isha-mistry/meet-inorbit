@@ -34,6 +34,7 @@ import QuickLinks from "./QuickLinks";
 import { handleRecording, handleStopRecording } from "../HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
+import { fetchApi } from "@/utils/api";
 
 const BottomBar = ({
   daoName,
@@ -123,7 +124,7 @@ const BottomBar = ({
         };
 
         try {
-          const response = await fetch("/api/update-video-uri", requestOptions);
+          const response = await fetchApi("/update-video-uri", requestOptions);
           const result = await response.json();
           console.log(result);
         } catch (error) {
@@ -206,8 +207,8 @@ const BottomBar = ({
             }),
           };
 
-          const response = await fetch(
-            `/api/update-recording-status`,
+          const response = await fetchApi(
+            `/update-recording-status`,
             requestOptions
           );
           console.log("Response: ", response);

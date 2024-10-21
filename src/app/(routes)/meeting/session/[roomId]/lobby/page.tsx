@@ -38,6 +38,7 @@ import { truncateAddress } from "@/utils/text";
 import { useSession } from "next-auth/react";
 import { useConnection } from "@/app/hooks/useConnection";
 import { APP_BASE_URL } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 
 type lobbyProps = {};
 
@@ -111,7 +112,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       //   body: raw,
       //   redirect: "follow",
       // };
-      // const response = await fetch("/api/verify-meeting-id", requestOptions);
+      // const response = await fetchApi("/verify-meeting-id", requestOptions);
       // const result = await response.json();
 
       // if (result.success) {
@@ -147,7 +148,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           if (address) {
             myHeaders.append("x-wallet-address", address);
           }
-          const response = await fetch("/api/new-token", {
+          const response = await fetchApi("/new-token", {
             method: "POST",
             headers: myHeaders,
             body: JSON.stringify(requestBody),
@@ -206,8 +207,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           redirect: "follow",
         };
 
-        const response = await fetch(
-          `/api/update-meeting-status/${params.roomId}`,
+        const response = await fetchApi(
+          `/update-meeting-status/${params.roomId}`,
           requestOptions
         );
         const responseData = await response.json();
@@ -270,7 +271,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: raw,
         };
 
-        fetch("/api/update-session-attendees", requestOptions)
+        fetchApi("/update-session-attendees", requestOptions)
           .then((response) => response.text())
           .then((result) => console.log(result))
           .catch((error) => console.error(error));
@@ -305,7 +306,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
     async function verifyMeetingId() {
       try {
-        const response = await fetch("/api/verify-meeting-id", requestOptions);
+        const response = await fetchApi("/verify-meeting-id", requestOptions);
         const result = await response.json();
         console.log("Resulttt of verify id:::: ", result);
 
@@ -383,8 +384,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               redirect: "follow",
             };
             console.log("Req OPTIONS", requestOptions);
-            const response = await fetch(
-              `/api/profile/${address}`,
+            const response = await fetchApi(
+              `/profile/${address}`,
               requestOptions
             );
             const result = await response.json();

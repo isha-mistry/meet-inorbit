@@ -1,5 +1,6 @@
 import { APP_BASE_URL } from "@/config/constants";
 import { SessionInterface } from "@/types/MeetingTypes";
+import { fetchApi } from "@/utils/api";
 import toast from "react-hot-toast";
 
 export const startRecording = async (
@@ -21,7 +22,7 @@ export const startRecording = async (
       }),
     };
 
-    const status = await fetch(`/api/startRecording/${roomId}`, requestOptions);
+    const status = await fetchApi(`/startRecording/${roomId}`, requestOptions);
     if (!status.ok) {
       console.error(`Request failed with status: ${status.status}`);
       toast.error("Failed to start recording");
@@ -59,8 +60,8 @@ export const handleStopRecording = async (
         roomId: roomId,
       }),
     };
-    const response = await fetch(
-      `/api/stopRecording/${roomId}`,
+    const response = await fetchApi(
+      `/stopRecording/${roomId}`,
       requestOptions
     );
     const data = await response.json();
@@ -120,7 +121,7 @@ export const handleCloseMeeting = async (
       }),
     };
 
-    const response = await fetch(`/api/end-call`, requestOptions);
+    const response = await fetchApi(`/end-call`, requestOptions);
     const result = await response.json();
     console.log("result in end call::", result);
 
@@ -146,7 +147,7 @@ export const handleCloseMeeting = async (
         if (address) {
           myHeaders.append("x-wallet-address", address);
         }
-        const response = await fetch(`/api/get-attest-data`, {
+        const response = await fetchApi(`/get-attest-data`, {
           method: "POST",
           headers: myHeaders,
           body: JSON.stringify({
