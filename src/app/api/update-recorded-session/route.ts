@@ -2,6 +2,7 @@ import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import useAuthentication from "@/app/hooks/useAuthentication";
 // export const revalidate = 0;
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -10,17 +11,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
       await req.json();
     console.log(meetingId, host_address, title, description, thumbnail_image);
 
-    const token = await getToken({
-      req: req,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
-    console.log("token::::", token?.accessToken);
-    const authorizationToken: any = token?.accessToken;
+    const { isAuthorized, token, origin } = await useAuthentication(
+      req,
+      host_address
+    );
+
     const myHeaders = new Headers();
+
     myHeaders.append("Content-Type", "application/json");
     if (host_address) {
       myHeaders.append("x-wallet-address", host_address);
-      myHeaders.append("Authorization", authorizationToken);
+      myHeaders.append(
+        "Authorization",
+        JSON.stringify({ token, isAuthorized, origin })
+      );
     }
     const raw = JSON.stringify({
       meetingId: meetingId,
