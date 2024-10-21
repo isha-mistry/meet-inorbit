@@ -5,6 +5,7 @@ import { getToken } from "next-auth/jwt";
 // export const revalidate = 0;
 
 export async function POST(req: NextRequest, res: NextResponse) {
+  console.log("req object::", req);
   try {
     const { meetingId, host_address, title, description, thumbnail_image } =
       await req.json();
@@ -14,14 +15,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
       req: req,
       secret: process.env.NEXTAUTH_SECRET,
     });
-    console.log("token::::", token?.accessToken);
-    const authorizationToken: any = token?.accessToken;
+    console.log("token::::", token);
+    const authorizationToken: any = token;
+    // const authorizationToken: any = token?.accessToken;
+
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("x-api-key", process.env.NEXT_PUBLIC_TEST_API_KEY!);
     if (host_address) {
       myHeaders.append("x-wallet-address", host_address);
-      myHeaders.append("Authorization", authorizationToken);
+      myHeaders.append("Authorization", JSON.stringify(authorizationToken));
     }
+
     const raw = JSON.stringify({
       meetingId: meetingId,
       host_address: host_address,
