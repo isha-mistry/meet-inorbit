@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/config/constants";
+import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { useRouter } from "next-nprogress-bar";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -62,7 +62,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
             className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"
             onClick={() =>
               router.push(
-                `/profile/${data.host_address}?active=sessions&session=hosted`
+                `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
               )
             }
           />
@@ -106,7 +106,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
                 className="bg-black hover:bg-blue-shade-200 text-white flex items-center justify-center py-4 rounded-full w-[178px]"
                 onClick={() =>
                   router.push(
-                    `/profile/${data.host_address}?active=sessions&session=hosted`
+                    `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
                   )
                 }
               >
