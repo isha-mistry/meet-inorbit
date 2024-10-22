@@ -1,4 +1,3 @@
-import useAuthentication from "@/app/hooks/useAuthentication";
 import { BASE_URL } from "@/config/constants";
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
@@ -29,10 +28,10 @@ async function handler(
   //verify authentication
   if (["POST", "PUT", "DELETE"].includes(request.method)) {
     const walletAddress = request.headers.get("x-wallet-address");
-    const { token, isAuthorized, origin } = await useAuthentication(
-      request,
-      walletAddress!
-    );
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
 
     // If no token is present
     if (!token) {
@@ -49,10 +48,12 @@ async function handler(
       );
     }
 
+    const UserAddress = token.sub;
+
     // If wallet address doesn't match
-    if (!isAuthorized) {
+    if (walletAddress && UserAddress !== walletAddress) {
       console.log(
-        `Forbidden access attempt: By user with address :- ${walletAddress}`
+        `Forbidden access attempt: By user with address :- ${UserAddress}`
       );
       return new NextResponse(
         JSON.stringify({ error: "Forbidden - Address mismatch" }),
