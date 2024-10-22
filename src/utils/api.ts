@@ -40,5 +40,5 @@ export async function fetchApi(
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  return response.json();
+  return response;
 }
