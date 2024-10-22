@@ -18,12 +18,15 @@ async function handler(
   const headers = Object.fromEntries(request.headers);
 
   try {
-    const url = `${BASE_URL}/${path}${searchParams ? `?${searchParams}` : ""}`;
+    const url = `${BASE_URL}/api/${path}${
+      searchParams ? `?${searchParams}` : ""
+    }`;
     const response = await fetch(url, {
       method,
       headers: {
         ...headers,
-        Authorization: `Bearer ${process.env.API_KEY}`,
+        // Authorization: `Bearer ${process.env.API_KEY}`,
+        "x-api-key": `${process.env.NEXT_PUBLIC_TEST_API_KEY}`,
         "Content-Type": "application/json",
       },
       ...(requestBody && { body: JSON.stringify(requestBody) }),

@@ -54,8 +54,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
           method: "GET",
           redirect: "follow",
         };
-        const response = await fetchApi(
-          `/get-watch-data?${params.toString()}`,
+        const response = await fetch(
+          `/api/get-watch-data?${params.toString()}`,
           requestOptions
         );
 

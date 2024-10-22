@@ -95,36 +95,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     if (isDisconnected) {
       toast("Connect your wallet to join the meeting!");
     } else {
-      // const myHeaders = new Headers();
-      // myHeaders.append("Content-Type", "application/json");
-      // if (address) {
-      //   myHeaders.append("x-wallet-address", address);
-      // }
-
-      // const raw = JSON.stringify({
-      //   roomId: params.roomId,
-      //   meetingType: "session",
-      // });
-
-      // const requestOptions: any = {
-      //   method: "POST",
-      //   headers: myHeaders,
-      //   body: raw,
-      //   redirect: "follow",
-      // };
-      // const response = await fetchApi("/verify-meeting-id", requestOptions);
-      // const result = await response.json();
-
-      // if (result.success) {
-      //   setHostAddress(result.data.host_address);
-      //   setDaoName(result.data.dao_name);
-      // }
-      // if (result.message === "Meeting is ongoing") {
-      //   setMeetingStatus("Ongoing");
-      // }
-
-      // if (address === hostAddress || meetingStatus === "Ongoing") {
-      // if (address === hostAddress || result.message === "Meeting is ongoing") {
       setIsJoining(true);
 
       let role;
@@ -148,7 +118,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           if (address) {
             myHeaders.append("x-wallet-address", address);
           }
-          const response = await fetchApi("/new-token", {
+          const response = await fetch("/api/new-token", {
             method: "POST",
             headers: myHeaders,
             body: JSON.stringify(requestBody),
