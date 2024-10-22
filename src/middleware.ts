@@ -53,48 +53,48 @@ export async function middleware(request: NextRequest) {
   }
 
   // For POST, PUT, DELETE requests, verify authentication
-  if (["POST", "PUT", "DELETE"].includes(request.method)) {
-    const walletAddress = request.headers.get("x-wallet-address");
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
+  // if (["POST", "PUT", "DELETE"].includes(request.method)) {
+  //   const walletAddress = request.headers.get("x-wallet-address");
+  //   const token = await getToken({
+  //     req: request,
+  //     secret: process.env.NEXTAUTH_SECRET,
+  //   });
 
-    // If no token is present
-    if (!token) {
-      return new NextResponse(
-        JSON.stringify({ error: "Unauthorized - No token present" }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": origin || "*",
-            "Access-Control-Allow-Credentials": "true",
-          },
-        }
-      );
-    }
+  //   // If no token is present
+  //   if (!token) {
+  //     return new NextResponse(
+  //       JSON.stringify({ error: "Unauthorized - No token present" }),
+  //       {
+  //         status: 401,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Access-Control-Allow-Origin": origin || "*",
+  //           "Access-Control-Allow-Credentials": "true",
+  //         },
+  //       }
+  //     );
+  //   }
 
-    const UserAddress = token.sub;
+  //   const UserAddress = token.sub;
 
-    // If wallet address doesn't match
-    if (walletAddress && UserAddress !== walletAddress) {
-      console.log(
-        `Forbidden access attempt: By user with address :- ${UserAddress}`
-      );
-      return new NextResponse(
-        JSON.stringify({ error: "Forbidden - Address mismatch" }),
-        {
-          status: 403,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": origin || "*",
-            "Access-Control-Allow-Credentials": "true",
-          },
-        }
-      );
-    }
-  }
+  //   // If wallet address doesn't match
+  //   if (walletAddress && UserAddress !== walletAddress) {
+  //     console.log(
+  //       `Forbidden access attempt: By user with address :- ${UserAddress}`
+  //     );
+  //     return new NextResponse(
+  //       JSON.stringify({ error: "Forbidden - Address mismatch" }),
+  //       {
+  //         status: 403,
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Access-Control-Allow-Origin": origin || "*",
+  //           "Access-Control-Allow-Credentials": "true",
+  //         },
+  //       }
+  //     );
+  //   }
+  // }
 
   // If all checks pass, proceed with the request
   const response = NextResponse.next();

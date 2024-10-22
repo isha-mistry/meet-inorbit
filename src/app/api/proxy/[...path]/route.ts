@@ -1,5 +1,16 @@
 import { BASE_URL } from "@/config/constants";
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+
+const PUBLIC_ROUTES = [
+  "verify-meeting-id",
+  // Add more public routes as needed
+];
+
+// Helper function to check if the current path should bypass auth
+const shouldBypassAuth = (path: string): boolean => {
+  return PUBLIC_ROUTES.some((route) => path.startsWith(route));
+};
 
 async function handler(
   request: NextRequest,
@@ -12,6 +23,50 @@ async function handler(
   let requestBody;
   if (["POST", "PUT"].includes(method)) {
     requestBody = await request.json();
+  }
+
+  //verify authentication
+  if (["POST", "PUT", "DELETE"].includes(request.method)) {
+    const walletAddress = request.headers.get("x-wallet-address");
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    // If no token is present
+    if (!token) {
+      return new NextResponse(
+        JSON.stringify({ error: "Unauthorized - No token present" }),
+        {
+          status: 401,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": origin || "*",
+            "Access-Control-Allow-Credentials": "true",
+          },
+        }
+      );
+    }
+
+    const UserAddress = token.sub;
+
+    // If wallet address doesn't match
+    if (walletAddress && UserAddress !== walletAddress) {
+      console.log(
+        `Forbidden access attempt: By user with address :- ${UserAddress}`
+      );
+      return new NextResponse(
+        JSON.stringify({ error: "Forbidden - Address mismatch" }),
+        {
+          status: 403,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": origin || "*",
+            "Access-Control-Allow-Credentials": "true",
+          },
+        }
+      );
+    }
   }
 
   // Get all headers from the incoming request
