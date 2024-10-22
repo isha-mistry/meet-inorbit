@@ -126,8 +126,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
 
-    verifyMeetingId();
-  }, [params.roomId, address]);
+    if (isReady) {
+      verifyMeetingId();
+    }
+  }, [params.roomId, address, isReady]);
 
   // Fetch Profile Details
   useEffect(() => {
