@@ -194,7 +194,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       const role = address === hostAddress ? "host" : "guest";
 
       // Get room token
-      const tokenResponse = await fetch("/api/new-token", {
+      const tokenResponse = await fetchApi("/new-token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -208,7 +208,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         }),
       });
 
-      const token = await tokenResponse.text();
+      const token = await tokenResponse.json();
 
       // Join room
       await joinRoom({
