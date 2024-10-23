@@ -22,7 +22,7 @@ async function handler(
   const searchParams = request.nextUrl.searchParams.toString();
   console.log("path:::", path);
   let requestBody;
-  if (["POST", "PUT"].includes(method)) {
+  if (["POST", "PUT", "DELETE"].includes(method)) {
     requestBody = await request.json();
   }
 
@@ -80,7 +80,7 @@ async function handler(
       headers: {
         ...headers,
         // Authorization: `Bearer ${process.env.API_KEY}`,
-        "x-api-key": `${process.env.NEXT_PUBLIC_TEST_API_KEY}`,
+        "x-api-key": `${process.env.CHORA_CLUB_API_KEY}`,
         "Content-Type": "application/json",
       },
       ...(requestBody && { body: JSON.stringify(requestBody) }),

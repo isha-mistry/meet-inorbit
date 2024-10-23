@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const myHeaders = new Headers();
 
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("x-api-key", process.env.NEXT_PUBLIC_TEST_API_KEY!);
+    myHeaders.append("x-api-key", process.env.CHORA_CLUB_API_KEY!);
     myHeaders.append(
       "Authorization",
       JSON.stringify({ token, isAuthorized, origin })
