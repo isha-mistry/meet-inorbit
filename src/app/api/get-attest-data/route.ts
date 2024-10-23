@@ -1,10 +1,12 @@
 import { connectDB } from "@/config/connectDB";
 import { BASE_URL } from "@/config/constants";
+import { fetchApi } from "@/utils/api";
 import { NextRequest, NextResponse } from "next/server";
 
 async function delegateAttestationOffchain(data: any) {
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("x-api-key", process.env.MEETING_APP_API_KEY!);
   if (data.connectedAddress) {
     myHeaders.append("x-wallet-address", data.connectedAddress);
   }
@@ -15,6 +17,7 @@ async function delegateAttestationOffchain(data: any) {
     body: JSON.stringify(data),
   };
 
+  // const response = await fetchApi(`/attest-offchain`, requestOptions);
   const response = await fetch(
     `${BASE_URL}/api/attest-offchain/`,
     requestOptions

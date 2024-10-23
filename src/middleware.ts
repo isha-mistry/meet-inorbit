@@ -12,12 +12,30 @@ const allowedOrigins = [
 
 export async function middleware(request: NextRequest) {
   const origin = request.nextUrl.origin;
-  console.log("request:::", request);
-  console.log("request:::", request.nextUrl.origin);
+  const apiKey = request.headers.get("x-api-key");
+  const authorizationToken = request.headers.get("Authorization");
+  const walletAddress = request.headers.get("x-wallet-address");
+
   console.log("Allowed Origins:", allowedOrigins);
   console.log("Origin from request:", origin);
+  console.log("apiKey", apiKey);
+  console.log("authorizationToken", authorizationToken);
 
-  // Handle CORS pre-flight requests
+  if (!origin || !allowedOrigins.includes(origin)) {
+    console.log("Unknown origin request. Forbidden");
+    return new NextResponse(
+      JSON.stringify({ error: "Unknown origin request. Forbidden" }),
+      {
+        status: 403,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": origin,
+          "Referrer-Policy": "strict-origin",
+        },
+      }
+    );
+  }
+
   if (request.method === "OPTIONS") {
     return new NextResponse(null, {
       status: 200,
@@ -26,77 +44,61 @@ export async function middleware(request: NextRequest) {
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Authorization, x-wallet-address",
-        "Access-Control-Allow-Credentials": "true",
+        "Referrer-Policy": "strict-origin",
       },
     });
   }
 
-  // Check origin
-  if (origin && !allowedOrigins.includes(origin)) {
-    return new NextResponse(
-      JSON.stringify({ error: "Unknown origin request. Forbidden" }),
-      {
-        status: 403,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": origin,
-        },
-      }
-    );
-  }
-
-  // For GET requests, proceed without authentication
-  if (request.method === "GET") {
+  if (!["POST", "PUT", "DELETE"].includes(request.method)) {
     const response = NextResponse.next();
     setCorsHeaders(response, origin);
     return response;
   }
 
-  // For POST, PUT, DELETE requests, verify authentication
-  // if (["POST", "PUT", "DELETE"].includes(request.method)) {
-  //   const walletAddress = request.headers.get("x-wallet-address");
-  //   const token = await getToken({
-  //     req: request,
-  //     secret: process.env.NEXTAUTH_SECRET,
+  if (!apiKey || apiKey !== process.env.MEETING_APP_API_KEY!) {
+    console.log("Invalid API key. Forbidden");
+    return new NextResponse(
+      JSON.stringify({ error: "Invalid API key. Forbidden" }),
+      {
+        status: 403,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
+  // const token = await getToken({
+  //   req: request,
+  //   secret: process.env.NEXTAUTH_SECRET,
+  // });
+  // console.log("token", token);
+  // if (!token) {
+  //   console.log("Unauthorized");
+  //   return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
   //   });
-
-  //   // If no token is present
-  //   if (!token) {
-  //     return new NextResponse(
-  //       JSON.stringify({ error: "Unauthorized - No token present" }),
-  //       {
-  //         status: 401,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Access-Control-Allow-Origin": origin || "*",
-  //           "Access-Control-Allow-Credentials": "true",
-  //         },
-  //       }
-  //     );
-  //   }
-
-  //   const UserAddress = token.sub;
-
-  //   // If wallet address doesn't match
-  //   if (walletAddress && UserAddress !== walletAddress) {
-  //     console.log(
-  //       `Forbidden access attempt: By user with address :- ${UserAddress}`
-  //     );
-  //     return new NextResponse(
-  //       JSON.stringify({ error: "Forbidden - Address mismatch" }),
-  //       {
-  //         status: 403,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Access-Control-Allow-Origin": origin || "*",
-  //           "Access-Control-Allow-Credentials": "true",
-  //         },
-  //       }
-  //     );
-  //   }
   // }
 
-  // If all checks pass, proceed with the request
+  // const UserAddress = token.sub;
+
+  // if (UserAddress !== walletAddress) {
+  //   console.log(
+  //     `Forbidden access attempt: By user with address :- ${UserAddress}`
+  //   );
+  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+  //     status: 403,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Access-Control-Allow-Origin": origin || "*",
+  //     },
+  //   });
+  // }
+
   const response = NextResponse.next();
   setCorsHeaders(response, origin);
   return response;
@@ -112,7 +114,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, x-wallet-address"
   );
-  response.headers.set("Access-Control-Allow-Credentials", "true");
+  response.headers.set("Referrer-Policy", "strict-origin");
 }
 
 export const config = {
@@ -127,9 +129,9 @@ export const config = {
     "/api/get-attest-data/:path*",
     "/api/new-token/:path*",
     "/api/profile/:path*",
+    "/api/attest-offchain/:path",
   ],
 };
 
-// "/api/attest-offchain/:path",
 // "/api/verify-meeting-id/:path",
 // "/api/images/og/nft/:path",

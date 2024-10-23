@@ -80,8 +80,7 @@ async function handler(
       method,
       headers: {
         ...headers,
-        // Authorization: `Bearer ${process.env.API_KEY}`,
-        "x-api-key": `${process.env.CHORA_CLUB_API_KEY}`,
+        "x-api-key": `${process.env.MEETING_APP_API_KEY}`,
         "Content-Type": "application/json",
       },
       ...(requestBody && { body: JSON.stringify(requestBody) }),
