@@ -208,8 +208,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         }),
       });
 
-      const token = await tokenResponse.json();
-
+      const result = await tokenResponse.json();
+      console.log("token", result.token);
+      const token = result.token;
       // Join room
       await joinRoom({
         roomId: params.roomId,

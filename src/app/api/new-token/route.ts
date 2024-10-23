@@ -45,15 +45,17 @@ export async function POST(req: NextRequest) {
   console.log(roomId, role, displayName, address);
 
   if (!roomId) {
-    return new Response("Missing roomId", { status: 400 });
+    return NextResponse.json("Missing roomId", { status: 400 });
   }
 
   if (!role) {
-    return new Response("Missing role", { status: 400 });
+    // return new Response("Missing role", { status: 400 });
+    return NextResponse.json("Missing role", { status: 400 });
   }
 
   if (!displayName) {
-    return new Response("Missing displayName", { status: 400 });
+    // return new Response("Missing displayName", { status: 400 });
+    return NextResponse.json("Missing displayName", { status: 400 });
   }
 
   let token: string;
@@ -81,5 +83,6 @@ export async function POST(req: NextRequest) {
     token = await createToken(roomId, Role.HOST, displayName, address);
   }
 
-  return new Response(token, { status: 200 });
+  // return new Response(token, { status: 200 });
+  return NextResponse.json({ success: true, token }, { status: 200 });
 }

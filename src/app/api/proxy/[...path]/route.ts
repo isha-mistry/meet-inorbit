@@ -71,7 +71,7 @@ async function handler(
 
   // Get all headers from the incoming request
   const headers = Object.fromEntries(request.headers);
-  console.log("header from incoming request::", headers);
+  // console.log("header from incoming request::", headers);
 
   try {
     const url = `${BASE_URL}/api/${path}${
