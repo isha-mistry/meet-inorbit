@@ -22,6 +22,7 @@ import {
   updateAttendeeStatus,
   updateMeetingStatus,
 } from "@/utils/LobbyApiActions";
+import { APP_BASE_URL } from "@/config/constants";
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // State Management
@@ -271,7 +272,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             Oops, {notAllowedMessage}
           </div>
           <Link
-            href="/"
+            href={`${APP_BASE_URL}/profile/${address}?active=info`}
             className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300"
           >
             Back to Profile
