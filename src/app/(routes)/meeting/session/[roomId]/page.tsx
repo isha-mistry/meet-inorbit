@@ -161,19 +161,19 @@ export default function Component({ params }: { params: { roomId: string } }) {
             setShowFeedbackPopups(true);
           }
 
-          if (role === "host") {
-            setTimeout(async () => {
-              await handleCloseMeeting(
-                address,
-                meetingCategory,
-                params.roomId,
-                daoName,
-                hostAddress,
-                meetingData,
-                isRecording
-              );
-            }, 10000);
-          }
+          // if (role === "host") {
+          //   setTimeout(async () => {
+          //     await handleCloseMeeting(
+          //       address,
+          //       meetingCategory,
+          //       params.roomId,
+          //       daoName,
+          //       hostAddress,
+          //       meetingData,
+          //       isRecording
+          //     );
+          //   }, 10000);
+          // }
           setIsRecording(false);
         } else {
           router.push(`/meeting/session/${params.roomId}/lobby`);

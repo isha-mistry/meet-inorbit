@@ -31,7 +31,11 @@ import {
 } from "../../ui/dropdown-menu";
 import { SessionInterface } from "@/types/MeetingTypes";
 import QuickLinks from "./QuickLinks";
-import { handleRecording, handleStopRecording } from "../HuddleUtils";
+import {
+  handleCloseMeeting,
+  handleRecording,
+  handleStopRecording,
+} from "../HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 import { fetchApi } from "@/utils/api";
@@ -212,6 +216,19 @@ const BottomBar = ({
             requestOptions
           );
           console.log("Response: ", response);
+          if (role === "host") {
+            setTimeout(async () => {
+              await handleCloseMeeting(
+                address,
+                meetingCategory,
+                roomId,
+                daoName,
+                hostAddress,
+                meetingData,
+                isRecording
+              );
+            }, 4000);
+          }
         } catch (e) {
           console.log("Error: ", e);
         }
