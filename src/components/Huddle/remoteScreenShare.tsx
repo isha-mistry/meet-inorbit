@@ -35,7 +35,7 @@ const RemoteScreenShare = ({ peerId }: RemotePeerProps) => {
   return (
     <>
       {videoTrack && (
-        <div className="w-3/4">
+        <div className="w-full lg:w-[150%]">
           <GridContainer className="w-full h-full">
             <>
               <Video

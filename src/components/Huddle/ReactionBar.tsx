@@ -24,7 +24,7 @@ function ReactionBar() {
   return (
     <div>
       <div className="flex rounded-lg bg-gray-500/80 hover:bg-gray-600 items-center">
-        <div className="grid grid-cols-3 place-items-center gap-2 ps-2">
+        <div className="hidden lg:grid grid-cols-3 place-items-center gap-2 ps-2">
           {emojiList.map((emoji) => (
             <span
               key={emoji}

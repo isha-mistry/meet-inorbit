@@ -21,9 +21,10 @@ import Image from "next/image";
 
 interface RemotePeerProps {
   peerId: string;
+  className?: string;
 }
 
-const RemotePeer = ({ peerId }: RemotePeerProps) => {
+const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   const { stream: videoStream } = useRemoteVideo({ peerId });
   const { stream: audioStream, isAudioOn } = useRemoteAudio({ peerId });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
@@ -47,13 +48,10 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
   });
 
   return (
-    <GridContainer
+    <div
       className={clsx(
-        isScreenShared
-          ? "w-full h-full gap-y-2 mx-1"
-          : `w-[49%] ${
-              peerIds.length === 2 || peerIds.length === 3 ? "h-[49%]" : ""
-            }`
+        "bg-gray-100 bg-opacity-80 relative border border-white rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] w-full",
+        className
       )}
     >
       <div className="absolute left-4 top-4 text-3xl z-10">{reaction}</div>
@@ -90,7 +88,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
       {audioStream && (
         <Audio stream={audioStream} name={metadata?.displayName ?? "guest"} />
       )}
-    </GridContainer>
+    </div>
   );
 };
 

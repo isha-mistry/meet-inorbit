@@ -66,7 +66,7 @@ export default function RootLayout({
             <RootProviders>
               <HuddleContextProvider>
                 <div className="flex">
-                  <div className="w-[100%] ml-auto mt-[78px] sm:mt-[64px] lg:mt-0">
+                  <div className="w-[100%] ml-auto">
                     {/* <FeedbackTile /> */}
                     <div>{children}</div>
                   </div>

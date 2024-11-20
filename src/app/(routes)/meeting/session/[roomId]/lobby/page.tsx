@@ -8,7 +8,7 @@ import { useHuddle01, useRoom, useLocalPeer } from "@huddle01/react/hooks";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
-import { Oval, TailSpin } from "react-loader-spinner";
+import { Oval, RotatingLines } from "react-loader-spinner";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useConnection } from "@/app/hooks/useConnection";
@@ -210,7 +210,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       });
 
       const result = await tokenResponse.json();
-      console.log("token", result.token);
+      // console.log("token", result.token);
       const token = result.token;
       // Join room
       await joinRoom({
@@ -250,14 +250,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   if (isPageLoading || isSessionLoading || isApiCalling) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <TailSpin
-          visible={true}
-          height="80"
-          width="80"
-          color="#0500FF"
-          ariaLabel="tail-spin-loading"
-          radius="1"
-        />
+        <RotatingLines
+            strokeColor="#0356fc"
+            strokeWidth="5"
+            animationDuration="0.75"
+            width="60" 
+            visible={true}
+          />
       </div>
     );
   }
@@ -287,7 +286,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter === true && (
         <div
-          className={`h-screen bg-contain bg-center bg-no-repeat rounded-full ${
+          className={`min-h-screen bg-contain bg-center bg-no-repeat rounded-full ${
             daoName === "optimism"
               ? "bg-op-logo"
               : daoName === "arbitrum"
@@ -295,8 +294,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               : ""
           }`}
         >
-          <main className="flex h-screen flex-col bg-lobby text-slate-100 font-poppins backdrop-blur-md">
-            <div className="flex justify-between px-10 pt-4">
+          <main className="flex min-h-screen flex-col bg-lobby text-slate-100 font-poppins backdrop-blur-md">
+            <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
               <div className="text-4xl font-semibold font-quanty tracking-wide">
                 <span className="text-black">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
@@ -304,11 +303,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               <ConnectWalletWithENS />
             </div>
 
-            <div className="flex w-full items-center justify-center my-auto">
-              <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
+            <div className="flex w-full items-center justify-center my-auto px-4">
+              <div className="flex flex-col items-center justify-center gap-4 w-full xs:w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 mt-8 lg:mt-14">
                 {/* Avatar Section */}
                 <div
-                  className={`text-center flex items-center justify-center border border-white w-full rounded-2xl py-28 bg-opacity-40 ${
+                  className={`text-center flex items-center justify-center border border-white w-full rounded-2xl py-16 sm:py-20 lg:py-28 bg-opacity-40 ${
                     daoName === "optimism"
                       ? "bg-slate-100"
                       : daoName === "arbitrum"
@@ -320,9 +319,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     <Image
                       src={avatarUrl}
                       alt="profile-avatar"
-                      width={125}
-                      height={125}
-                      className="maskAvatar shadow-md"
+                      width={100}
+                      height={100}
+                      className="maskAvatar shadow-md w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
                       quality={100}
                       priority
                     />
@@ -354,12 +353,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                         <Image
                           alt="user-icon"
                           src="/images/user-icon.svg"
-                          className="w-5 h-5"
+                          className="size-4 sm:size-5"
                           width={30}
                           height={30}
                         />
                       </div>
-                      <div className="flex-1 bg-transparent py-3 outline-none text-[#f0f0f0]">
+                      <div className="flex-1 bg-transparent py-2 sm:py-3 outline-none text-[#f0f0f0] text-sm sm:text-base">
                         {isLoadingProfile ? (
                           <div className="flex items-center justify-center">
                             <Oval
@@ -379,10 +378,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
 
                 {/* Start Button */}
-                <div className="flex items-center w-1/2">
+                <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
                   <button
-                    className={`flex items-center justify-center w-full py-4 px-6 mt-4
-                  text-white font-bold text-lg rounded-full transition-all duration-300
+                    className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
                   ${
                     isLoadingProfile
                       ? "bg-gray-400"
@@ -407,7 +405,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                         width={24}
                         height={24}
                         src={arrow}
-                        className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1"
+                        className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-1"
                       />
                     )}
                   </button>

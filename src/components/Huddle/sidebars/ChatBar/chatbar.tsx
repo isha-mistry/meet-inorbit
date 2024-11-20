@@ -89,7 +89,7 @@ const ChatBar = () => {
   };
 
   return (
-    <div className="flex w-96 rounded-lg mr-2 flex-col h-full bg-gray-100 text-white">
+    <div className="absolute right-0 top-0 h-full flex w-96 rounded-l-lg flex-col bg-gray-100 text-white shadow-lg transition-transform duration-300 ease-in-out">
       <div className="flex px-4 py-2 border-b border-gray-700 justify-between items-center">
         <h1 className="text-xl font-semibold text-[#0500FF]">Chat</h1>
         <button type="button" onClick={() => setIsChatOpen(false)}>
