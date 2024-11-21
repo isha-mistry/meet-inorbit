@@ -505,7 +505,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           )}
         >
           <div className="backdrop-blur-xl flex flex-col h-screen">
-            <header className="flex items-center justify-between pt-4 px-4 md:px-6 lg:px-16">
+            <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
                 <div className="text-3xl font-semibold tracking-wide font-quanty">
                   <span className="text-black">Chora</span>
