@@ -12,9 +12,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
       await req.json();
     console.log(meetingId, host_address, title, description, thumbnail_image);
 
+    const authHeader = req.headers.get("authorization");
+    const privyToken = authHeader?.replace("Bearer ", "");
+  
+
     const { isAuthorized, token, origin } = await useAuthentication(
       req,
-      host_address
+      host_address,
+      privyToken
     );
 
     console.log(isAuthorized, token, origin);
@@ -35,6 +40,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       JSON.stringify({ token, isAuthorized, origin })
     );
     myHeaders.append("x-wallet-address", host_address);
+    myHeaders.append("Authorization",`Bearer ${token}`);
 
     const raw = JSON.stringify({
       meetingId: meetingId,

@@ -19,15 +19,13 @@ type MeetingCommonData = {
    * @param address Wallet address of the caller
    */
   export const updateMeetingStatus = async (
-    params: { roomId: string },
-    additionalData: MeetingCommonData,
-    address: string | undefined
-  ) => {
+params: { roomId: string; }, additionalData: MeetingCommonData, address: string | undefined, Privytoken: string | null  ) => {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       if (address) {
         myHeaders.append("x-wallet-address", address);
+        myHeaders.append("Authorization",`Bearer ${Privytoken}`);
       }
   
       const requestBody = {
@@ -64,14 +62,13 @@ type MeetingCommonData = {
    * @param attendeeAddress The wallet address of the attendee
    */
   export const updateAttendeeStatus = async (
-    meetingId: string,
-    attendeeAddress: string | undefined
-  ) => {
+meetingId: string, attendeeAddress: string | undefined, Privytoken: string | null  ) => {
     try {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       if (attendeeAddress) {
         myHeaders.append("x-wallet-address", attendeeAddress);
+        myHeaders.append("Authorization",`Bearer ${Privytoken}`)
       }
   
       const requestBody = {

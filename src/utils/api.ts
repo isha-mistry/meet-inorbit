@@ -12,17 +12,37 @@ export async function fetchApi(
   endpoint: string,
   options: RequestOptions | RequestInit = {}
 ) {
-  console.log("endpoint", endpoint);
-  console.log("options", options);
+  // console.log("endpoint", endpoint);
+  // console.log("options", options);
+  
   const { method = "GET", body, headers = {}, ...otherOptions } = options;
+
+  // Convert Headers object to plain object if needed
+  let headersObject: Record<string, string> = {};
+  
+  if (headers instanceof Headers) {
+    // Convert Headers object to plain object
+    Array.from(headers.entries()).forEach(([key, value]) => {
+      headersObject[key] = value;
+    });
+  } else {
+    headersObject = headers as Record<string, string>;
+  }
 
   const defaultHeaders = {
     "Content-Type": "application/json",
   };
 
+  // Merge headers properly
+  const mergedHeaders = {
+    ...defaultHeaders,
+    ...headersObject,
+  };
+
+  // Create fetch options
   const fetchOptions: RequestInit = {
     method,
-    headers: { ...defaultHeaders, ...headers },
+    headers: mergedHeaders,
     ...otherOptions,
   };
 
@@ -33,6 +53,12 @@ export async function fetchApi(
       fetchOptions.body = JSON.stringify(body);
     }
   }
+
+  // Debug log to verify headers
+  // console.log("Final fetch options:", {
+  //   ...fetchOptions,
+  //   headers: mergedHeaders
+  // });
 
   const response = await fetch(`/api/proxy${endpoint}`, fetchOptions);
 

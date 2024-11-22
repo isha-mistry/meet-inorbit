@@ -6,6 +6,8 @@ import SessionPreview from "./SessionPreview";
 import { Time } from "@internationalized/date";
 import { ThreeDots } from "react-loader-spinner";
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 import { useRouter } from "next-nprogress-bar";
 import UpdateSessionDetailsSkeletonLoader from "@/components/SkeletonLoader/UpdateSessionDetailsSkeletonLoader";
 // import not_found from "@/assets/images/daos/404.png";
@@ -40,6 +42,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const { address } = useAccount();
+  const {walletAddress}=useWalletAddress();
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
@@ -93,12 +96,14 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
 
   const handleUpdate = async () => {
     try {
-      if (address?.toLowerCase() === data.host_address.toLowerCase()) {
+      if (walletAddress?.toLowerCase() === data.host_address.toLowerCase()) {
         setLoading(true);
         const myHeaders = new Headers();
+        const token=await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
+        if (walletAddress) {
+          myHeaders.append("x-wallet-address", walletAddress);
+          myHeaders.append("Authorization",`Bearer ${token}`);
         }
 
         const raw = JSON.stringify({
@@ -138,7 +143,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   return (
     <div className="font-poppins">
       {!dataLoading ? (
-        address?.toLowerCase() === data?.host_address.toLowerCase() ? (
+        walletAddress?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-16 ">
             {showPopup && (
               <div
@@ -205,7 +210,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
-                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
+                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
                         )
                       }
                     >
@@ -237,7 +242,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
-                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
+                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
                         )
                       }
                     >

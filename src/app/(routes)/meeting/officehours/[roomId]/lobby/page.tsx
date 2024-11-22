@@ -6,6 +6,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next-nprogress-bar";
 
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 
 // Assets
 import { Toaster, toast } from "react-hot-toast";
@@ -56,7 +58,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   const { address, isDisconnected } = useAccount();
 
+  const {walletAddress}=useWalletAddress();
+
   const { push } = useRouter();
+  
 
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
@@ -84,13 +89,15 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             roomId: params.roomId,
             role: "host",
             displayName: name,
-            address: address, // assuming you have userAddress defined somewhere
+            address: walletAddress, // assuming you have userAddress defined somewhere
           };
           try {
             const myHeaders = new Headers();
+            const PrivyToken=await getAccessToken();
             myHeaders.append("Content-Type", "application/json");
-            if (address) {
-              myHeaders.append("x-wallet-address", address);
+            if (walletAddress) {
+              myHeaders.append("x-wallet-address", walletAddress);
+              myHeaders.append("Authorization",`Bearer ${PrivyToken}`);
             }
             const response = await fetchApi(`/new-token`, {
               method: "POST",
@@ -114,7 +121,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         }
 
         try {
-          console.log({ token });
+          // console.log({ token });
           console.log(params.roomId);
           await joinRoom({
             roomId: params.roomId,
@@ -128,11 +135,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         console.log("Role.HOST", Role.HOST);
         if (Role.HOST) {
-          console.log("inside put api");
+          // console.log("inside put api");
+          const token=await getAccessToken();
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
-          if (address) {
-            myHeaders.append("x-wallet-address", address);
+          if (walletAddress) {
+            myHeaders.append("x-wallet-address", walletAddress);
+            myHeaders.append("Authorization",`Bearer ${token}`);
+
           }
 
           const raw = JSON.stringify({
@@ -166,29 +176,32 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   }, [state]);
 
   useEffect(() => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    if (address) {
-      myHeaders.append("x-wallet-address", address);
-    }
-
-    const raw = JSON.stringify({
-      roomId: params.roomId,
-      meetingType: "officehours",
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
     async function verifyMeetingId() {
+      const myHeaders = new Headers();
+      const token = await getAccessToken(); // Get the token here
+      myHeaders.append("Content-Type", "application/json");
+      if (walletAddress) {
+        myHeaders.append("x-wallet-address", walletAddress);
+        myHeaders.append("Authorization",`Bearer ${token}`);
+      }
+  
+      const raw = JSON.stringify({
+        roomId: params.roomId,
+        meetingType: "officehours",
+      });
+  
+      const requestOptions: any = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+  
       try {
         const response = await fetchApi(`/verify-meeting-id`, requestOptions);
         const result = await response.json();
-
+        // console.log("Line 203...",result);
+  
         if (result.success) {
           if (result.message === "Meeting has ended") {
             console.log("Meeting has ended");
@@ -219,10 +232,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         console.error("Fetch error:", error);
       }
     }
-
+  
     verifyMeetingId();
   }, [params.roomId, isAllowToEnter, notAllowedMessage]);
-
+  
   return (
     <>
       {isAllowToEnter ? (
@@ -358,7 +371,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
-                  href={`${APP_BASE_URL}/profile/${address}?active=info`}
+                  href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile

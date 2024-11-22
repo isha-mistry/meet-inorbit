@@ -35,6 +35,8 @@ import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
 import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import { Tooltip } from "@nextui-org/react";
@@ -57,6 +59,7 @@ import { fetchApi } from "@/utils/api";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
+  const {login,authenticated}=usePrivy();
   const {
     isAudioOn,
     enableAudio,
@@ -110,6 +113,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
+  const {walletAddress}=useWalletAddress();
 
   // let meetingType;
 
@@ -122,76 +126,153 @@ export default function Component({ params }: { params: { roomId: string } }) {
   // }
   console.log("path: ", path);
 
+  // const { state } = useRoom({
+  //   onLeave: async ({ reason }) => {
+  //     try {
+  //       if (reason === "CLOSED") {
+  //         const myHeaders = new Headers();
+  //         const token=await getAccessToken();
+  //         myHeaders.append("Content-Type", "application/json");
+
+  //         if (walletAddress) {
+  //           myHeaders.append("x-wallet-address", walletAddress);
+  //           myHeaders.append("Authorization",`Bearer ${token}`);
+
+  //         }
+
+  //         const raw = JSON.stringify({
+  //           address: walletAddress,
+  //           role: role,
+  //         });
+
+  //         const requestOptions: any = {
+  //           method: "POST",
+  //           headers: myHeaders,
+  //           body: raw,
+  //           redirect: "follow",
+  //         };
+
+  //         const response = await fetchApi(
+  //           "/feedback/get-feedback-status",
+  //           requestOptions
+  //         );
+
+  //         const result = await response.json();
+
+  //         console.log("result: ", result);
+
+  //         if (result.data) {
+  //           setShowFeedbackPopups(false);
+  //           handlePopupRedirection();
+  //         } else {
+  //           setShowFeedbackPopups(true);
+  //         }
+
+  //         // if (role === "host") {
+  //         //   setTimeout(async () => {
+  //         //     await handleCloseMeeting(
+  //         //       address,
+  //         //       meetingCategory,
+  //         //       params.roomId,
+  //         //       daoName,
+  //         //       hostAddress,
+  //         //       meetingData,
+  //         //       isRecording
+  //         //     );
+  //         //   }, 10000);
+  //         // }
+  //         setIsRecording(false);
+  //       } else {
+  //         router.push(`/meeting/session/${params.roomId}/lobby`);
+  //       }
+
+  //       const storedStatus = sessionStorage.getItem("meetingData");
+  //       if (storedStatus) {
+  //         const parsedStatus = JSON.parse(storedStatus);
+  //         if (parsedStatus.meetingId === params.roomId) {
+  //           sessionStorage.removeItem("meetingData");
+  //         }
+  //       }
+  //     } catch (e) {
+  //       setIsRecording(false);
+  //       console.log("error in closing room: ", e);
+  //     }
+  //   },
+  // });
+
+
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       try {
         if (reason === "CLOSED") {
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-
-          if (address) {
-            myHeaders.append("x-wallet-address", address);
+          // Only attempt to send feedback status if user is still authenticated
+          if (authenticated && walletAddress) {
+            const token = await getAccessToken();
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("x-wallet-address", walletAddress);
+            myHeaders.append("Authorization", `Bearer ${token}`);
+  
+            const requestOptions = {
+              method: "POST",
+              headers: myHeaders,
+              // redirect: "follow"
+              body: JSON.stringify({
+                address: walletAddress,
+                role: role
+              }),
+              
+            };
+  
+            try {
+              const response = await fetchApi("/feedback/get-feedback-status", requestOptions);
+              if (response.ok) {
+                const result = await response.json();
+                if (result.data) {
+                  setShowFeedbackPopups(false);
+                  handlePopupRedirection();
+                } else {
+                  setShowFeedbackPopups(true);
+                }
+              } else {
+                console.log("Failed to get feedback status:", response.status);
+                // Handle gracefully by showing feedback popup anyway
+                setShowFeedbackPopups(true);
+              }
+            } catch (error) {
+              console.log("Error checking feedback status:", error);
+              // Handle gracefully by showing feedback popup
+              setShowFeedbackPopups(true);
+            }
           }
-
-          const raw = JSON.stringify({
-            address: address,
-            role: role,
-          });
-
-          const requestOptions: any = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
-
-          const response = await fetchApi(
-            "/feedback/get-feedback-status",
-            requestOptions
-          );
-
-          const result = await response.json();
-
-          console.log("result: ", result);
-
-          if (result.data) {
-            setShowFeedbackPopups(false);
-            handlePopupRedirection();
-          } else {
-            setShowFeedbackPopups(true);
+  
+          // Clear session storage
+          const storedStatus = sessionStorage.getItem("meetingData");
+          if (storedStatus) {
+            const parsedStatus = JSON.parse(storedStatus);
+            if (parsedStatus.meetingId === params.roomId) {
+              sessionStorage.removeItem("meetingData");
+            }
           }
-
-          // if (role === "host") {
-          //   setTimeout(async () => {
-          //     await handleCloseMeeting(
-          //       address,
-          //       meetingCategory,
-          //       params.roomId,
-          //       daoName,
-          //       hostAddress,
-          //       meetingData,
-          //       isRecording
-          //     );
-          //   }, 10000);
-          // }
+  
           setIsRecording(false);
         } else {
+          // Only redirect if the room wasn't explicitly closed
           router.push(`/meeting/session/${params.roomId}/lobby`);
         }
-
-        const storedStatus = sessionStorage.getItem("meetingData");
-        if (storedStatus) {
-          const parsedStatus = JSON.parse(storedStatus);
-          if (parsedStatus.meetingId === params.roomId) {
-            sessionStorage.removeItem("meetingData");
-          }
-        }
       } catch (e) {
+        console.log("Error in closing room:", e);
+        // Ensure recording state is reset even if there's an error
         setIsRecording(false);
-        console.log("error in closing room: ", e);
+        
+        // Ensure user can still leave the room even if there's an error
+        if (reason !== "CLOSED") {
+          router.push(`/meeting/session/${params.roomId}/lobby`);
+        }
       }
     },
   });
+  
 
   const handleFeedbackPopupsClose = () => {
     setShowFeedbackPopups(false);
@@ -203,7 +284,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
       const storedStatus = sessionStorage.getItem("meetingData");
       if (storedStatus) {
         const parsedStatus = JSON.parse(storedStatus);
-        console.log("storedStatus: ", parsedStatus);
+        console.log("Line 213:",parsedStatus);
+        // console.log("storedStatus: ", parsedStatus);
         if (
           parsedStatus.meetingId === params.roomId &&
           parsedStatus.isMeetingRecorded === true
@@ -303,11 +385,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handleModalClose = () => {
     setModalOpen(false);
-    if (address === hostAddress) {
-      push(`${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`);
+    if (walletAddress === hostAddress) {
+      push(`${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`);
     } else {
       push(
-        `${APP_BASE_URL}/profile/${address}?active=sessions&session=attended`
+        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=attended`
       );
     }
   };
@@ -316,15 +398,19 @@ export default function Component({ params }: { params: { roomId: string } }) {
     async function verifyMeetingId() {
       try {
         const myHeaders = new Headers();
+        const token=await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
 
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
+        if (walletAddress) {
+          myHeaders.append("x-wallet-address", walletAddress);
+          myHeaders.append("Authorization",`Bearer ${token}`);
+
         }
         const raw = JSON.stringify({
           roomId: params.roomId,
           meetingType: "session",
         });
+
 
         const requestOptions: any = {
           method: "POST",
@@ -334,6 +420,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         };
         const response = await fetchApi("/verify-meeting-id", requestOptions);
         const result = await response.json();
+        // console.log("348:",result);
 
         if (result.success) {
           setMeetingData(result.data);
@@ -373,8 +460,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     }
 
-    verifyMeetingId();
-  }, [params.roomId, isAllowToEnter, notAllowedMessage, address]);
+    if(authenticated && walletAddress!=null){
+      verifyMeetingId();
+    }
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, walletAddress]);
 
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
@@ -386,7 +475,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
-        walletAddress: address || "",
+        walletAddress: walletAddress || "",
       });
     }
   }, [isAllowToEnter, state]);
@@ -418,6 +507,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   const handleMeetingModalClose = async (result: boolean) => {
+    const token=await getAccessToken();
     if (role === "host") {
       setShowModal(false);
       const meetingData = {
@@ -430,7 +520,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       setMeetingRecordingStatus(result);
       updateRecordingStatus(result);
       if (result) {
-        startRecording(params.roomId, setIsRecording);
+        startRecording(params.roomId, setIsRecording,walletAddress?walletAddress:'',token?token:'');
       }
     }
   };
@@ -674,7 +764,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </div>
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
-                  href={`${APP_BASE_URL}/profile/${address}?active=info`}
+                  href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile
@@ -710,10 +800,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
         </>
       )}
 
-      {role !== null && address !== undefined && showFeedbackPopups && (
+      {role !== null && walletAddress !== undefined && showFeedbackPopups && (
         <PopupSlider
           role={role}
-          address={address}
+          address={walletAddress?walletAddress:''}
           daoName={daoName}
           meetingId={params.roomId}
           onClose={handleFeedbackPopupsClose}

@@ -5,6 +5,7 @@ import { Oval } from "react-loader-spinner";
 import { popups } from "./FeedbackPrompts";
 import PopupContent from "./PopupContent";
 import { fetchApi } from "@/utils/api";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 
 function PopupSlider({
   role,
@@ -47,11 +48,13 @@ function PopupSlider({
     console.log("Responses submitted:", responses);
 
     try {
+      const token=await getAccessToken();
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
       if (address) {
         myHeaders.append("x-wallet-address", address);
+        myHeaders.append("Authorization",`Bearer ${token}`);
       }
 
       const raw = JSON.stringify({

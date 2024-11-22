@@ -21,6 +21,8 @@ import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
 import ReactionBar from "../ReactionBar";
@@ -67,6 +69,8 @@ const BottomBar = ({
   const { chain } = useAccount();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address } = useAccount();
+  const {walletAddress}=useWalletAddress();
+  const [privypass,setPrivyToken]=useState('');
   const {
     role,
     metadata,
@@ -102,6 +106,17 @@ const BottomBar = ({
       },
     });
 
+    useEffect(() => {
+      const fetchToken = async () => {
+        const token = await getAccessToken();
+        if (token) {
+          setPrivyToken(token);
+        }
+      };
+  
+      fetchToken();
+    }, [walletAddress]); // Empty dependency array ensures this runs only once.
+
   useDataMessage({
     async onMessage(payload, from, label) {
       if (label === "server-message") {
@@ -111,9 +126,11 @@ const BottomBar = ({
         setS3URL(videoUri);
 
         const myHeaders = new Headers();
+        const token=await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
-        if (address) {
-          myHeaders.append("x-wallet-address", address);
+        if (walletAddress) {
+          myHeaders.append("x-wallet-address", walletAddress);
+          myHeaders.append("Authorization",`Bearer ${token}`);
         }
 
         const raw = JSON.stringify({
@@ -157,7 +174,7 @@ const BottomBar = ({
     setIsLoading(true);
 
     if (role === "host" && meetingRecordingStatus === true) {
-      await handleStopRecording(roomId, address, setIsRecording);
+      await handleStopRecording(roomId, walletAddress??'',privypass, setIsRecording);
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -195,9 +212,11 @@ const BottomBar = ({
         }
         try {
           const myHeaders = new Headers();
+          const token=await getAccessToken();
           myHeaders.append("Content-Type", "application/json");
-          if (address) {
-            myHeaders.append("x-wallet-address", address);
+          if (walletAddress) {
+            myHeaders.append("x-wallet-address", walletAddress);
+            myHeaders.append("Authorization",`Bearer ${token}`);
           }
           const requestOptions = {
             method: "PUT",
@@ -219,7 +238,8 @@ const BottomBar = ({
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(
-                address,
+                walletAddress??'',
+                token,
                 meetingCategory,
                 roomId,
                 daoName,
@@ -242,9 +262,11 @@ const BottomBar = ({
 
     if (meetingCategory === "officehours") {
       const myHeaders = new Headers();
+      const token=await getAccessToken();
       myHeaders.append("Content-Type", "application/json");
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
+      if (walletAddress) {
+        myHeaders.append("x-wallet-address", walletAddress);
+        myHeaders.append("Authorization",`Bearer ${token}`);
       }
       try {
         const res = await fetch(
@@ -341,7 +363,7 @@ const BottomBar = ({
                 displayName: metadata?.displayName || "",
                 avatarUrl: metadata?.avatarUrl || "",
                 isHandRaised: !metadata?.isHandRaised,
-                walletAddress: metadata?.walletAddress || address || "",
+                walletAddress: metadata?.walletAddress || walletAddress || "",
               });
             }}
             className={clsx(
@@ -390,7 +412,8 @@ const BottomBar = ({
               onClick={() =>
                 handleRecording(
                   roomId,
-                  address,
+                  walletAddress??'',
+                  privypass,
                   isRecording,
                   setIsRecording,
                   meetingRecordingStatus,

@@ -12,6 +12,8 @@ import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 import { SiFarcaster } from "react-icons/si";
 
 function ShareMediaModal({
@@ -30,12 +32,13 @@ function ShareMediaModal({
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const { address } = useAccount();
+  const {walletAddress}=useWalletAddress();
 
   console.log("data::", data);
 
   useEffect(() => {
-    setLink(`${window.location.href}${address ? `?referrer=${address}` : ""}`);
-  }, [address]);
+    setLink(`${window.location.href}${walletAddress ? `?referrer=${walletAddress}` : ""}`);
+  }, [walletAddress]);
 
   useEffect(() => {
     // Lock scrolling when the modal is open

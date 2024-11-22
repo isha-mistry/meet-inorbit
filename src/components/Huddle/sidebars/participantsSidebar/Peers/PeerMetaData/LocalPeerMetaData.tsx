@@ -15,7 +15,8 @@ import { cn } from "@/utils/helpers";
 import { NestedPeerListIcons, PeerListIcons } from "@/utils/PeerListIcons";
 import { useStudioState } from "@/store/studioState";
 import { useAccount } from "wagmi";
-
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 interface PeerMetaDatProps {
   isRequested?: boolean;
   className?: string;
@@ -48,6 +49,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
   } = useLocalAudio();
 
   const { address } = useAccount();
+  const {walletAddress}=useWalletAddress();
 
   // const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
 
@@ -82,7 +84,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               displayName: metadata?.displayName ?? "Guest",
               avatarUrl: metadata?.avatarUrl ?? "/avatars/avatars/0.png",
               isHandRaised: !metadata?.isHandRaised,
-              walletAddress: metadata?.walletAddress || address || "",
+              walletAddress: metadata?.walletAddress || walletAddress || "",
             });
             // }
           }}

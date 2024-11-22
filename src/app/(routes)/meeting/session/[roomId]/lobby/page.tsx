@@ -6,7 +6,9 @@ import { useRouter } from "next-nprogress-bar";
 import { Toaster, toast } from "react-hot-toast";
 import { useHuddle01, useRoom, useLocalPeer } from "@huddle01/react/hooks";
 import { useAccount } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
+// import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
 import { Oval, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
@@ -46,34 +48,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Hooks
   const { push } = useRouter();
   const { address, isDisconnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  // const { openConnectModal } = useConnectModal();
+  const {login,authenticated}=usePrivy();
   const { data: session } = useSession();
   const { isConnected, isPageLoading, isSessionLoading, isReady } =
     useConnection();
   const { state, joinRoom } = useRoom();
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
+  const {walletAddress}=useWalletAddress();
 
   // Connection Management
-  useEffect(() => {
-    if (
-      !isConnected &&
-      openConnectModal &&
-      !isPageLoading &&
-      !isSessionLoading
-    ) {
-      openConnectModal();
+  // useEffect(() => {
+  //   if (
+  //     !isConnected &&
+  //     openConnectModal &&
+  //     !isPageLoading &&
+  //     !isSessionLoading
+  //   ) {
+  //     openConnectModal();
+  //   }
+  // }, [isConnected, isPageLoading, isSessionLoading]);
+
+  useEffect(()=>{
+    if(!authenticated){
+      login()
     }
-  }, [isConnected, isPageLoading, isSessionLoading, openConnectModal]);
+    console.log("Line 76:",walletAddress);
+  },[authenticated,walletAddress])
 
   // Verify Meeting ID
   useEffect(() => {
+    console.log(params.roomId);
     const verifyMeetingId = async () => {
       if (!params.roomId) return;
       setIsApiCalling(true);
       try {
         const myHeaders = new Headers();
+        const token=await getAccessToken();
+        // console.log("Line 88",token);
         myHeaders.append("Content-Type", "application/json");
-        if (address) myHeaders.append("x-wallet-address", address);
+        if (walletAddress) {
+           myHeaders.append("x-wallet-address", walletAddress);
+           myHeaders.append("Authorization",`Bearer ${token}`);
+        }
 
         const response = await fetchApi("/verify-meeting-id", {
           method: "POST",
@@ -127,28 +144,34 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
 
-    if (isReady) {
+    if (authenticated &&  walletAddress!=null) {
       verifyMeetingId();
     }
-  }, [params.roomId, address, isReady]);
+  }, [params.roomId, walletAddress, authenticated]);
 
   // Fetch Profile Details
   useEffect(() => {
     const fetchProfileDetails = async () => {
-      if (!isAllowToEnter || !address || !isConnected) return;
+      if (!isAllowToEnter || !authenticated) return;
 
       try {
         setIsLoadingProfile(true);
-        const response = await fetchApi(`/profile/${address}`, {
+        console.log(isAllowToEnter,walletAddress,isConnected);
+        const token=await getAccessToken();
+        const response = await fetchApi(`/profile/${walletAddress}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-wallet-address": address,
+            "x-wallet-address": walletAddress?walletAddress:'',
+            "Authorization":`Bearer ${token}`
           },
-          body: JSON.stringify({ address }),
+          body: JSON.stringify({ walletAddress }),
         });
 
+        console.log(response)
+
         const { data } = await response.json();
+        console.log("171:",data);
 
         if (Array.isArray(data)) {
           const profileWithName = data.find(
@@ -164,8 +187,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           }
 
           // Set name from ENS or truncated address
-          const ensName = await fetchEnsName(address);
-          setName(ensName?.ensName || (await truncateAddress(address)));
+          const ensName = await fetchEnsName(walletAddress);
+          setName(ensName?.ensName || truncateAddress(walletAddress?walletAddress:''));
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -176,7 +199,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     };
 
     fetchProfileDetails();
-  }, [address, isConnected, isAllowToEnter]);
+  }, [walletAddress, authenticated, isAllowToEnter]);
 
   // Handle Room State Change
   useEffect(() => {
@@ -186,31 +209,32 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   }, [state, params.roomId, push]);
 
   const handleStartSpaces = async () => {
-    if (isDisconnected) {
+    if (!authenticated) {
       return toast("Connect your wallet to join the meeting!");
     }
 
     try {
       setIsJoining(true);
-      const role = address === hostAddress ? "host" : "guest";
+      const role = walletAddress === hostAddress ? "host" : "guest";
+      const Privytoken=await getAccessToken();
 
       // Get room token
       const tokenResponse = await fetchApi("/new-token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(address && { "x-wallet-address": address }),
+          ...(walletAddress && { "x-wallet-address": walletAddress,"Authorization":`Bearer ${Privytoken}` }),
         },
         body: JSON.stringify({
           roomId: params.roomId,
           role,
           displayName: name,
-          address,
+          walletAddress,
         }),
       });
 
       const result = await tokenResponse.json();
-      console.log("token", result.token);
+      // console.log("token", result.token);
       const token = result.token;
       // Join room
       await joinRoom({
@@ -221,7 +245,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       // Update meeting status
       if (Role.HOST) {
         const commonData = {
-          callerAddress: address,
+          callerAddress: walletAddress??'',
           daoName,
           sessionType,
           hostAddress,
@@ -231,12 +255,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           meetingData,
         };
 
-        await updateMeetingStatus(params, commonData, address);
+        await updateMeetingStatus(params, commonData, walletAddress??'',Privytoken);
       }
 
       // Update attendee status if guest
       if (role === "guest") {
-        await updateAttendeeStatus(params.roomId, address);
+        await updateAttendeeStatus(params.roomId, walletAddress??'',Privytoken);
       }
     } catch (error) {
       console.error("Error starting spaces:", error);
@@ -272,7 +296,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             Oops, {notAllowedMessage}
           </div>
           <Link
-            href={`${APP_BASE_URL}/profile/${address}?active=info`}
+            href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
             className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300"
           >
             Back to Profile

@@ -4,16 +4,15 @@ import { fetchApi } from "@/utils/api";
 import toast from "react-hot-toast";
 
 export const startRecording = async (
-  roomId: string | undefined,
-  setIsRecording: (val: boolean | null) => void
-) => {
+roomId: string | undefined, setIsRecording: (val: boolean | null) => void, address: string, token: string) => {
   try {
     console.log("recording started");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    // if (address) {
-    //   myHeaders.append("x-wallet-address", address);
-    // }
+    if (address) {
+      myHeaders.append("x-wallet-address", address);
+      myHeaders.append("Authorization",`Bearer ${token}`);
+    }
     const requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -23,6 +22,7 @@ export const startRecording = async (
     };
 
     const status = await fetchApi(`/startRecording/${roomId}`, requestOptions);
+    console.log("Line huddle 26:",status);
     if (!status.ok) {
       console.error(`Request failed with status: ${status.status}`);
       toast.error("Failed to start recording");
@@ -39,6 +39,7 @@ export const startRecording = async (
 export const handleStopRecording = async (
   roomId: string | undefined,
   address: string | undefined,
+  token:string|undefined,
   setIsRecording: (val: boolean | null) => void
 ) => {
   console.log("stop recording");
@@ -52,6 +53,7 @@ export const handleStopRecording = async (
     myHeaders.append("Content-Type", "application/json");
     if (address) {
       myHeaders.append("x-wallet-address", address);
+      myHeaders.append("Authorization",`Bearer ${token}`);
     }
     const requestOptions = {
       method: "POST",
@@ -86,14 +88,7 @@ export const handleStopRecording = async (
 };
 
 export const handleCloseMeeting = async (
-  address: string | undefined,
-  meetingCategory: string,
-  roomId: string | undefined,
-  daoName: string,
-  hostAddress: string,
-  meetingData: SessionInterface | undefined,
-  isRecording: boolean | null
-) => {
+address: string | undefined, token: string | null, meetingCategory: string, roomId: string | undefined, daoName: string, hostAddress: string, meetingData: SessionInterface | undefined, isRecording: boolean | null) => {
   // if (role === "host") {
   let meetingType;
   if (meetingCategory === "officehours") {
@@ -109,6 +104,7 @@ export const handleCloseMeeting = async (
     myHeaders.append("Content-Type", "application/json");
     if (address) {
       myHeaders.append("x-wallet-address", address);
+      myHeaders.append("Authorization",`Bearer ${token}`);
     }
     const requestOptions = {
       method: "POST",
@@ -146,6 +142,7 @@ export const handleCloseMeeting = async (
         myHeaders.append("Content-Type", "application/json");
         if (address) {
           myHeaders.append("x-wallet-address", address);
+          myHeaders.append("Authorization",`Bearer ${token}`);
         }
         const response = await fetchApi(`/get-attest-data`, {
           method: "POST",
@@ -175,6 +172,7 @@ export const handleCloseMeeting = async (
 export const handleRecording = async (
   roomId: string | undefined,
   address: string | undefined,
+  privyToken:string|undefined,
   isRecording: boolean | null,
   setIsRecording: (val: boolean | null) => void,
   meetingRecordingStatus: boolean,
@@ -182,7 +180,7 @@ export const handleRecording = async (
 ) => {
   if (meetingRecordingStatus) {
     setMeetingRecordingStatus(false);
-    handleStopRecording(roomId, address, setIsRecording);
+    handleStopRecording(roomId, address,privyToken, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
@@ -195,7 +193,7 @@ export const handleRecording = async (
   } else {
     setMeetingRecordingStatus(true);
 
-    startRecording(roomId, setIsRecording);
+    startRecording(roomId, setIsRecording,address?address:'',privyToken?privyToken:'');
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);

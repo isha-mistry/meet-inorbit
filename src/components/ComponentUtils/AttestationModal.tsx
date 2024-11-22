@@ -7,6 +7,8 @@ import { FaArrowRight } from "react-icons/fa6";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 import { useAccount } from "wagmi";
+import { useWalletAddress } from "@/app/hooks/useWalletAddress";
+import { getAccessToken } from "@privy-io/react-auth";
 import StarRating from "../FeedbackPopup/RatingTypes/StarRating";
 import { fetchApi } from "@/utils/api";
 
@@ -30,6 +32,7 @@ function AttestationModal({
   const [feedbackStored, setFeedbackStored] = useState(false);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const { address } = useAccount();
+  const {walletAddress}=useWalletAddress();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("meetingData");
@@ -76,6 +79,7 @@ function AttestationModal({
   const storeUserFeedback = async () => {
     try {
       const myHeaders = new Headers();
+      const token=await getAccessToken();
       myHeaders.append("Content-Type", "application/json");
 
       const raw = JSON.stringify({
@@ -83,14 +87,15 @@ function AttestationModal({
         role: role,
         feedbackType: "feedbackReceived",
         data: {
-          guestAddress: address,
+          guestAddress: walletAddress,
           meetingId: meetingId,
           ratings: rating,
         },
       });
 
-      if (address) {
-        myHeaders.append("x-wallet-address", address);
+      if (walletAddress) {
+        myHeaders.append("x-wallet-address", walletAddress);
+        myHeaders.append("Authorization",`Bearer ${token}`);
       }
 
       const requestOptions: any = {
