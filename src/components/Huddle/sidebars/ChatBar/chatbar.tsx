@@ -89,9 +89,10 @@ const ChatBar = () => {
   };
 
   return (
-    <div className="absolute right-0 top-0 h-full flex w-full 0.5xm:w-96 0.5xm:rounded-l-lg flex-col bg-gray-100 text-white shadow-lg transition-transform duration-300 ease-in-out">
-      <div className="flex px-4 py-2 border-b border-gray-700 justify-between items-center">
-        <h1 className="text-xl font-semibold text-[#0500FF]">Chat</h1>
+    // <div className="absolute right-0 top-0 h-full flex w-full 0.5xm:w-96 0.5xm:rounded-l-lg flex-col 0.5xm:border-y 0.5xm:border-l border-white bg-[#2f2f2f] text-white shadow-lg transition-transform duration-300 ease-in-out">
+    <div className="absolute right-0 top-0 h-full flex w-full 0.5xm:w-96 0.5xm:rounded-l-lg flex-col bg-[#202020] text-white shadow-lg transition-transform duration-300 ease-in-out">
+      <div className="flex px-4 py-2 border-b-1 border-[#2f2f2f] justify-between items-center">
+        <h1 className="text-xl font-semibold text-gray-300 ">Chat</h1>
         <button type="button" onClick={() => setIsChatOpen(false)}>
           {BasicIcons.close}
         </button>
@@ -102,7 +103,7 @@ const ChatBar = () => {
       <div className="p-2 rounded-b-lg">
         <div className="flex gap-2">
           <Input
-            className="flex-1 rounded-lg bg-gray-50 text-black placeholder-gray-400"
+            className="flex-1 rounded-lg bg-[#202020]  text-white placeholder-gray-400"
             placeholder="Type your message"
             onChange={(e) => setMessage(e.target.value)}
             value={message}
@@ -115,7 +116,7 @@ const ChatBar = () => {
             {BasicIcons.upload}
           </Button> */}
           <Button
-            className="bg-gray-700 hover:bg-gray-600 text-gray-200"
+            className="bg-[#202020] hover:bg-gray-600/50 text-gray-200"
             onClick={sendMessage}
           >
             {BasicIcons.send}

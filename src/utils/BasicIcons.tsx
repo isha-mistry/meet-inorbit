@@ -523,7 +523,7 @@ export const BasicIcons = {
       fill="black"
       viewBox="0 0 24 24"
       strokeWidth="1.5"
-      stroke="white"
+      stroke="#717682"
       data-slot="icon"
       className="w-6 h-6"
     >

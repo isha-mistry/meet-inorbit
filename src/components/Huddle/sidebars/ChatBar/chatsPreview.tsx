@@ -21,7 +21,7 @@ const ChatsPreview = () => {
             className={clsx(
               chat.isUser
                 ? "ml-auto text-md break-words max-w-xs w-fit py-1 px-2 mb-2 bg-[#216CFC] rounded-lg items-center flex"
-                : "w-fit py-1 px-2 break-words max-w-xs text-md mb-2 rounded-lg bg-[#343744]",
+                : "w-fit py-1 px-2 break-words max-w-xs text-md mb-2 rounded-lg bg-gray-600/50",
               validateUrl(chat.text) && "hover:bg-blue-500/50"
             )}
           >

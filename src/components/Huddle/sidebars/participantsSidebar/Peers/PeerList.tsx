@@ -24,13 +24,13 @@ const PeerList: React.FC<PeerListProps> = ({
   return (
     <div className={cn(className)}>
       <div className="h-full overflow-y-auto flex gap-4 items-center">
-        <div className="bg-slate-800 h-[1px] flex-1 translate-y-2" />
-        <div className="relative mt-4 flex items-center justify-center text-gray-600 text-xs font-medium gap-1">
+        <div className="bg-[#2f2f2f] h-[1px] flex-1 translate-y-2" />
+        <div className="relative mt-4 flex items-center justify-center text-gray-400 text-xs font-medium gap-1">
           {title}
           {TitleArr.includes(title) && <span>- {count}</span>}
           {/* <span>{PeerListIcons.info}</span> */}
         </div>
-        <div className="bg-slate-800 h-[1px] flex-1 translate-y-2" />
+        <div className="bg-[#2f2f2f] h-[1px] flex-1 translate-y-2" />
       </div>
       {children}
     </div>

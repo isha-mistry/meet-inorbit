@@ -50,7 +50,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   return (
     <div
       className={clsx(
-        "bg-gray-100 bg-opacity-80 relative border border-white rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] w-full",
+        "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] w-full",
         className
       )}
     >
@@ -65,7 +65,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
       ) : (
         <div className="flex w-24 h-24 rounded-full">
           {metadata?.avatarUrl && (
-            <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
+            <div className=" rounded-full w-24 h-24">
               <Image
                 src={metadata?.avatarUrl}
                 alt="image"
@@ -77,7 +77,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
           )}
         </div>
       )}
-      <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+      <span className="absolute bottom-4 left-4 text-white font-medium">
         {metadata?.displayName}
       </span>
       <span className="absolute bottom-4 right-4">

@@ -504,11 +504,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
             }`
           )}
         >
-          <div className="backdrop-blur-xl flex flex-col h-screen">
+          <div className="bg-[#0a0a0a] flex flex-col h-screen">
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
                 <div className="text-3xl font-semibold tracking-wide font-quanty">
-                  <span className="text-black">Chora</span>
+                  <span className="text-white">Chora</span>
                   <span className="text-blue-shade-100">Club</span>
                 </div>
               </div>
@@ -534,7 +534,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 <div className="flex space-x-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="flex gap-2 bg-gray-600/50 text-gray-200 hover:bg-gray-500/50">
+                      <Button className="flex gap-2 bg-[#202020] text-gray-200 hover:bg-gray-500/50">
                         {BasicIcons.invite}
                         <span className="hidden lg:block">Invite</span>
                       </Button>
@@ -542,14 +542,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     <DropdownMenuContent className="w-72">
                       <div className="flex items-center space-x-2 p-2">
                         <span
-                          className="flex-grow p-2  bg-gray-200 rounded-lg  text-black truncate text-sm"
+                          className="flex-grow p-2  bg-[#2f2f2f] rounded-lg  text-white truncate text-sm"
                           title={`${BASE_URL}${path}`}
                         >
                           {typeof window !== "undefined" &&
                             truncateAddress(`${BASE_URL}${path}`)}
                         </span>
                         <Button
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-900 text-sm px-3 py-2"
+                          className="bg-[#2f2f2f] hover:bg-gray-600/50 text-white text-sm px-3 py-2"
                           onClick={handleCopy}
                         >
                           {isCopied ? "Copied" : "Copy"}
@@ -590,7 +590,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 >
                   {role !== Role.BOT && (
                     <div
-                      className={`bg-gray-100 bg-opacity-80 relative border border-white rounded-lg flex  flex-col items-center justify-center min-w-[150px] min-h-[150px]`}
+                      className={`bg-[#202020] bg-opacity-80 relative rounded-lg flex  flex-col items-center justify-center min-w-[150px] min-h-[150px]`}
                     >
                       <div className="absolute left-4 top-4 text-3xl z-10">
                         {reaction}
@@ -611,11 +611,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       ) : (
                         <div className="flex w-24 h-24 rounded-full">
                           {metadata?.avatarUrl && (
-                            <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
+                            <div className=" rounded-full w-24 h-24">
                               <Image
                                 alt="image"
                                 src={metadata?.avatarUrl}
-                                className="maskAvatar object-contain object-center"
+                                className="maskAvatar object-cover object-center"
                                 width={100}
                                 height={100}
                               />
@@ -623,7 +623,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           )}
                         </div>
                       )}
-                      <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+                      <span className="absolute bottom-4 left-4 text-white font-medium">
                         {`${metadata?.displayName} (You)`}
                       </span>
                       <span className="absolute bottom-4 right-4">

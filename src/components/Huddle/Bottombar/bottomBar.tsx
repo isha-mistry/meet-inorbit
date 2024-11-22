@@ -276,7 +276,7 @@ const BottomBar = ({
 
   return (
     <>
-      <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-white lg:bg-transparent z-10">
+      <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-[#0a0a0a] lg:bg-transparent z-10">
         <div className="">
           <QuickLinks daoName={daoName} />
         </div>
@@ -336,7 +336,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              `hidden lg:block bg-gray-500/80 hover:bg-gray-600 ${
+              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
                 (shareStream !== null || isScreenShared) && "bg-gray-500/80"
               }`
             )}
@@ -354,7 +354,7 @@ const BottomBar = ({
               });
             }}
             className={clsx(
-              `hidden lg:block bg-gray-500/80 hover:bg-gray-600 ${
+              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
                 metadata?.isHandRaised && "bg-gray-500/80"
               }`
             )}
@@ -444,7 +444,7 @@ const BottomBar = ({
           </div>
 
           <ButtonWithIcon
-            content=""
+            
             onClick={() =>
               handleRecording(
                 roomId,
@@ -455,7 +455,7 @@ const BottomBar = ({
                 setMeetingRecordingStatus
               )
             }
-            className="bg-red-500"
+            className="bg-red-500 lg:hidden"
           >
             {isUploading ? BasicIcons.spin : BasicIcons.record}
           </ButtonWithIcon>
@@ -485,7 +485,7 @@ const BottomBar = ({
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
           >
             <div className="flex items-center justify-center">
               {BasicIcons.people}
@@ -497,7 +497,7 @@ const BottomBar = ({
           <ButtonWithIcon
             content="Chat"
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
           >
             {BasicIcons.chat}
           </ButtonWithIcon>

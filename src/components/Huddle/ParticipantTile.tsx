@@ -17,15 +17,15 @@ function ParticipantTile({ className }: participantTileProps) {
   return (
     <GridContainer
       className={clsx(
-        "bg-gray-100 bg-opacity-80 relative border border-white rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px]",
+        "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px]",
         className
       )}
     >
-      <div className="hidden sm:flex md:hidden lg:flex  items-center justify-center w-24 h-24 rounded-full bg-blue-shade-100 text-gray-200 text-3xl font-semibold ">
+      <div className="hidden sm:flex md:hidden lg:flex  items-center justify-center w-24 h-24 rounded-full bg-[#232631] text-[#717682] text-3xl font-semibold ">
         +{peerIds.length - 2}
       </div>
 
-      <div className="sm:hidden md:flex lg:hidden flex items-center justify-center w-24 h-24 rounded-full bg-blue-shade-100 text-gray-200 text-3xl font-semibold">
+      <div className="sm:hidden md:flex lg:hidden flex items-center justify-center w-24 h-24 rounded-full bg-[#232631] text-[#717682] text-3xl font-semibold">
         +{peerIds.length - 1}
       </div>
     </GridContainer>

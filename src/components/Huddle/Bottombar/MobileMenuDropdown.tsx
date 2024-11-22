@@ -46,15 +46,15 @@ interface MobileMenuDropdownProps {
     <div className="lg:hidden ">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="bg-gray-500/80 hover:bg-gray-600">
+          <Button variant="ghost" size="icon" className="bg-[#202020] hover:bg-gray-500/50">
             <Menu className="h-5 w-5 text-white" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-full bg-gray-800 text-white p-2 rounded-lg">
+        <DropdownMenuContent className="w-full bg-[#202020] text-white p-2 rounded-lg">
           <div className="space-y-2">
             {/* Chat Option */}
             <Button 
-              className="w-full flex items-center justify-start gap-2 bg-gray-700 hover:bg-gray-600"
+              className="w-full flex items-center justify-start gap-2 bg-[#2f2f2f] hover:bg-gray-600/50"
               onClick={onToggleChat}
             >
               {BasicIcons.chat}
@@ -63,7 +63,7 @@ interface MobileMenuDropdownProps {
 
             {/* Participants Option */}
             <Button 
-              className="w-full flex items-center justify-start gap-2 bg-gray-700 hover:bg-gray-600"
+              className="w-full flex items-center justify-start gap-2 bg-[#2f2f2f] hover:bg-gray-600/50"
               onClick={onToggleParticipants}
             >
               <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ interface MobileMenuDropdownProps {
 
             {/* Screen Share Option */}
             <Button 
-              className="w-full flex items-center justify-start gap-2 bg-gray-700 hover:bg-gray-600"
+              className="w-full flex items-center justify-start gap-2 bg-[#2f2f2f] hover:bg-gray-600/50"
               onClick={onToggleScreen}
               disabled={isScreenShared && !shareStream}
             >
@@ -92,7 +92,7 @@ interface MobileMenuDropdownProps {
 
             {/* Hand Raise Option */}
             <Button 
-              className="w-full flex items-center justify-start gap-2 bg-gray-700 hover:bg-gray-600"
+              className="w-full flex items-center justify-start gap-2 bg-[#2f2f2f] hover:bg-gray-600/50"
               onClick={onToggleHand}
             >
               {BasicIcons.handRaise}
@@ -101,7 +101,7 @@ interface MobileMenuDropdownProps {
 
             {/* Invite Link Option */}
             <Button 
-              className="w-full flex items-center justify-start gap-2 bg-gray-700 hover:bg-gray-600"
+              className="w-full flex items-center justify-start gap-2 bg-[#2f2f2f] hover:bg-gray-600/50"
               onClick={onCopyLink}
             >
               <PiLinkSimpleBold className="h-5 w-5" />
