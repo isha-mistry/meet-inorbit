@@ -179,13 +179,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
           router.push(`/meeting/session/${params.roomId}/lobby`);
         }
 
-        const storedStatus = sessionStorage.getItem("meetingData");
-        if (storedStatus) {
-          const parsedStatus = JSON.parse(storedStatus);
-          if (parsedStatus.meetingId === params.roomId) {
-            sessionStorage.removeItem("meetingData");
-          }
-        }
       } catch (e) {
         setIsRecording(false);
         console.log("error in closing room: ", e);
@@ -193,15 +186,19 @@ export default function Component({ params }: { params: { roomId: string } }) {
     },
   });
 
-  const handleFeedbackPopupsClose = () => {
+  const handleFeedbackPopupsClose = async () => {
     setShowFeedbackPopups(false);
-    handlePopupRedirection();
+    console.log("Response given");
+    await handlePopupRedirection();
   };
 
-  const handlePopupRedirection = () => {
+  const handlePopupRedirection = async () => {
     if (role === "host") {
+      console.log("host submitted the review");
       const storedStatus = sessionStorage.getItem("meetingData");
+      console.log("storedStatus::: ", storedStatus);
       if (storedStatus) {
+        console.log("storedStatus::: ", storedStatus);
         const parsedStatus = JSON.parse(storedStatus);
         console.log("storedStatus: ", parsedStatus);
         if (
@@ -218,6 +215,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     } else if (role === "guest") {
       setModalOpen(true);
+    }
+    const storedStatus = sessionStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      if (parsedStatus.meetingId === params.roomId) {
+        sessionStorage.removeItem("meetingData");
+      }
     }
   };
 
