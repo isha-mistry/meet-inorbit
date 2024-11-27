@@ -10,6 +10,7 @@ export async function POST(
   res: NextResponse<StoreFeedbackInterface>
 ) {
   const { address, role, feedbackType, data } = await req.json();
+  let client;
 
   console.log(
     "address, role, feedbackType, data: ",
@@ -19,8 +20,8 @@ export async function POST(
     data
   );
 
-  const client = await connectDB();
   try {
+    client = await connectDB();
     const db = client.db();
     const collection = db.collection("feedbacks");
 
@@ -117,7 +118,6 @@ export async function POST(
       { upsert: true, arrayFilters }
     );
 
-    client.close();
     return NextResponse.json(
       { success: true, data: insertedDocument },
       { status: 200 }
@@ -129,6 +129,8 @@ export async function POST(
       { status: 500 }
     );
   } finally {
-    client.close();
+    if (client) {
+      await client.close();
+    }
   }
 }

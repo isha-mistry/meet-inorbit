@@ -203,11 +203,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
+      const token = await getAccessToken();
       try {
         if (reason === "CLOSED") {
           // Only attempt to send feedback status if user is still authenticated
-          if (authenticated && walletAddress) {
-            const token = await getAccessToken();
+          if (authenticated && walletAddress) {           
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("x-wallet-address", walletAddress);
@@ -254,8 +254,24 @@ export default function Component({ params }: { params: { roomId: string } }) {
               sessionStorage.removeItem("meetingData");
             }
           }
-  
+
+
+          if (role === "host") {
+            setTimeout(async () => {
+              await handleCloseMeeting(
+                address,
+                token,
+                meetingCategory,
+                params.roomId,
+                daoName,
+                hostAddress,
+                meetingData,
+                isRecording
+              );
+            }, 10000);
+          }
           setIsRecording(false);
+  
         } else {
           // Only redirect if the room wasn't explicitly closed
           router.push(`/meeting/session/${params.roomId}/lobby`);
