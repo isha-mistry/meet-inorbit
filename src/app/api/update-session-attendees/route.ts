@@ -47,10 +47,10 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     if (attendeeExists) {
       client.close();
-      console.log("MongoDB connection closed");
+      console.log("Attendee already exists, returning existing document");
       return NextResponse.json(
-        { success: false, error: "Attendee already exists" },
-        { status: 409 }
+        { success: true, data: existingDocument },
+        { status: 200 }
       );
     }
 

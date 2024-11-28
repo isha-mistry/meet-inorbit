@@ -126,179 +126,85 @@ export default function Component({ params }: { params: { roomId: string } }) {
   // }
   console.log("path: ", path);
 
-  // const { state } = useRoom({
-  //   onLeave: async ({ reason }) => {
-  //     try {
-  //       if (reason === "CLOSED") {
-  //         const myHeaders = new Headers();
-  //         const token=await getAccessToken();
-  //         myHeaders.append("Content-Type", "application/json");
-
-  //         if (walletAddress) {
-  //           myHeaders.append("x-wallet-address", walletAddress);
-  //           myHeaders.append("Authorization",`Bearer ${token}`);
-
-  //         }
-
-  //         const raw = JSON.stringify({
-  //           address: walletAddress,
-  //           role: role,
-  //         });
-
-  //         const requestOptions: any = {
-  //           method: "POST",
-  //           headers: myHeaders,
-  //           body: raw,
-  //           redirect: "follow",
-  //         };
-
-  //         const response = await fetchApi(
-  //           "/feedback/get-feedback-status",
-  //           requestOptions
-  //         );
-
-  //         const result = await response.json();
-
-  //         console.log("result: ", result);
-
-  //         if (result.data) {
-  //           setShowFeedbackPopups(false);
-  //           handlePopupRedirection();
-  //         } else {
-  //           setShowFeedbackPopups(true);
-  //         }
-
-  //         // if (role === "host") {
-  //         //   setTimeout(async () => {
-  //         //     await handleCloseMeeting(
-  //         //       address,
-  //         //       meetingCategory,
-  //         //       params.roomId,
-  //         //       daoName,
-  //         //       hostAddress,
-  //         //       meetingData,
-  //         //       isRecording
-  //         //     );
-  //         //   }, 10000);
-  //         // }
-  //         setIsRecording(false);
-  //       } else {
-  //         router.push(`/meeting/session/${params.roomId}/lobby`);
-  //       }
-
-  //       const storedStatus = sessionStorage.getItem("meetingData");
-  //       if (storedStatus) {
-  //         const parsedStatus = JSON.parse(storedStatus);
-  //         if (parsedStatus.meetingId === params.roomId) {
-  //           sessionStorage.removeItem("meetingData");
-  //         }
-  //       }
-  //     } catch (e) {
-  //       setIsRecording(false);
-  //       console.log("error in closing room: ", e);
-  //     }
-  //   },
-  // });
-
-
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
       const token = await getAccessToken();
       try {
         if (reason === "CLOSED") {
-          // Only attempt to send feedback status if user is still authenticated
-          if (authenticated && walletAddress) {           
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+
+          if (walletAddress) {
             myHeaders.append("x-wallet-address", walletAddress);
-            myHeaders.append("Authorization", `Bearer ${token}`);
-  
-            const requestOptions = {
-              method: "POST",
-              headers: myHeaders,
-              // redirect: "follow"
-              body: JSON.stringify({
-                address: walletAddress,
-                role: role
-              }),
-              
-            };
-  
-            try {
-              const response = await fetchApi("/feedback/get-feedback-status", requestOptions);
-              if (response.ok) {
-                const result = await response.json();
-                if (result.data) {
-                  setShowFeedbackPopups(false);
-                  handlePopupRedirection();
-                } else {
-                  setShowFeedbackPopups(true);
-                }
-              } else {
-                console.log("Failed to get feedback status:", response.status);
-                // Handle gracefully by showing feedback popup anyway
-                setShowFeedbackPopups(true);
-              }
-            } catch (error) {
-              console.log("Error checking feedback status:", error);
-              // Handle gracefully by showing feedback popup
-              setShowFeedbackPopups(true);
-            }
-          }
-  
-          // Clear session storage
-          const storedStatus = sessionStorage.getItem("meetingData");
-          if (storedStatus) {
-            const parsedStatus = JSON.parse(storedStatus);
-            if (parsedStatus.meetingId === params.roomId) {
-              sessionStorage.removeItem("meetingData");
-            }
+            myHeaders.append("Authorization",`Bearer ${token}`)
           }
 
+          const raw = JSON.stringify({
+            address: walletAddress,
+            role: role,
+          });
 
-          if (role === "host") {
-            setTimeout(async () => {
-              await handleCloseMeeting(
-                address,
-                token,
-                meetingCategory,
-                params.roomId,
-                daoName,
-                hostAddress,
-                meetingData,
-                isRecording
-              );
-            }, 10000);
+          const requestOptions: any = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+
+          const response = await fetchApi(
+            "/feedback/get-feedback-status",
+            requestOptions
+          );
+
+          const result = await response.json();
+
+          console.log("result: ", result);
+
+          if (result.data) {
+            setShowFeedbackPopups(false);
+            handlePopupRedirection();
+          } else {
+            setShowFeedbackPopups(true);
           }
+
+          // if (role === "host") {
+          //   setTimeout(async () => {
+          //     await handleCloseMeeting(
+          //       address,
+          //       meetingCategory,
+          //       params.roomId,
+          //       daoName,
+          //       hostAddress,
+          //       meetingData,
+          //       isRecording
+          //     );
+          //   }, 10000);
+          // }
           setIsRecording(false);
-  
         } else {
-          // Only redirect if the room wasn't explicitly closed
           router.push(`/meeting/session/${params.roomId}/lobby`);
         }
+
       } catch (e) {
-        console.log("Error in closing room:", e);
-        // Ensure recording state is reset even if there's an error
         setIsRecording(false);
-        
-        // Ensure user can still leave the room even if there's an error
-        if (reason !== "CLOSED") {
-          router.push(`/meeting/session/${params.roomId}/lobby`);
-        }
+        console.log("error in closing room: ", e);
       }
     },
   });
-  
 
-  const handleFeedbackPopupsClose = () => {
+  const handleFeedbackPopupsClose = async () => {
     setShowFeedbackPopups(false);
-    handlePopupRedirection();
+    console.log("Response given");
+    await handlePopupRedirection();
   };
 
-  const handlePopupRedirection = () => {
+  const handlePopupRedirection = async () => {
     if (role === "host") {
+      console.log("host submitted the review");
       const storedStatus = sessionStorage.getItem("meetingData");
+      console.log("storedStatus::: ", storedStatus);
       if (storedStatus) {
+        console.log("storedStatus::: ", storedStatus);
         const parsedStatus = JSON.parse(storedStatus);
         console.log("Line 213:",parsedStatus);
         // console.log("storedStatus: ", parsedStatus);
@@ -316,6 +222,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     } else if (role === "guest") {
       setModalOpen(true);
+    }
+    const storedStatus = sessionStorage.getItem("meetingData");
+    if (storedStatus) {
+      const parsedStatus = JSON.parse(storedStatus);
+      if (parsedStatus.meetingId === params.roomId) {
+        sessionStorage.removeItem("meetingData");
+      }
     }
   };
 

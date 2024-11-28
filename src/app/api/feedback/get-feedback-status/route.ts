@@ -23,8 +23,7 @@ export async function POST(
 
     if (!feedbackDoc) {
       return NextResponse.json(
-        { data: false, message: "Address not found in the database" },
-        { status: 404 }
+        { data: false, message: "Address not found in the database" }
       );
     }
 
