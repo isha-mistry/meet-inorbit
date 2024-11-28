@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
-  const { meetingId, meetingType, recordedStatus, meetingStatus, nft_image } =
-    await req.json();
+  const {
+    meetingId,
+    meetingType,
+    recordedStatus,
+    meetingStatus,
+    nft_image,
+    daoName,
+  } = await req.json();
 
   console.log(
     "meetingId, meetingType, recordedStatus: ",
@@ -58,7 +64,9 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         const delegateUpdateResult = await delegateCollection.findOneAndUpdate(
           { address: host_address },
           {
-            $inc: { "meetingRecords.sessionHosted.totalHostedMeetings": 1 },
+            $inc: {
+              [`meetingRecords.${daoName}.sessionHosted.totalHostedMeetings`]: 1,
+            },
           },
           { returnDocument: "after", upsert: true } // Ensures the document is created if it doesn't exist
         );
@@ -69,7 +77,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             { address: attendee_address },
             {
               $inc: {
-                "meetingRecords.sessionAttended.totalAttendedMeetings": 1,
+                [`meetingRecords.${daoName}.sessionAttended.totalAttendedMeetings`]: 1,
               },
               // $setOnInsert: {
               //   "meetingRecords.sessionAttended.offchainCount": 0,

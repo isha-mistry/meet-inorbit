@@ -173,7 +173,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
-            $inc: { "meetingRecords.sessionHosted.offchainCounts": 1 },
+            $inc: { [`meetingRecords.${requestData.daoName}.sessionHosted.offchainCounts`]: 1 },
           }
         );
 
@@ -202,7 +202,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
-            $inc: { "meetingRecords.sessionAttended.offchainCounts": 1 },
+            $inc: { [`meetingRecords.${requestData.daoName}.sessionAttended.offchainCounts`]: 1 },
           }
         );
 

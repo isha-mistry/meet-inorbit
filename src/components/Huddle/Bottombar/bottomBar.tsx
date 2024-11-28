@@ -227,6 +227,8 @@ const BottomBar = ({
               recordedStatus: isRecording,
               meetingStatus: isRecording === true ? "Recorded" : "Finished",
               nft_image: nft_image,
+              daoName: daoName
+              
             }),
           };
 
