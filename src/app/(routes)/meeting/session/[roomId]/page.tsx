@@ -12,6 +12,7 @@ import {
   useLocalScreenShare,
   useLocalVideo,
   usePeerIds,
+  useRemoteScreenShare,
   useRoom,
 } from "@huddle01/react/hooks";
 import {
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/Bottombar/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
@@ -35,7 +36,7 @@ import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
 import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
-import { TailSpin } from "react-loader-spinner";
+import { RotatingLines, TailSpin } from "react-loader-spinner";
 import Link from "next/link";
 import { Tooltip } from "@nextui-org/react";
 import { PiRecordFill } from "react-icons/pi";
@@ -54,6 +55,7 @@ import {
 } from "@/components/Huddle/HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
+import { Fullscreen, Maximize2, Minimize2 } from 'lucide-react';
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -80,6 +82,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     audioInputDevice,
     layout,
     isScreenShared,
+    setIsScreenShared,
     avatarUrl,
     isRecording,
     setIsRecording,
@@ -110,6 +113,22 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isRemoteFullScreen,setIsRemoteFullScreen] = useState(false);
+
+  const [remoteVideoTracks, setRemoteVideoTracks] = useState<Record<string, MediaStreamTrack | null>>({});
+
+  const handleVideoTrackUpdate = useCallback((peerId: string, videoTrack: MediaStreamTrack | null) => {
+    setRemoteVideoTracks(prev => ({
+      ...prev,
+      [peerId]: videoTrack
+    }));
+  }, []);
+  
+
+  const toggleFullScreen = () => {
+    setIsFullScreen(!isFullScreen);
+  };
 
   const handleCopy = () => {
     if (typeof window === "undefined") return;
@@ -563,28 +582,32 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <main
               className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
             >
-              <div className="flex flex-col lg:flex-row w-full h-full">
+              <div className={`relative flex flex-col lg:flex-row w-full h-full ${(isRemoteFullScreen || !isScreenShared)? "" : `${isFullScreen || !isScreenShared ? "" : "bg-[#202020] rounded-lg justify-center"}`} `}>
                 {shareStream && (
-                  <div className="w-full lg:w-[150%]">
-                    <GridContainer className="w-full h-full">
-                      <>
-                        <Video
-                          stream={videoStreamTrack}
-                          name={metadata?.displayName ?? "guest"}
-                        />
-                      </>
-                    </GridContainer>
-                  </div>
+        <div className={`w-full ${isFullScreen ? "lg:w-full" : "lg:w-[150%]"}`}>
+        <GridContainer className="w-full h-full relative">
+          <>
+          <Tooltip content={(isFullScreen ) ? "Less Screen": "Full Screen"}>
+
+          <Button className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full" onClick={toggleFullScreen}>{isFullScreen ? <Minimize2 /> : <Maximize2 />}</Button>
+          </Tooltip>
+            <Video
+              stream={videoStreamTrack}
+              name={metadata?.displayName ?? "guest"}
+            />
+          </>
+        </GridContainer>
+      </div>
                 )}
                 {peerIds.map((peerId) => (
-                  <RemoteScreenShare key={peerId} peerId={peerId} />
+                  <RemoteScreenShare key={peerId} peerId={peerId} isRemoteFullScreen={isRemoteFullScreen} setIsRemoteFullScreen={setIsRemoteFullScreen}  onVideoTrackUpdate={handleVideoTrackUpdate}/>
                 ))}
                 <section
-                  className={`py-4 lg:py-0 lg:px-4 gap-2 w-full h-full grid overflow-y-auto ${
+                  className={`${(isRemoteFullScreen || !isScreenShared)? "grid" : `${isFullScreen || !isScreenShared ? "grid" : "hidden"}`} py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto ${
                     peerIds.length === 0
                       ? "grid-cols-1"
                       : peerIds.length === 1
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 1.5xl:grid-cols-2"
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 "
                       : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 1.5xl:grid-cols-2"
                   }`}
                 >
@@ -633,24 +656,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       </span>
                     </div>
                   )}
-                  {/* {isScreenShared ? (
-                    peerIds
-                      .slice(0, 2)
-                      .map((peerId) => (
-                        <RemotePeer key={peerId} peerId={peerId} />
-                      ))
-                  ) : peerIds.length > 3 ? (
-                    <>
-                      {peerIds.slice(0, 2).map((peerId) => (
-                        <RemotePeer key={peerId} peerId={peerId} />
-                      ))}
-                      <ParticipantTile />
-                    </>
-                  ) : (
-                    peerIds.map((peerId) => (
-                      <RemotePeer key={peerId} peerId={peerId} />
-                    ))
-                  )} */}
 
                   {isScreenShared ? (
                     <>
@@ -741,13 +746,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         ))
                       )}
                     </>
-                  ) : 
-                  peerIds.length > 3 ? (
+                  ) : peerIds.length > 3 ? (
                     <>
                       {peerIds.slice(0, 2).map((peerId) => (
                         <RemotePeer key={peerId} peerId={peerId} />
                       ))}
-                      <ParticipantTile />
+                      <GridContainer
+                        className={clsx(
+                          "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] border-none"
+                        )}
+                      >
+                        <div className="flex items-center justify-center w-24 h-24 rounded-full bg-[#232631] text-[#717682] text-3xl font-semibold ">
+                          +{peerIds.length - 2}
+                        </div>
+                      </GridContainer>
                     </>
                   ) : (
                     peerIds.map((peerId) => (
@@ -755,7 +767,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     ))
                   )}
                 </section>
-                {/* <MainGridLayout params={params} /> */}
+               
+
               </div>
               {isChatOpen && <ChatBar />}
               {isParticipantsOpen && <ParticipantsBar />}
@@ -790,24 +803,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
             </div>
           ) : (
             <>
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center h-screen bg-[#0a0a0a]">
                 <div className="text-center">
                   <div className="flex items-center justify-center pt-10">
-                    <TailSpin
-                      // visible={true}
-                      // height="40"
-                      // width="40"
-                      // color="#0500FF"
-                      // secondaryColor="#cdccff"
-                      // ariaLabel="oval-loading"
+                    <RotatingLines
+                      strokeColor="#0356fc"
+                      strokeWidth="5"
+                      animationDuration="0.75"
+                      width="60"
                       visible={true}
-                      height="80"
-                      width="80"
-                      color="#0500FF"
-                      ariaLabel="tail-spin-loading"
-                      radius="1"
-                      wrapperStyle={{}}
-                      wrapperClass=""
                     />
                   </div>
                 </div>

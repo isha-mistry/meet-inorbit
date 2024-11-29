@@ -292,7 +292,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              isVideoOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
+              isVideoOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
             )}
           >
             {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
@@ -307,7 +307,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              isAudioOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
+              isAudioOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
             )}
           >
             {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
@@ -444,7 +444,7 @@ const BottomBar = ({
           </div>
 
           <ButtonWithIcon
-            
+            content={meetingRecordingStatus ? "Stop Recording" : "Record"}
             onClick={() =>
               handleRecording(
                 roomId,

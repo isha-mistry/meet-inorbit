@@ -6,12 +6,18 @@ import GridContainer from "./GridContainer";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useStudioState } from "@/store/studioState";
+import { Maximize2, Minimize2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface RemotePeerProps {
   peerId: string;
+  isRemoteFullScreen: boolean;
+  setIsRemoteFullScreen: (value: boolean) => void;
+  onVideoTrackUpdate: (peerId: string, videoTrack: MediaStreamTrack | null) => void;
 }
 
-const RemoteScreenShare = ({ peerId }: RemotePeerProps) => {
+const RemoteScreenShare = ({ peerId,isRemoteFullScreen,setIsRemoteFullScreen ,onVideoTrackUpdate }: RemotePeerProps) => {
+  // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
     peerId,
@@ -26,18 +32,39 @@ const RemoteScreenShare = ({ peerId }: RemotePeerProps) => {
   });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
+  // const [isRemoteFullScreen, setIsRemoteFullScreen] = useState(false);
 
+  const toggleFullScreen = () => {
+    setIsRemoteFullScreen(!isRemoteFullScreen);
+  };
+
+  // useEffect(() => {
+  //   setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
+  //   console.log("videoTrack-remotescreen", videoTrack);
+  // }, [videoTrack]);
   useEffect(() => {
-    setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
-    console.log("videoTrack", videoTrack);
-  }, [videoTrack]);
+    if (videoTrack) {
+      const newVideoStreamTrack = new MediaStream([videoTrack]);
+      setVideoStreamTrack(newVideoStreamTrack);
+      onVideoTrackUpdate(peerId, videoTrack);
+    } else {
+      setVideoStreamTrack(null);
+      onVideoTrackUpdate(peerId, null);
+    }
+  }, [videoTrack, peerId, onVideoTrackUpdate]);
 
   return (
     <>
       {videoTrack && (
-        <div className="w-full lg:w-[150%]">
-          <GridContainer className="w-full h-full">
+         <div className={`w-full ${isRemoteFullScreen ? "lg:w-full" : "lg:w-[150%]"}`}>
+          <GridContainer className="w-full h-full relative">
             <>
+              <Button
+                className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
+                onClick={toggleFullScreen}
+              >
+                {isRemoteFullScreen ? <Minimize2 /> : <Maximize2 />}
+              </Button>
               <Video
                 stream={videoStreamTrack}
                 name={metadata?.displayName ?? "guest"}
