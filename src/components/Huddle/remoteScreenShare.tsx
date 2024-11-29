@@ -8,15 +8,16 @@ import { useEffect, useState } from "react";
 import { useStudioState } from "@/store/studioState";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@nextui-org/react";
 
 interface RemotePeerProps {
   peerId: string;
-  isRemoteFullScreen: boolean;
-  setIsRemoteFullScreen: (value: boolean) => void;
+  isRemoteLessScreen: boolean;
+  setIsRemoteLessScreen: (value: boolean) => void;
   onVideoTrackUpdate: (peerId: string, videoTrack: MediaStreamTrack | null) => void;
 }
 
-const RemoteScreenShare = ({ peerId,isRemoteFullScreen,setIsRemoteFullScreen ,onVideoTrackUpdate }: RemotePeerProps) => {
+const RemoteScreenShare = ({ peerId,isRemoteLessScreen,setIsRemoteLessScreen ,onVideoTrackUpdate }: RemotePeerProps) => {
   // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
@@ -32,10 +33,10 @@ const RemoteScreenShare = ({ peerId,isRemoteFullScreen,setIsRemoteFullScreen ,on
   });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
-  // const [isRemoteFullScreen, setIsRemoteFullScreen] = useState(false);
+  // const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
 
   const toggleFullScreen = () => {
-    setIsRemoteFullScreen(!isRemoteFullScreen);
+    setIsRemoteLessScreen(!isRemoteLessScreen);
   };
 
   // useEffect(() => {
@@ -56,15 +57,17 @@ const RemoteScreenShare = ({ peerId,isRemoteFullScreen,setIsRemoteFullScreen ,on
   return (
     <>
       {videoTrack && (
-         <div className={`w-full ${isRemoteFullScreen ? "lg:w-full" : "lg:w-[150%]"}`}>
+         <div className={`w-full`}>
           <GridContainer className="w-full h-full relative">
             <>
+            <Tooltip content={(isRemoteLessScreen ) ? "Full Screen": "Less Screen"}>
               <Button
                 className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
                 onClick={toggleFullScreen}
               >
-                {isRemoteFullScreen ? <Minimize2 /> : <Maximize2 />}
+                {isRemoteLessScreen ? <Maximize2 /> : < Minimize2/>}
               </Button>
+              </Tooltip>
               <Video
                 stream={videoStreamTrack}
                 name={metadata?.displayName ?? "guest"}

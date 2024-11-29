@@ -55,7 +55,7 @@ import {
 } from "@/components/Huddle/HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
-import { Fullscreen, Maximize2, Minimize2 } from 'lucide-react';
+import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -113,21 +113,25 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isRemoteFullScreen,setIsRemoteFullScreen] = useState(false);
+  const [isLessScreen, setIsLessScreen] = useState(false);
+  const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
 
-  const [remoteVideoTracks, setRemoteVideoTracks] = useState<Record<string, MediaStreamTrack | null>>({});
+  const [remoteVideoTracks, setRemoteVideoTracks] = useState<
+    Record<string, MediaStreamTrack | null>
+  >({});
 
-  const handleVideoTrackUpdate = useCallback((peerId: string, videoTrack: MediaStreamTrack | null) => {
-    setRemoteVideoTracks(prev => ({
-      ...prev,
-      [peerId]: videoTrack
-    }));
-  }, []);
-  
+  const handleVideoTrackUpdate = useCallback(
+    (peerId: string, videoTrack: MediaStreamTrack | null) => {
+      setRemoteVideoTracks((prev) => ({
+        ...prev,
+        [peerId]: videoTrack,
+      }));
+    },
+    []
+  );
 
   const toggleFullScreen = () => {
-    setIsFullScreen(!isFullScreen);
+    setIsLessScreen(!isLessScreen);
   };
 
   const handleCopy = () => {
@@ -582,28 +586,89 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <main
               className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
             >
-              <div className={`relative flex flex-col lg:flex-row w-full h-full ${(isRemoteFullScreen || !isScreenShared)? "" : `${isFullScreen || !isScreenShared ? "" : "bg-[#202020] rounded-lg justify-center"}`} `}>
+              <div
+                className={`relative flex flex-col lg:flex-row w-full h-full ${
+                  isRemoteLessScreen || !isScreenShared
+                    ? ""
+                    : `${
+                        isLessScreen || !isScreenShared
+                          ? ""
+                          : "bg-[#202020] rounded-lg justify-center"
+                      }`
+                } `}
+              >
+                {/* {console.log("is less screen",isLessScreen)}
+                {console.log("less screen in remote", isRemoteLessScreen)}
+                {console.log("screen share", isScreenShared)} */}
+                {/* {(!isLessScreen || isScreenShared) &&  ( */}
+                {/* <div className={`${(!isLessScreen && isScreenShared) ? "flex" : `${!isRemoteLessScreen && isScreenShared ? "flex" : ""}`} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
+                    {metadata?.avatarUrl && (
+                            <div className=" rounded-full w-20 h-20">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-cover object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                  <span className="absolute bottom-2 left-2">You</span>
+                 </div> */}
+                {/* )} */}
+                {/* {(!isRemoteLessScreen && isScreenShared) &&  (
+                  <div className={`${!isLessScreen && isScreenShared} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
+                    {metadata?.avatarUrl && (
+                            <div className=" rounded-full w-20 h-20">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-cover object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                  <span className="absolute bottom-2 left-2">You</span>
+                 </div>
+                )} */}
                 {shareStream && (
-        <div className={`w-full ${isFullScreen ? "lg:w-full" : "lg:w-[150%]"}`}>
-        <GridContainer className="w-full h-full relative">
-          <>
-          <Tooltip content={(isFullScreen ) ? "Less Screen": "Full Screen"}>
-
-          <Button className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full" onClick={toggleFullScreen}>{isFullScreen ? <Minimize2 /> : <Maximize2 />}</Button>
-          </Tooltip>
-            <Video
-              stream={videoStreamTrack}
-              name={metadata?.displayName ?? "guest"}
-            />
-          </>
-        </GridContainer>
-      </div>
+                  <div className={`w-full `}>
+                    <GridContainer className="w-full h-full relative">
+                      <>
+                        <Tooltip
+                          content={isLessScreen ? "Full Screen" : "Less Screen"}
+                        >
+                          <Button
+                            className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
+                            onClick={toggleFullScreen}
+                          >
+                            {isLessScreen ? <Maximize2 /> : <Minimize2 />}
+                          </Button>
+                        </Tooltip>
+                        <Video
+                          stream={videoStreamTrack}
+                          name={metadata?.displayName ?? "guest"}
+                        />
+                      </>
+                    </GridContainer>
+                  </div>
                 )}
                 {peerIds.map((peerId) => (
-                  <RemoteScreenShare key={peerId} peerId={peerId} isRemoteFullScreen={isRemoteFullScreen} setIsRemoteFullScreen={setIsRemoteFullScreen}  onVideoTrackUpdate={handleVideoTrackUpdate}/>
+                  <RemoteScreenShare
+                    key={peerId}
+                    peerId={peerId}
+                    isRemoteLessScreen={isRemoteLessScreen}
+                    setIsRemoteLessScreen={setIsRemoteLessScreen}
+                    onVideoTrackUpdate={handleVideoTrackUpdate}
+                  />
                 ))}
                 <section
-                  className={`${(isRemoteFullScreen || !isScreenShared)? "grid" : `${isFullScreen || !isScreenShared ? "grid" : "hidden"}`} py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto ${
+                  className={`${
+                    isRemoteLessScreen || !isScreenShared
+                      ? "grid"
+                      : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
+                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto ${
                     peerIds.length === 0
                       ? "grid-cols-1"
                       : peerIds.length === 1
@@ -767,8 +832,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     ))
                   )}
                 </section>
-               
-
               </div>
               {isChatOpen && <ChatBar />}
               {isParticipantsOpen && <ParticipantsBar />}
