@@ -2,7 +2,6 @@ import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { BASE_URL } from "@/config/constants";
-import { fetchApi } from "@/utils/api";
 
 // Helper function to handle referrer storage
 const handleReferrerStorage = (referrer: string | null) => {
@@ -44,29 +43,20 @@ export function PrivyAuthHandler() {
           return;
         }
 
-        // Log available wallets for debugging
-        // console.log("Available wallets:", wallets.map(w => ({
-        //   address: w.address?.toLowerCase(),
-        //   type: w.walletClientType
-        // })));
-
         // Get verified wallets from user object
         const verifiedWallets = user.linkedAccounts
           .filter(account => account.type === 'wallet')
-          .map(account => account.address.toLowerCase());
-
-        // console.log("Verified wallets:", verifiedWallets);
+          .map(account => account.address);
 
         // Find a wallet that is both connected and verified
         const selectedWallet = wallets.find(wallet => 
           wallet.address && 
-          verifiedWallets.includes(wallet.address.toLowerCase())
+          verifiedWallets.includes(wallet.address)
         );
 
         if (!selectedWallet) {
           console.log("No verified wallet found. Available wallets:", 
-            wallets.map(w => w.address?.toLowerCase()));
-          // console.log("Verified addresses:", verifiedWallets);
+            wallets.map(w => w.address));
           return;
         }
 
@@ -77,26 +67,19 @@ export function PrivyAuthHandler() {
         }
 
         // Check if we've already processed this wallet
-        const walletAddress = selectedWallet.address.toLowerCase();
-        if (processedWalletRef.current === walletAddress) {
-          console.log("Wallet already processed:", walletAddress);
+        if (processedWalletRef.current === selectedWallet.address) {
+          console.log("Wallet already processed:", selectedWallet.address);
           return;
         }
 
-        // Log selected wallet for debugging
-        // console.log("Selected wallet:", {
-        //   address: walletAddress,
-        //   type: selectedWallet.walletClientType
-        // });
-
         // Store the processed wallet address
-        processedWalletRef.current = walletAddress;
+        processedWalletRef.current = selectedWallet.address;
 
         // Small delay to ensure everything is synchronized
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Create or verify account
-        await createOrVerifyAccount(walletAddress, token, referrer);
+        await createOrVerifyAccount(selectedWallet.address, token, referrer);
 
       } catch (error) {
         console.error("Error handling user login:", error);
@@ -116,21 +99,17 @@ async function createOrVerifyAccount(
   referrer: string | null
 ) {
   try {
-    // Ensure wallet address is lowercase
-    const normalizedAddress = walletAddress.toLowerCase();
-    console.log("121..",normalizedAddress);
-    
-    // console.log("Creating/verifying account for address:", normalizedAddress);
+    console.log("Creating/verifying account for address:", walletAddress);
 
     const response = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-wallet-address": normalizedAddress,
+        "x-wallet-address": walletAddress,
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        address: normalizedAddress,
+        address: walletAddress,
         isEmailVisible: false,
         createdAt: new Date(),
         referrer: referrer,
@@ -138,8 +117,6 @@ async function createOrVerifyAccount(
     });
 
     const responseText = await response.text();
-    // console.log("Server response:", response.status, responseText);
-
     if (response.status === 200) {
       console.log("Account created successfully");
     } else if (response.status === 409) {
