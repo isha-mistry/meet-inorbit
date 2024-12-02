@@ -597,41 +597,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       }`
                 } `}
               >
-                {/* {console.log("is less screen",isLessScreen)}
-                {console.log("less screen in remote", isRemoteLessScreen)}
-                {console.log("screen share", isScreenShared)} */}
-                {/* {(!isLessScreen || isScreenShared) &&  ( */}
-                {/* <div className={`${(!isLessScreen && isScreenShared) ? "flex" : `${!isRemoteLessScreen && isScreenShared ? "flex" : ""}`} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
-                    {metadata?.avatarUrl && (
-                            <div className=" rounded-full w-20 h-20">
-                              <Image
-                                alt="image"
-                                src={metadata?.avatarUrl}
-                                className="maskAvatar object-cover object-center"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
-                          )}
-                  <span className="absolute bottom-2 left-2">You</span>
-                 </div> */}
-                {/* )} */}
-                {/* {(!isRemoteLessScreen && isScreenShared) &&  (
-                  <div className={`${!isLessScreen && isScreenShared} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
-                    {metadata?.avatarUrl && (
-                            <div className=" rounded-full w-20 h-20">
-                              <Image
-                                alt="image"
-                                src={metadata?.avatarUrl}
-                                className="maskAvatar object-cover object-center"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
-                          )}
-                  <span className="absolute bottom-2 left-2">You</span>
-                 </div>
-                )} */}
                 {shareStream && (
                   <div className={`w-full `}>
                     <GridContainer className="w-full h-full relative">
@@ -652,6 +617,26 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         />
                       </>
                     </GridContainer>
+                    {!isLessScreen && (
+                      <div
+                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}
+                      >
+                        {metadata?.avatarUrl && (
+                          <div className=" rounded-full w-20 h-20">
+                            <Image
+                              alt="image"
+                              src={metadata?.avatarUrl}
+                              className="maskAvatar object-cover object-center"
+                              width={100}
+                              height={100}
+                            />
+                          </div>
+                        )}
+                        <span className="absolute bottom-2 left-2 text-white">
+                          You
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
                 {peerIds.map((peerId) => (

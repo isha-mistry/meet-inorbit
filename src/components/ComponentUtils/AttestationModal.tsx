@@ -119,33 +119,39 @@ function AttestationModal({
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center font-poppins">
           <div
-            className="absolute inset-0 bg-gray-800"
+            className="absolute inset-0 bg-[#0a0a0a]"
             // onClick={toggleModal}
           ></div>
-          <div className="z-50 bg-white rounded-3xl max-w-7xl">
+          <div className="z-50 bg-white rounded-3xl max-w-7xl mx-3">
             <Confetti recycle={false} />
-            <div className="flex justify-evenly">
-              <div>
+            <div className="flex flex-col sm:flex-row">
+              <div className="relative">
                 <Image
                   src={img}
                   alt="image"
                   height={300}
                   width={300}
-                  className="rounded-3xl"
+                  className="rounded-t-3xl sm:rounded-tl-3xl sm:rounded-tr-none sm:rounded-l-3xl object-none"
                 />
-              </div>
-              <div className="flex flex-col items-center justify-center relative px-20">
                 <button
-                  className="text-gray-500 hover:text-gray-800 absolute top-3 right-4"
+                  className="sm:hidden text-black font-semibold bg-white rounded-full hover:bg-gray-200 absolute top-3 right-4 p-0.5"
                   onClick={toggleModal}
                 >
-                  <RxCross2 size={20} />
+                  <RxCross2 size={12} />
                 </button>
-                <div className="py-4 text-gray-900">
-                  <h2 className="text-2xl font-bold text-center">
+              </div>
+              <div className="flex flex-col items-center justify-center relative sm:px-4 1.5md:px-14 2md:px-20">
+                <button
+                  className="hidden sm:block text-white bg-black rounded-full hover:bg-gray-800 absolute top-3 right-4 p-0.5"
+                  onClick={toggleModal}
+                >
+                  <RxCross2 size={12} />
+                </button>
+                <div className="pt-6 pb-3 sm:py-0 sm:px-4 text-gray-900">
+                  <h2 className="text-xl md:text-2xl font-bold text-center">
                     Thanks for joining us!🎉
                   </h2>
-                  <div className="font-medium py-2">
+                  <div className="text-xs md:text-base font-medium py-2">
                     Your attestation will be on its way shortly. 📜✨
                   </div>
                 </div>
@@ -167,25 +173,26 @@ function AttestationModal({
                     </div>
                   </div>
                 )}
-                <div className="flex items-center text-blue-shade-100 mt-4">
-                  <FaArrowRight size={10} className="mt-1 mr-1" />
-                  <div className="mr-8">
-                    <Link
-                      href={
-                        "https://app.deform.cc/form/580f4057-b21e-4052-bf93-6b85e28a6032/?page_number=0"
-                      }
-                      target="_blank"
-                      className="ps-[2px] underline font-semibold text-xs"
-                      onClick={() => {
-                        if (rating !== null && !feedbackStored) {
-                          storeUserFeedback();
+                <div className="flex-col md:flex-row flex items-center text-blue-shade-100 mb-6 sm:mb-0 sm:mt-6 gap-2 sm:gap-0">
+                  <div className="flex items-center">
+                    <FaArrowRight size={10} className="mt-1 mr-1" />
+                    <div className="mr-8">
+                      <Link
+                        href={
+                          "https://app.deform.cc/form/580f4057-b21e-4052-bf93-6b85e28a6032/?page_number=0"
                         }
-                      }}
-                    >
-                      Share Your Feedback!
-                    </Link>
+                        target="_blank"
+                        className="ps-[2px] underline font-semibold text-xs"
+                        onClick={() => {
+                          if (rating !== null && !feedbackStored) {
+                            storeUserFeedback();
+                          }
+                        }}
+                      >
+                        Share Your Feedback!
+                      </Link>
+                    </div>
                   </div>
-                  {/* </div> */}
 
                   <div>
                     {/* <div className="flex justify-center"> */}
