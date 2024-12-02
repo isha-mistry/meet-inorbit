@@ -91,9 +91,9 @@ const MuteMicDiv: React.FC<Props> = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="flex items-center justify-center border border-custom-4 rounded-lg p-2 gap-2 w-full"
+    className="flex items-center justify-center border border-custom-4 rounded-lg p-2 gap-2 w-full bg-[#202020]"
   >
     <span>{NestedPeerListIcons.inactive.mic}</span>
-    <span className="text-gray-600 text-sm font-semibold">Mute Everyone</span>
+    <span className="text-gray-400 text-sm font-semibold">Mute Everyone</span>
   </button>
 );
