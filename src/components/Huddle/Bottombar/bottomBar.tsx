@@ -70,8 +70,8 @@ const BottomBar = ({
   const { chain } = useAccount();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address } = useAccount();
-  const {walletAddress}=useWalletAddress();
-  const [privypass,setPrivyToken]=useState('');
+  const { walletAddress } = useWalletAddress();
+  const [privypass, setPrivyToken] = useState("");
   const {
     role,
     metadata,
@@ -107,16 +107,16 @@ const BottomBar = ({
       },
     });
 
-    useEffect(() => {
-      const fetchToken = async () => {
-        const token = await getAccessToken();
-        if (token) {
-          setPrivyToken(token);
-        }
-      };
-  
-      fetchToken();
-    }, [walletAddress]); // Empty dependency array ensures this runs only once.
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getAccessToken();
+      if (token) {
+        setPrivyToken(token);
+      }
+    };
+
+    fetchToken();
+  }, [walletAddress]); // Empty dependency array ensures this runs only once.
 
   useDataMessage({
     async onMessage(payload, from, label) {
@@ -127,11 +127,11 @@ const BottomBar = ({
         setS3URL(videoUri);
 
         const myHeaders = new Headers();
-        const token=await getAccessToken();
+        const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
         if (walletAddress) {
           myHeaders.append("x-wallet-address", walletAddress);
-          myHeaders.append("Authorization",`Bearer ${token}`);
+          myHeaders.append("Authorization", `Bearer ${token}`);
         }
 
         const raw = JSON.stringify({
@@ -175,7 +175,12 @@ const BottomBar = ({
     setIsLoading(true);
 
     if (role === "host" && meetingRecordingStatus === true) {
-      await handleStopRecording(roomId, walletAddress??'',privypass, setIsRecording);
+      await handleStopRecording(
+        roomId,
+        walletAddress ?? "",
+        privypass,
+        setIsRecording
+      );
     }
 
     console.log("s3URL in handleEndCall", s3URL);
@@ -213,11 +218,11 @@ const BottomBar = ({
         }
         try {
           const myHeaders = new Headers();
-          const token=await getAccessToken();
+          const token = await getAccessToken();
           myHeaders.append("Content-Type", "application/json");
           if (walletAddress) {
             myHeaders.append("x-wallet-address", walletAddress);
-            myHeaders.append("Authorization",`Bearer ${token}`);
+            myHeaders.append("Authorization", `Bearer ${token}`);
           }
           const requestOptions = {
             method: "PUT",
@@ -228,8 +233,7 @@ const BottomBar = ({
               recordedStatus: isRecording,
               meetingStatus: isRecording === true ? "Recorded" : "Finished",
               nft_image: nft_image,
-              daoName: daoName
-              
+              daoName: daoName,
             }),
           };
 
@@ -241,7 +245,7 @@ const BottomBar = ({
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(
-                walletAddress??'',
+                walletAddress ?? "",
                 token,
                 meetingCategory,
                 roomId,
@@ -265,11 +269,11 @@ const BottomBar = ({
 
     if (meetingCategory === "officehours") {
       const myHeaders = new Headers();
-      const token=await getAccessToken();
+      const token = await getAccessToken();
       myHeaders.append("Content-Type", "application/json");
       if (walletAddress) {
         myHeaders.append("x-wallet-address", walletAddress);
-        myHeaders.append("Authorization",`Bearer ${token}`);
+        myHeaders.append("Authorization", `Bearer ${token}`);
       }
       try {
         const res = await fetch(
@@ -472,7 +476,8 @@ const BottomBar = ({
             onClick={() =>
               handleRecording(
                 roomId,
-                address,
+                walletAddress ?? "",
+                privypass,
                 isRecording,
                 setIsRecording,
                 meetingRecordingStatus,
@@ -492,7 +497,7 @@ const BottomBar = ({
               onClick={() =>
                 handleRecording(
                   roomId,
-                  walletAddress??'',
+                  walletAddress ?? "",
                   privypass,
                   isRecording,
                   setIsRecording,

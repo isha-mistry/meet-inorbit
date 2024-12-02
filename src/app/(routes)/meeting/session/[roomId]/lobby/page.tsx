@@ -49,13 +49,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const { push } = useRouter();
   const { address, isDisconnected } = useAccount();
   // const { openConnectModal } = useConnectModal();
-  const {login,authenticated}=usePrivy();
+  const { login, authenticated } = usePrivy();
   const { data: session } = useSession();
   const { isConnected, isPageLoading, isSessionLoading, isReady } =
     useConnection();
   const { state, joinRoom } = useRoom();
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
 
   // Connection Management
   // useEffect(() => {
@@ -69,12 +69,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   //   }
   // }, [isConnected, isPageLoading, isSessionLoading]);
 
-  useEffect(()=>{
-    if(!authenticated){
-      login()
+  useEffect(() => {
+    if (!authenticated) {
+      login();
     }
-    console.log("Line 76:",walletAddress);
-  },[authenticated,walletAddress])
+    console.log("Line 76:", walletAddress);
+  }, [authenticated, walletAddress]);
 
   // Verify Meeting ID
   useEffect(() => {
@@ -84,12 +84,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       setIsApiCalling(true);
       try {
         const myHeaders = new Headers();
-        const token=await getAccessToken();
+        const token = await getAccessToken();
         // console.log("Line 88",token);
         myHeaders.append("Content-Type", "application/json");
         if (walletAddress) {
-           myHeaders.append("x-wallet-address", walletAddress);
-           myHeaders.append("Authorization",`Bearer ${token}`);
+          myHeaders.append("x-wallet-address", walletAddress);
+          myHeaders.append("Authorization", `Bearer ${token}`);
         }
 
         const response = await fetchApi("/verify-meeting-id", {
@@ -144,7 +144,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
 
-    if (authenticated &&  walletAddress!=null) {
+    if (authenticated && walletAddress != null) {
       verifyMeetingId();
     }
   }, [params.roomId, walletAddress, authenticated]);
@@ -156,22 +156,22 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       try {
         setIsLoadingProfile(true);
-        console.log(isAllowToEnter,walletAddress,isConnected);
-        const token=await getAccessToken();
+        console.log(isAllowToEnter, walletAddress, isConnected);
+        const token = await getAccessToken();
         const response = await fetchApi(`/profile/${walletAddress}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-wallet-address": walletAddress?walletAddress:'',
-            "Authorization":`Bearer ${token}`
+            "x-wallet-address": walletAddress ? walletAddress : "",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ walletAddress }),
         });
 
-        console.log(response)
+        console.log(response);
 
         const { data } = await response.json();
-        console.log("171:",data);
+        console.log("171:", data);
 
         if (Array.isArray(data)) {
           const profileWithName = data.find(
@@ -188,7 +188,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
           // Set name from ENS or truncated address
           const ensName = await fetchEnsName(walletAddress);
-          setName(ensName?.ensName || truncateAddress(walletAddress?walletAddress:''));
+          setName(
+            ensName?.ensName ||
+              truncateAddress(walletAddress ? walletAddress : "")
+          );
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -216,14 +219,17 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     try {
       setIsJoining(true);
       const role = walletAddress === hostAddress ? "host" : "guest";
-      const Privytoken=await getAccessToken();
+      const privyToken = await getAccessToken();
 
       // Get room token
       const tokenResponse = await fetchApi("/new-token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(walletAddress && { "x-wallet-address": walletAddress,"Authorization":`Bearer ${Privytoken}` }),
+          ...(walletAddress && {
+            "x-wallet-address": walletAddress,
+            Authorization: `Bearer ${privyToken}`,
+          }),
         },
         body: JSON.stringify({
           roomId: params.roomId,
@@ -245,7 +251,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       // Update meeting status
       if (Role.HOST) {
         const commonData = {
-          callerAddress: walletAddress??'',
+          callerAddress: walletAddress ?? "",
           daoName,
           sessionType,
           hostAddress,
@@ -255,12 +261,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           meetingData,
         };
 
-        await updateMeetingStatus(params, commonData, walletAddress??'',Privytoken);
+        await updateMeetingStatus(
+          params,
+          commonData,
+          walletAddress ?? "",
+          privyToken
+        );
       }
 
       // Update attendee status if guest
       if (role === "guest") {
-        await updateAttendeeStatus(params.roomId, walletAddress??'',Privytoken);
+        await updateAttendeeStatus(
+          params.roomId,
+          walletAddress ?? "",
+          privyToken
+        );
       }
     } catch (error) {
       console.error("Error starting spaces:", error);
@@ -275,12 +290,12 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     return (
       <div className="flex justify-center items-center h-screen bg-[#0a0a0a]">
         <RotatingLines
-            strokeColor="#0356fc"
-            strokeWidth="5"
-            animationDuration="0.75"
-            width="60" 
-            visible={true}
-          />
+          strokeColor="#0356fc"
+          strokeWidth="5"
+          animationDuration="0.75"
+          width="60"
+          visible={true}
+        />
       </div>
     );
   }
@@ -310,24 +325,22 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter === true && (
         <div className="min-h-screen bg-[#0a0a0a] ">
-        <main className="flex min-h-screen flex-col text-white font-poppins">
-          <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
-            <div className="text-4xl font-semibold font-quanty tracking-wide">
-              <span className="text-white">Chora</span>
-              <span className="text-blue-shade-100">Club</span>
+          <main className="flex min-h-screen flex-col text-white font-poppins">
+            <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
+              <div className="text-4xl font-semibold font-quanty tracking-wide">
+                <span className="text-white">Chora</span>
+                <span className="text-blue-shade-100">Club</span>
+              </div>
+              <ConnectWalletWithENS />
             </div>
-            <ConnectWalletWithENS />
-          </div>
 
             <div className="flex w-full items-center justify-center my-auto px-4">
               <div className="flex flex-col items-center justify-center gap-4 w-full xs:w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 mt-8 lg:mt-14">
-                 {/* Avatar Section */}
-                 <div className="relative w-full rounded-2xl py-16 sm:py-20 lg:py-28 overflow-hidden">
+                {/* Avatar Section */}
+                <div className="relative w-full rounded-2xl py-16 sm:py-20 lg:py-28 overflow-hidden">
                   {/* Background blur layer */}
-                  <div 
-                    className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"
-                  ></div>
-                  
+                  <div className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"></div>
+
                   {/* Avatar container */}
                   <div className="relative z-10 flex items-center justify-center ">
                     <div className="relative rounded-full p-1">

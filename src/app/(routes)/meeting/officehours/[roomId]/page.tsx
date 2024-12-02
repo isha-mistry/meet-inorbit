@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 // import { useRouter } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/Bottombar/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
@@ -77,6 +77,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
     },
   });
   const [daoName, setDaoName] = useState<any>();
+  const [isLessScreen, setIsLessScreen] = useState(false);
+  const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
+
+  const [remoteVideoTracks, setRemoteVideoTracks] = useState<
+    Record<string, MediaStreamTrack | null>
+  >({});
 
   useDataMessage({
     async onMessage(payload, from, label) {
@@ -134,6 +140,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
       changeAudio();
     }
   }, [audioInputDevice]);
+
+  const handleVideoTrackUpdate = useCallback(
+    (peerId: string, videoTrack: MediaStreamTrack | null) => {
+      setRemoteVideoTracks((prev) => ({
+        ...prev,
+        [peerId]: videoTrack,
+      }));
+    },
+    []
+  );
 
   return (
     <div className={clsx("flex flex-col h-screen bg-white")}>
@@ -198,7 +214,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
             </div>
           )}
           {peerIds.map((peerId) => (
-            <RemoteScreenShare key={peerId} peerId={peerId} />
+            <RemoteScreenShare
+              key={peerId}
+              peerId={peerId}
+              isRemoteLessScreen={true}
+              setIsRemoteLessScreen={setIsRemoteLessScreen}
+              onVideoTrackUpdate={handleVideoTrackUpdate}
+            />
           ))}
           <section
             className={clsx(
@@ -254,11 +276,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         name={metadata?.displayName}
         localPeerId={peerId}
       /> */}
-      <BottomBar
-        daoName={daoName}
-        hostAddress=""
-        meetingCategory=""
-      />
+      <BottomBar daoName={daoName} hostAddress="" meetingCategory="" />
     </div>
   );
 }
