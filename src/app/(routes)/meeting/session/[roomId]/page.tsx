@@ -12,6 +12,7 @@ import {
   useLocalScreenShare,
   useLocalVideo,
   usePeerIds,
+  useRemoteScreenShare,
   useRoom,
 } from "@huddle01/react/hooks";
 import {
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import BottomBar from "@/components/Huddle/Bottombar/bottomBar";
 import { Button } from "@/components/ui/button";
 import { PeerMetadata } from "@/utils/types";
@@ -37,7 +38,7 @@ import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
 import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
-import { TailSpin } from "react-loader-spinner";
+import { RotatingLines } from "react-loader-spinner";
 import Link from "next/link";
 import { Tooltip } from "@nextui-org/react";
 import { PiRecordFill } from "react-icons/pi";
@@ -56,10 +57,11 @@ import {
 } from "@/components/Huddle/HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
+import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
-  const {login,authenticated}=usePrivy();
+  const { login, authenticated } = usePrivy();
   const {
     isAudioOn,
     enableAudio,
@@ -83,6 +85,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     audioInputDevice,
     layout,
     isScreenShared,
+    setIsScreenShared,
     avatarUrl,
     isRecording,
     setIsRecording,
@@ -113,7 +116,44 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
+  const [isLessScreen, setIsLessScreen] = useState(false);
+  const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
+
+  const [remoteVideoTracks, setRemoteVideoTracks] = useState<
+    Record<string, MediaStreamTrack | null>
+  >({});
+
+  const handleVideoTrackUpdate = useCallback(
+    (peerId: string, videoTrack: MediaStreamTrack | null) => {
+      setRemoteVideoTracks((prev) => ({
+        ...prev,
+        [peerId]: videoTrack,
+      }));
+    },
+    []
+  );
+
+  const toggleFullScreen = () => {
+    setIsLessScreen(!isLessScreen);
+  };
+
+  const handleCopy = () => {
+    if (typeof window === "undefined") return;
+
+    navigator.clipboard.writeText(`${BASE_URL}${path}/lobby`);
+    setIsCopied(true);
+
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 3000);
+  };
+
+  // Function to truncate long addresses
+  const truncateAddress = (address: string, maxLength = 30) => {
+    if (address.length <= maxLength) return address;
+    return address.slice(0, maxLength) + "...";
+  };
 
   // let meetingType;
 
@@ -136,7 +176,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
           if (walletAddress) {
             myHeaders.append("x-wallet-address", walletAddress);
-            myHeaders.append("Authorization",`Bearer ${token}`)
+            myHeaders.append("Authorization", `Bearer ${token}`);
           }
 
           const raw = JSON.stringify({
@@ -184,7 +224,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
         } else {
           router.push(`/meeting/session/${params.roomId}/lobby`);
         }
-
       } catch (e) {
         setIsRecording(false);
         console.log("error in closing room: ", e);
@@ -206,7 +245,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       if (storedStatus) {
         console.log("storedStatus::: ", storedStatus);
         const parsedStatus = JSON.parse(storedStatus);
-        console.log("Line 213:",parsedStatus);
+        console.log("Line 213:", parsedStatus);
         // console.log("storedStatus: ", parsedStatus);
         if (
           parsedStatus.meetingId === params.roomId &&
@@ -315,7 +354,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const handleModalClose = () => {
     setModalOpen(false);
     if (walletAddress === hostAddress) {
-      push(`${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`);
+      push(
+        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
+      );
     } else {
       push(
         `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=attended`
@@ -327,19 +368,17 @@ export default function Component({ params }: { params: { roomId: string } }) {
     async function verifyMeetingId() {
       try {
         const myHeaders = new Headers();
-        const token=await getAccessToken();
+        const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
 
         if (walletAddress) {
           myHeaders.append("x-wallet-address", walletAddress);
-          myHeaders.append("Authorization",`Bearer ${token}`);
-
+          myHeaders.append("Authorization", `Bearer ${token}`);
         }
         const raw = JSON.stringify({
           roomId: params.roomId,
           meetingType: "session",
         });
-
 
         const requestOptions: any = {
           method: "POST",
@@ -389,7 +428,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     }
 
-    if(authenticated && walletAddress!=null){
+    if (authenticated && walletAddress != null) {
       verifyMeetingId();
     }
   }, [params.roomId, isAllowToEnter, notAllowedMessage, walletAddress]);
@@ -436,7 +475,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   const handleMeetingModalClose = async (result: boolean) => {
-    const token=await getAccessToken();
+    const token = await getAccessToken();
     if (role === "host") {
       setShowModal(false);
       const meetingData = {
@@ -449,7 +488,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
       setMeetingRecordingStatus(result);
       updateRecordingStatus(result);
       if (result) {
-        startRecording(params.roomId, setIsRecording,walletAddress?walletAddress:'',token?token:'');
+        startRecording(
+          params.roomId,
+          setIsRecording,
+          walletAddress ? walletAddress : "",
+          token ? token : ""
+        );
       }
     }
   };
@@ -506,11 +550,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
             }`
           )}
         >
-          <div className="backdrop-blur-xl flex flex-col h-screen">
-            <header className="flex items-center justify-between pt-4 px-4">
+          <div className="bg-[#0a0a0a] flex flex-col h-screen">
+            <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
-                <div className="text-3xl font-semibold tracking-wide px-4 font-quanty">
-                  <span className="text-black">Chora</span>
+                <div className="text-3xl font-semibold tracking-wide font-quanty">
+                  <span className="text-white">Chora</span>
                   <span className="text-blue-shade-100">Club</span>
                 </div>
               </div>
@@ -536,29 +580,23 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 <div className="flex space-x-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="flex gap-2 bg-gray-600/50 text-gray-200 hover:bg-gray-500/50">
+                      <Button className="flex gap-2 bg-[#202020] text-gray-200 hover:bg-gray-500/50">
                         {BasicIcons.invite}
-                        Invite
+                        <span className="hidden lg:block">Invite</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <div className="flex space-x-2">
-                        <span className="p-2 bg-gray-200 rounded-lg text-black">
+                    <DropdownMenuContent className="w-72">
+                      <div className="flex items-center space-x-2 p-2">
+                        <span
+                          className="flex-grow p-2  bg-[#2f2f2f] rounded-lg  text-white truncate text-sm"
+                          title={`${BASE_URL}${path}`}
+                        >
                           {typeof window !== "undefined" &&
-                            `${BASE_URL}${path}`}
+                            truncateAddress(`${BASE_URL}${path}`)}
                         </span>
                         <Button
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-900"
-                          onClick={() => {
-                            if (typeof window === "undefined") return;
-                            navigator.clipboard.writeText(
-                              `${BASE_URL}${path}/lobby`
-                            );
-                            setIsCopied(true);
-                            setTimeout(() => {
-                              setIsCopied(false);
-                            }, 3000);
-                          }}
+                          className="bg-[#2f2f2f] hover:bg-gray-600/50 text-white text-sm px-3 py-2"
+                          onClick={handleCopy}
                         >
                           {isCopied ? "Copied" : "Copy"}
                         </Button>
@@ -569,13 +607,68 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </div>
             </header>
             <main
-              className={`transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
+              className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
             >
-              <div className="flex w-full h-full">
+              <div
+                className={`relative flex flex-col lg:flex-row w-full h-full ${
+                  isRemoteLessScreen || !isScreenShared
+                    ? ""
+                    : `${
+                        isLessScreen || !isScreenShared
+                          ? ""
+                          : "bg-[#202020] rounded-lg justify-center"
+                      }`
+                } `}
+              >
+                {/* {console.log("is less screen",isLessScreen)}
+                {console.log("less screen in remote", isRemoteLessScreen)}
+                {console.log("screen share", isScreenShared)} */}
+                {/* {(!isLessScreen || isScreenShared) &&  ( */}
+                {/* <div className={`${(!isLessScreen && isScreenShared) ? "flex" : `${!isRemoteLessScreen && isScreenShared ? "flex" : ""}`} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
+                    {metadata?.avatarUrl && (
+                            <div className=" rounded-full w-20 h-20">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-cover object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                  <span className="absolute bottom-2 left-2">You</span>
+                 </div> */}
+                {/* )} */}
+                {/* {(!isRemoteLessScreen && isScreenShared) &&  (
+                  <div className={`${!isLessScreen && isScreenShared} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
+                    {metadata?.avatarUrl && (
+                            <div className=" rounded-full w-20 h-20">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-cover object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                  <span className="absolute bottom-2 left-2">You</span>
+                 </div>
+                )} */}
                 {shareStream && (
-                  <div className="w-3/4">
-                    <GridContainer className="w-full h-full">
+                  <div className={`w-full `}>
+                    <GridContainer className="w-full h-full relative">
                       <>
+                        <Tooltip
+                          content={isLessScreen ? "Full Screen" : "Less Screen"}
+                        >
+                          <Button
+                            className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
+                            onClick={toggleFullScreen}
+                          >
+                            {isLessScreen ? <Maximize2 /> : <Minimize2 />}
+                          </Button>
+                        </Tooltip>
                         <Video
                           stream={videoStreamTrack}
                           name={metadata?.displayName ?? "guest"}
@@ -585,27 +678,30 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   </div>
                 )}
                 {peerIds.map((peerId) => (
-                  <RemoteScreenShare key={peerId} peerId={peerId} />
+                  <RemoteScreenShare
+                    key={peerId}
+                    peerId={peerId}
+                    isRemoteLessScreen={isRemoteLessScreen}
+                    setIsRemoteLessScreen={setIsRemoteLessScreen}
+                    onVideoTrackUpdate={handleVideoTrackUpdate}
+                  />
                 ))}
                 <section
-                  className={clsx(
-                    "justify-center px-4",
-                    isScreenShared
-                      ? "flex flex-col w-1/4 gap-2"
-                      : "flex flex-wrap gap-3 w-full"
-                  )}
+                  className={`${
+                    isRemoteLessScreen || !isScreenShared
+                      ? "grid"
+                      : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
+                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto ${
+                    peerIds.length === 0
+                      ? "grid-cols-1"
+                      : peerIds.length === 1
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 "
+                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 1.5xl:grid-cols-2"
+                  }`}
                 >
                   {role !== Role.BOT && (
-                    <GridContainer
-                      className={clsx(
-                        isScreenShared
-                          ? "w-full h-full gap-y-2 mx-1"
-                          : `w-[49%] ${
-                              peerIds.length === 2 || peerIds.length === 3
-                                ? "h-[49%]"
-                                : ""
-                            }`
-                      )}
+                    <div
+                      className={`bg-[#202020] bg-opacity-80 relative rounded-lg flex  flex-col items-center justify-center min-w-[150px] min-h-[150px]`}
                     >
                       <div className="absolute left-4 top-4 text-3xl z-10">
                         {reaction}
@@ -626,11 +722,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       ) : (
                         <div className="flex w-24 h-24 rounded-full">
                           {metadata?.avatarUrl && (
-                            <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
+                            <div className=" rounded-full w-24 h-24">
                               <Image
                                 alt="image"
                                 src={metadata?.avatarUrl}
-                                className="maskAvatar object-contain object-center"
+                                className="maskAvatar object-cover object-center"
                                 width={100}
                                 height={100}
                               />
@@ -638,7 +734,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           )}
                         </div>
                       )}
-                      <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+                      <span className="absolute bottom-4 left-4 text-white font-medium">
                         {`${metadata?.displayName} (You)`}
                       </span>
                       <span className="absolute bottom-4 right-4">
@@ -646,20 +742,112 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           ? NestedPeerListIcons.active.mic
                           : NestedPeerListIcons.inactive.mic}
                       </span>
-                    </GridContainer>
+                    </div>
                   )}
+
                   {isScreenShared ? (
-                    peerIds
-                      .slice(0, 2)
-                      .map((peerId) => (
-                        <RemotePeer key={peerId} peerId={peerId} />
-                      ))
+                    <>
+                      {peerIds.length > 2 ? (
+                        <>
+                          {peerIds.slice(0, 1).map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={clsx("sm:hidden")}
+                            />
+                          ))}
+                          <ParticipantTile className={clsx("sm:hidden")} />
+                        </>
+                      ) : (
+                        peerIds.map((peerId) => (
+                          <RemotePeer
+                            key={peerId}
+                            peerId={peerId}
+                            className={clsx("sm:hidden")}
+                          />
+                        ))
+                      )}
+                      {peerIds.length > 3 ? (
+                        <>
+                          {peerIds.slice(0, 2).map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={clsx("hidden sm:flex md:hidden")}
+                            />
+                          ))}
+                          <ParticipantTile
+                            className={clsx("hidden sm:flex md:hidden")}
+                          />
+                        </>
+                      ) : (
+                        peerIds.map((peerId) => (
+                          <RemotePeer
+                            key={peerId}
+                            peerId={peerId}
+                            className={clsx("hidden sm:flex md:hidden")}
+                          />
+                        ))
+                      )}
+                      {peerIds.length > 2 ? (
+                        <>
+                          {peerIds.slice(0, 1).map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={clsx("hidden md:flex lg:hidden")}
+                            />
+                          ))}
+                          <ParticipantTile
+                            className={clsx("hidden md:flex lg:hidden")}
+                          />
+                        </>
+                      ) : (
+                        peerIds.map((peerId) => (
+                          <RemotePeer
+                            key={peerId}
+                            peerId={peerId}
+                            className={clsx("hidden md:flex lg:hidden")}
+                          />
+                        ))
+                      )}
+                      {peerIds.length > 3 ? (
+                        <>
+                          {peerIds.slice(0, 2).map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={clsx("hidden lg:flex ")}
+                            />
+                          ))}
+                          <ParticipantTile
+                            className={clsx("hidden lg:flex ")}
+                          />
+                        </>
+                      ) : (
+                        peerIds.map((peerId) => (
+                          <RemotePeer
+                            key={peerId}
+                            peerId={peerId}
+                            className={clsx("hidden lg:flex ")}
+                          />
+                        ))
+                      )}
+                    </>
                   ) : peerIds.length > 3 ? (
                     <>
                       {peerIds.slice(0, 2).map((peerId) => (
                         <RemotePeer key={peerId} peerId={peerId} />
                       ))}
-                      <ParticipantTile />
+                      <GridContainer
+                        className={clsx(
+                          "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] border-none"
+                        )}
+                      >
+                        <div className="flex items-center justify-center w-24 h-24 rounded-full bg-[#232631] text-[#717682] text-3xl font-semibold ">
+                          +{peerIds.length - 2}
+                        </div>
+                      </GridContainer>
                     </>
                   ) : (
                     peerIds.map((peerId) => (
@@ -667,7 +855,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     ))
                   )}
                 </section>
-                {/* <MainGridLayout params={params} /> */}
               </div>
               {isChatOpen && <ChatBar />}
               {isParticipantsOpen && <ParticipantsBar />}
@@ -702,24 +889,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
             </div>
           ) : (
             <>
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center h-screen bg-[#0a0a0a]">
                 <div className="text-center">
                   <div className="flex items-center justify-center pt-10">
-                    <TailSpin
-                      // visible={true}
-                      // height="40"
-                      // width="40"
-                      // color="#0500FF"
-                      // secondaryColor="#cdccff"
-                      // ariaLabel="oval-loading"
+                    <RotatingLines
+                      strokeColor="#0356fc"
+                      strokeWidth="5"
+                      animationDuration="0.75"
+                      width="60"
                       visible={true}
-                      height="80"
-                      width="80"
-                      color="#0500FF"
-                      ariaLabel="tail-spin-loading"
-                      radius="1"
-                      wrapperStyle={{}}
-                      wrapperClass=""
                     />
                   </div>
                 </div>
@@ -732,7 +910,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {role !== null && walletAddress !== undefined && showFeedbackPopups && (
         <PopupSlider
           role={role}
-          address={walletAddress?walletAddress:''}
+          address={walletAddress ? walletAddress : ""}
           daoName={daoName}
           meetingId={params.roomId}
           onClose={handleFeedbackPopupsClose}

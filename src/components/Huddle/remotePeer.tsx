@@ -21,9 +21,10 @@ import Image from "next/image";
 
 interface RemotePeerProps {
   peerId: string;
+  className?: string;
 }
 
-const RemotePeer = ({ peerId }: RemotePeerProps) => {
+const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   const { stream: videoStream } = useRemoteVideo({ peerId });
   const { stream: audioStream, isAudioOn } = useRemoteAudio({ peerId });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
@@ -47,13 +48,10 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
   });
 
   return (
-    <GridContainer
+    <div
       className={clsx(
-        isScreenShared
-          ? "w-full h-full gap-y-2 mx-1"
-          : `w-[49%] ${
-              peerIds.length === 2 || peerIds.length === 3 ? "h-[49%]" : ""
-            }`
+        "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] w-full",
+        className
       )}
     >
       <div className="absolute left-4 top-4 text-3xl z-10">{reaction}</div>
@@ -67,7 +65,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
       ) : (
         <div className="flex w-24 h-24 rounded-full">
           {metadata?.avatarUrl && (
-            <div className="bg-pink-50 border border-pink-100 rounded-full w-24 h-24">
+            <div className=" rounded-full w-24 h-24">
               <Image
                 src={metadata?.avatarUrl}
                 alt="image"
@@ -79,7 +77,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
           )}
         </div>
       )}
-      <span className="absolute bottom-4 left-4 text-gray-800 font-medium">
+      <span className="absolute bottom-4 left-4 text-white font-medium">
         {metadata?.displayName}
       </span>
       <span className="absolute bottom-4 right-4">
@@ -90,7 +88,7 @@ const RemotePeer = ({ peerId }: RemotePeerProps) => {
       {audioStream && (
         <Audio stream={audioStream} name={metadata?.displayName ?? "guest"} />
       )}
-    </GridContainer>
+    </div>
   );
 };
 

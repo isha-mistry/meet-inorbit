@@ -41,6 +41,7 @@ import {
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 import { fetchApi } from "@/utils/api";
+import MobileMenuDropdown from "./MobileMenuDropdown";
 
 const BottomBar = ({
   daoName,
@@ -291,12 +292,20 @@ const BottomBar = ({
     }
   };
 
+  const handleCopyInviteLink = () => {
+    const meetingLink = `${window.location.origin}/${daoName}/spaces/${roomId}`;
+    navigator.clipboard.writeText(meetingLink);
+    toast.success("Meeting link copied to clipboard!");
+  };
+
   return (
     <>
-      <footer className="flex items-center justify-between px-4 py-2 font-poppins">
-        <QuickLinks daoName={daoName} />
+      <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-[#0a0a0a] lg:bg-transparent z-10">
+        <div className="">
+          <QuickLinks daoName={daoName} />
+        </div>
 
-        <div className={clsx("flex space-x-3")}>
+        <div className={clsx("flex space-x-2 sm:space-x-3")}>
           <ButtonWithIcon
             content={isVideoOn ? "Turn off camera" : "Turn on camera"}
             onClick={() => {
@@ -307,7 +316,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              isVideoOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
+              isVideoOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
             )}
           >
             {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
@@ -322,7 +331,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              isAudioOn ? "bg-gray-500" : "bg-red-400 hover:bg-red-500"
+              isAudioOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
             )}
           >
             {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
@@ -351,7 +360,7 @@ const BottomBar = ({
               }
             }}
             className={clsx(
-              `bg-gray-500/80 hover:bg-gray-600 ${
+              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
                 (shareStream !== null || isScreenShared) && "bg-gray-500/80"
               }`
             )}
@@ -369,7 +378,7 @@ const BottomBar = ({
               });
             }}
             className={clsx(
-              `bg-gray-500/80 hover:bg-gray-600 ${
+              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
                 metadata?.isHandRaised && "bg-gray-500/80"
               }`
             )}
@@ -381,6 +390,58 @@ const BottomBar = ({
           <div>
             <ReactionBar />
           </div>
+
+          <MobileMenuDropdown
+            isVideoOn={isVideoOn}
+            isAudioOn={isAudioOn}
+            isScreenShared={isScreenShared}
+            shareStream={shareStream}
+            metadata={metadata}
+            isChatOpen={isChatOpen}
+            isParticipantsOpen={isParticipantsOpen}
+            peerCount={Object.keys(peerIds).length + 1}
+            onToggleVideo={() => {
+              if (isVideoOn) {
+                disableVideo();
+              } else {
+                enableVideo();
+              }
+            }}
+            onToggleAudio={() => {
+              if (isAudioOn) {
+                disableAudio();
+              } else {
+                enableAudio();
+              }
+            }}
+            onToggleScreen={() => {
+              if (isScreenShared && shareStream !== null) {
+                stopScreenShare();
+              } else if (isScreenShared) {
+                toast.error("Only one screen share is allowed at a time");
+                return;
+              }
+              if (shareStream !== null) {
+                stopScreenShare();
+              } else {
+                startScreenShare();
+              }
+            }}
+            onToggleHand={() => {
+              updateMetadata({
+                displayName: metadata?.displayName || "",
+                avatarUrl: metadata?.avatarUrl || "",
+                isHandRaised: !metadata?.isHandRaised,
+                walletAddress: metadata?.walletAddress || address || "",
+              });
+            }}
+            onToggleChat={() => setIsChatOpen(!isChatOpen)}
+            onToggleParticipants={() =>
+              setIsParticipantsOpen(!isParticipantsOpen)
+            }
+            onCopyLink={handleCopyInviteLink}
+          />
+
           <div className="flex cursor-pointer items-center">
             <Dropdown
               triggerChild={BasicIcons.leave}
@@ -405,9 +466,26 @@ const BottomBar = ({
               )}
             </Dropdown>
           </div>
+
+          <ButtonWithIcon
+            content={meetingRecordingStatus ? "Stop Recording" : "Record"}
+            onClick={() =>
+              handleRecording(
+                roomId,
+                address,
+                isRecording,
+                setIsRecording,
+                meetingRecordingStatus,
+                setMeetingRecordingStatus
+              )
+            }
+            className="bg-red-500 lg:hidden"
+          >
+            {isUploading ? BasicIcons.spin : BasicIcons.record}
+          </ButtonWithIcon>
         </div>
 
-        <div className="flex space-x-3">
+        <div className="hidden lg:flex space-x-3">
           {role === "host" && (
             <Button
               className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
@@ -424,13 +502,15 @@ const BottomBar = ({
               }
             >
               {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
-              {meetingRecordingStatus ? "Stop Recording" : "Record"}
+              <span className="hidden lg:block">
+                {meetingRecordingStatus ? "Stop Recording" : "Record"}
+              </span>
             </Button>
           )}
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
           >
             <div className="flex items-center justify-center">
               {BasicIcons.people}
@@ -442,7 +522,7 @@ const BottomBar = ({
           <ButtonWithIcon
             content="Chat"
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-gray-600/50 hover:bg-gray-600")}
+            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
           >
             {BasicIcons.chat}
           </ButtonWithIcon>

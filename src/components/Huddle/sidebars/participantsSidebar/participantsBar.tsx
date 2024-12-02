@@ -10,10 +10,10 @@ const ParticipantsBar = () => {
   const { requestedPeers, setIsParticipantsOpen } = useStudioState();
 
   return (
-    <aside className="w-96 bg-gray-100 h-full mr-2 rounded-lg transition-all duration-300 ease-in-out">
+    <aside className="absolute right-0 top-0 w-full 0.5xm:w-96 bg-[#202020] h-full  0.5xm:rounded-l-lg transition-trasform duration-300 ease-in-out shadow-lg z-20">
       <div className="mb-6">
-        <div className="flex justify-between items-center px-4 py-2 border-b border-gray-700">
-          <h1 className="text-xl font-semibold text-[#0500FF]">Participants</h1>
+        <div className="flex justify-between items-center px-4 py-2 border-b border-[#2f2f2f]">
+          <h1 className="text-xl font-semibold text-gray-300">Participants</h1>
           <button type="button" onClick={() => setIsParticipantsOpen(false)}>
             {BasicIcons.close}
           </button>

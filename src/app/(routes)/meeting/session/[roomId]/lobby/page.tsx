@@ -10,7 +10,7 @@ import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 // import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
-import { Oval, TailSpin } from "react-loader-spinner";
+import { Oval, RotatingLines } from "react-loader-spinner";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useConnection } from "@/app/hooks/useConnection";
@@ -273,15 +273,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Render loading state
   if (isPageLoading || isSessionLoading || isApiCalling) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <TailSpin
-          visible={true}
-          height="80"
-          width="80"
-          color="#0500FF"
-          ariaLabel="tail-spin-loading"
-          radius="1"
-        />
+      <div className="flex justify-center items-center h-screen bg-[#0a0a0a]">
+        <RotatingLines
+            strokeColor="#0356fc"
+            strokeWidth="5"
+            animationDuration="0.75"
+            width="60" 
+            visible={true}
+          />
       </div>
     );
   }
@@ -289,7 +288,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // Render not allowed message
   if (!isAllowToEnter && notAllowedMessage) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-[#0a0a0a] text-white">
         <div className="text-center">
           <div className="text-6xl mb-6">☹️</div>
           <div className="text-lg font-semibold mb-8">
@@ -297,7 +296,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           </div>
           <Link
             href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
-            className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300"
+            className="px-6 py-3 bg-[#2f2f2f] text-white rounded-full shadow-lg hover:bg-[#202020] transition duration-300"
           >
             Back to Profile
           </Link>
@@ -310,88 +309,71 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   return (
     <>
       {isAllowToEnter === true && (
-        <div
-          className={`h-screen bg-contain bg-center bg-no-repeat rounded-full ${
-            daoName === "optimism"
-              ? "bg-op-logo"
-              : daoName === "arbitrum"
-              ? "bg-arb-logo"
-              : ""
-          }`}
-        >
-          <main className="flex h-screen flex-col bg-lobby text-slate-100 font-poppins backdrop-blur-md">
-            <div className="flex justify-between px-10 pt-4">
-              <div className="text-4xl font-semibold font-quanty tracking-wide">
-                <span className="text-black">Chora</span>
-                <span className="text-blue-shade-100">Club</span>
-              </div>
-              <ConnectWalletWithENS />
+        <div className="min-h-screen bg-[#0a0a0a] ">
+        <main className="flex min-h-screen flex-col text-white font-poppins">
+          <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
+            <div className="text-4xl font-semibold font-quanty tracking-wide">
+              <span className="text-white">Chora</span>
+              <span className="text-blue-shade-100">Club</span>
             </div>
+            <ConnectWalletWithENS />
+          </div>
 
-            <div className="flex w-full items-center justify-center my-auto">
-              <div className="flex flex-col items-center justify-center gap-4 w-1/3 mt-14">
-                {/* Avatar Section */}
-                <div
-                  className={`text-center flex items-center justify-center border border-white w-full rounded-2xl py-28 bg-opacity-40 ${
-                    daoName === "optimism"
-                      ? "bg-slate-100"
-                      : daoName === "arbitrum"
-                      ? "bg-slate-400"
-                      : ""
-                  }`}
-                >
-                  <div className="relative border-2 border-gray-600 rounded-full p-1">
-                    <Image
-                      src={avatarUrl}
-                      alt="profile-avatar"
-                      width={125}
-                      height={125}
-                      className="maskAvatar shadow-md"
-                      quality={100}
-                      priority
-                    />
+            <div className="flex w-full items-center justify-center my-auto px-4">
+              <div className="flex flex-col items-center justify-center gap-4 w-full xs:w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 mt-8 lg:mt-14">
+                 {/* Avatar Section */}
+                 <div className="relative w-full rounded-2xl py-16 sm:py-20 lg:py-28 overflow-hidden">
+                  {/* Background blur layer */}
+                  <div 
+                    className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"
+                  ></div>
+                  
+                  {/* Avatar container */}
+                  <div className="relative z-10 flex items-center justify-center ">
+                    <div className="relative rounded-full p-1">
+                      <Image
+                        src={avatarUrl}
+                        alt="profile-avatar"
+                        width={100}
+                        height={100}
+                        className="maskAvatar shadow-md w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full"
+                        quality={100}
+                        priority
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Name/Address Section */}
                 <div className="flex items-center w-full flex-col">
                   <div
-                    className={`flex flex-col justify-center w-full gap-1 ${
-                      daoName === "optimism"
-                        ? "text-[#e7e7e7]"
-                        : daoName === "arbitrum"
-                        ? "text-[#4f4f4f]"
-                        : ""
-                    } font-semibold`}
+                    className={`flex flex-col justify-center w-full gap-1 text-white font-semibold`}
                   >
                     ENS Name / Address
                     <div
-                      className={`flex w-full items-center rounded-[10px] ${
-                        daoName === "optimism"
-                          ? "bg-slate-100"
-                          : daoName === "arbitrum"
-                          ? "bg-slate-400"
-                          : ""
-                      } bg-opacity-40 border px-3 text-slate-300 outline-none border-white backdrop-blur-[400px]`}
+                      className={`flex w-full items-center rounded-[10px]  border border-[#2f2f2f] bg-[#202020] px-3 text-gray-300 outline-none backdrop-blur-[400px]`}
                     >
+                      {/* <div 
+                    className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"
+                  ></div> */}
                       <div className="mr-2">
                         <Image
                           alt="user-icon"
                           src="/images/user-icon.svg"
-                          className="w-5 h-5"
+                          className="size-4 sm:size-5"
                           width={30}
                           height={30}
                         />
                       </div>
-                      <div className="flex-1 bg-transparent py-3 outline-none text-[#f0f0f0]">
+                      <div className="flex-1 bg-transparent py-2 sm:py-3 outline-none text-gray-500 text-sm sm:text-base">
                         {isLoadingProfile ? (
                           <div className="flex items-center justify-center">
                             <Oval
                               visible={true}
                               height="20"
                               width="20"
-                              color="#0500FF"
-                              secondaryColor="#cdccff"
+                              color="#4f4f4f"
+                              secondaryColor="#2f2f2f"
                             />
                           </div>
                         ) : (
@@ -403,14 +385,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
 
                 {/* Start Button */}
-                <div className="flex items-center w-1/2">
+                <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
                   <button
-                    className={`flex items-center justify-center w-full py-4 px-6 mt-4
-                  text-white font-bold text-lg rounded-full transition-all duration-300
+                    className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
                   ${
                     isLoadingProfile
-                      ? "bg-gray-400"
-                      : "bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500"
+                      ? "bg-gray-700"
+                      : "bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700"
                   }
                   ${
                     isLoadingProfile || isJoining
@@ -431,7 +412,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                         width={24}
                         height={24}
                         src={arrow}
-                        className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1"
+                        className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-1"
                       />
                     )}
                   </button>

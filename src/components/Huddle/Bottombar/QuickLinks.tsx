@@ -7,30 +7,30 @@ import {
 import { arbBlock, opBlock } from "@/config/staticDataUtils";
 import React from "react";
 import { PiLinkSimpleBold } from "react-icons/pi";
+import clsx from "clsx";
 
 function QuickLinks({ daoName }: { daoName: string }) {
   return (
-    <div>
+    <div className="flex items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="bg-white hover:bg-white">
+          <Button className={clsx("bg-[#0a0a0a] hover:bg-[#0a0a0a] border-none")}>
             <div className="flex gap-2 items-center">
-              <div className="bg-gray-600/50 hover:bg-gray-600 p-2 rounded-lg">
+              <div className="bg-[#202020] hover:bg-gray-500/50 p-2 rounded-lg">
                 <PiLinkSimpleBold
                   className="text-white"
                   size={24}
                 ></PiLinkSimpleBold>
               </div>
-              <div className="text-gray-800 text-base">Quick Links</div>
+              <div className="hidden lg:block text-white text-base">Quick Links</div>
             </div>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="bg-white items-start"
+          className="w-full bg-[#202020] text-white p-2 rounded-lg"
           sideOffset={8}
-          align="start"
         >
-          <div className="">
+          <div className="space-y-2">
             {/* <div className="arrow-up"></div> */}
             {(daoName === "arbitrum"
               ? arbBlock
@@ -41,7 +41,7 @@ function QuickLinks({ daoName }: { daoName: string }) {
               <a
                 href={block.link}
                 target="_blank"
-                className="block px-4 py-2 text-gray-800 hover:bg-gray-200 hover:rounded-md"
+                className="block px-4 py-2 bg-[#2f2f2f] hover:bg-gray-600/50 hover:rounded-md"
                 key={index}
               >
                 {block.title}
