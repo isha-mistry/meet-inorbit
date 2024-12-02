@@ -36,6 +36,7 @@ import ConnectWalletWithENS from "@/components/ConnectWallet/ConnectWalletWithEN
 import { useStudioState } from "@/store/studioState";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
+import { usePrivy } from "@privy-io/react-auth";
 
 type lobbyProps = {};
 
@@ -55,6 +56,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   }>();
 
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
+  const {authenticated}=usePrivy();
 
   const { address, isDisconnected } = useAccount();
 
@@ -303,7 +305,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </FeatCommon>
               </div>
             </div>
-            {isDisconnected ? <ConnectWalletWithENS /> : null}
+            {!authenticated ? <ConnectWalletWithENS /> : null}
             <div className="flex items-center w-full flex-col">
               <div className="flex flex-col justify-center w-full gap-1 text-black">
                 Set a display name
