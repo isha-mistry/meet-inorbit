@@ -90,7 +90,6 @@ export async function fetchEnsName(address: any) {
       address,
       chainId: mainnet.id,
     });
-    console.log("ensName: ", ensName);
     const displayName = address?.slice(0, 4) + "..." + address?.slice(-4);
 
     const ensNameOrAddress = ensName ? ensName : displayName;

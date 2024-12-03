@@ -164,7 +164,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
   // } else {
   //   meetingType = 0;
   // }
-  console.log("path: ", path);
 
   const { state } = useRoom({
     onLeave: async ({ reason }) => {
@@ -197,8 +196,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
           );
 
           const result = await response.json();
-
-          console.log("result: ", result);
 
           if (result.data) {
             setShowFeedbackPopups(false);
@@ -233,20 +230,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handleFeedbackPopupsClose = async () => {
     setShowFeedbackPopups(false);
-    console.log("Response given");
     await handlePopupRedirection();
   };
 
   const handlePopupRedirection = async () => {
     if (role === "host") {
-      console.log("host submitted the review");
       const storedStatus = sessionStorage.getItem("meetingData");
-      console.log("storedStatus::: ", storedStatus);
       if (storedStatus) {
-        console.log("storedStatus::: ", storedStatus);
         const parsedStatus = JSON.parse(storedStatus);
-        console.log("Line 213:", parsedStatus);
-        // console.log("storedStatus: ", parsedStatus);
         if (
           parsedStatus.meetingId === params.roomId &&
           parsedStatus.isMeetingRecorded === true
@@ -255,7 +246,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
             `/meeting/session/${params.roomId}/update-session-details`
           );
         } else {
-          console.log("Open modal");
           setHostModalOpen(true);
         }
       }
@@ -300,7 +290,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
       if (label === "recordingStatus") {
         const status = JSON.parse(payload).isRecording;
-        // console.log("data message: ", status);
         setIsRecording(status);
       }
       if (label === "requestRecordingStatus" && role === "host") {
@@ -388,7 +377,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
         };
         const response = await fetchApi("/verify-meeting-id", requestOptions);
         const result = await response.json();
-        // console.log("348:",result);
 
         if (result.success) {
           setMeetingData(result.data);
@@ -399,23 +387,18 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
         if (result.success) {
           if (result.message === "Meeting has ended") {
-            console.log("Meeting has ended");
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting is upcoming") {
-            console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
           } else if (result.message === "Meeting has been denied") {
-            console.log("Meeting has been denied");
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
-            console.log("Meeting does not exist");
           } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
-            console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios
@@ -435,7 +418,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
-      console.log(`pushing to /meeting/session/${params.roomId}/lobby`);
       push(`/meeting/session/${params.roomId}/lobby`);
       return;
     } else {
@@ -450,18 +432,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   useEffect(() => {
     setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
-    console.log("videoTrack", videoTrack);
   }, [videoTrack]);
 
   // useEffect(() => {
   //   const storedStatus = localStorage.getItem("meetingData");
   //   if (storedStatus) {
   //     const parsedStatus = JSON.parse(storedStatus);
-  //     console.log("storedStatus: ", parsedStatus);
+  //     ("storedStatus: ", parsedStatus);
   //     setRecordingStatus(parsedStatus.isMeetingRecorded);
   //     setIsRecording(parsedStatus.isMeetingRecorded);
   //   }
-  //   console.log("recordingStatus: ", recordingStatus);
   // }, [recordingStatus]);
 
   const updateRecordingStatus = (status: any) => {
@@ -499,14 +479,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   useEffect(() => {
-    console.log("isRecording value: ", isRecording);
     // const value = meetingRecordingStatus;
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
-      console.log("parsedValue: ", parsedValue);
       if (parsedValue.meetingId === params.roomId) {
-        console.log("is true");
         setIsRecording(parsedValue.isMeetingRecorded);
         setMeetingRecordingStatus(parsedValue.recordingStatus);
 
@@ -528,7 +505,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //   const storedStatus = sessionStorage.getItem("meetingData");
   //   if (storedStatus) {
   //     const parsedStatus = JSON.parse(storedStatus);
-  //     console.log("storedStatus: ", parsedStatus);
   //     if (parsedStatus.meetingId === params.roomId) {
   //       setIsRecording(parsedStatus.isMeetingRecorded);
   //       setCurrentRecordingState(parsedStatus.recordingStatus);
@@ -620,9 +596,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       }`
                 } `}
               >
-                {/* {console.log("is less screen",isLessScreen)}
-                {console.log("less screen in remote", isRemoteLessScreen)}
-                {console.log("screen share", isScreenShared)} */}
                 {/* {(!isLessScreen || isScreenShared) &&  ( */}
                 {/* <div className={`${(!isLessScreen && isScreenShared) ? "flex" : `${!isRemoteLessScreen && isScreenShared ? "flex" : ""}`} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
                     {metadata?.avatarUrl && (

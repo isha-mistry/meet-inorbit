@@ -11,7 +11,6 @@ const allowedOrigins = [
   process.env.NEXT_PUBLIC_HOSTED_APP_URL!,
 ].filter(Boolean);
 
-
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
   process.env.NEXT_PUBLIC_PRIVY_SECRET!
@@ -35,15 +34,12 @@ const routeConfig = {
 };
 
 export async function middleware(request: NextRequest) {
-  // console.log("Request in APP Middleware:::", request);
   const origin = request.nextUrl.origin;
   const pathname = request.nextUrl.pathname;
   const apiKey = request.headers.get("x-api-key");
-  // console.log("Line 41",apiKey);
 
   // CORS check
   if (!origin || !allowedOrigins.includes(origin)) {
-    console.log("Origin check failed - Received origin:", origin);
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {
@@ -76,10 +72,6 @@ export async function middleware(request: NextRequest) {
   // Token validation
   const authHeader = request.headers.get("authorization");
   const privyToken = authHeader?.replace("Bearer ", "");
-
-  // console.log("Auth header:",authHeader);
-  // console.log("Privy Token:",privyToken);
-
 
   if (isProxyRoute) {
     // if (!token) {
@@ -117,16 +109,19 @@ export async function middleware(request: NextRequest) {
     // Find linked wallet that matches the provided address
     const linkedWallet = user.linkedAccounts
       .filter((account) => account.type === "wallet")
-      .find((wallet) => wallet.address?.toLowerCase() === walletAddress.toLowerCase());
+      .find(
+        (wallet) =>
+          wallet.address?.toLowerCase() === walletAddress.toLowerCase()
+      );
 
     if (!linkedWallet) {
-      console.log(
-        `Forbidden access attempt: Wallet address ${walletAddress} not linked to user ${verifiedUser.userId}`
+      return new NextResponse(
+        JSON.stringify({ error: "Invalid wallet address" }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        }
       );
-      return new NextResponse(JSON.stringify({ error: "Invalid wallet address" }), {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      });
     }
 
     // if (walletAddress && userAddress !== walletAddress) {

@@ -27,7 +27,6 @@ function PopupSlider({
 
   const handleResponse = (emoji: any) => {
     setResponses({ ...responses, [currentPopup]: emoji });
-    console.log(emoji);
   };
 
   const nextPopup = () => {
@@ -45,7 +44,6 @@ function PopupSlider({
   const handleSubmit = async () => {
     // setIsClosed(true);
     setIsSubmitting(true);
-    console.log("Responses submitted:", responses);
 
     try {
       const token=await getAccessToken();
@@ -94,7 +92,6 @@ function PopupSlider({
       );
 
       const result = await response.json();
-      console.log(result);
       if (result.success) {
         setIsSubmitting(false);
         onClose();

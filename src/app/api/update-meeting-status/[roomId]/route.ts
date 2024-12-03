@@ -6,7 +6,6 @@ import { getDisplayNameOrAddr } from "@/utils/NotificationUtils";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, meetingType, additionalData } = await req.json();
-  console.log("additionalData::", additionalData);
 
   const {
     daoName,
@@ -18,17 +17,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     attendeeJoinedStatus,
     meetingData,
   } = await additionalData;
-
-  console.log(
-    daoName,
-    sessionType,
-    callerAddress,
-    hostAddress,
-    attendeeAddress,
-    hostJoinedStatus,
-    attendeeJoinedStatus,
-    meetingData
-  );
 
   try {
     // Connect to MongoDB database
@@ -50,7 +38,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       return NextResponse.json(officeHours, { status: 200 });
     } else if (collectionName === "meetings") {
       if (sessionType === "session") {
-        console.log("inside type session");
         const userENSNameOrAddress = await getDisplayNameOrAddr(
           attendeeAddress
         );
@@ -68,7 +55,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               returnDocument: "after",
             }
           );
-          console.log("sessions::", sessions);
           if (hostJoinedStatus === "Pending") {
             const notificationToGuest = {
               receiver_address: attendeeAddress,
@@ -87,32 +73,27 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               notificationToGuest
             );
 
-            console.log("notificationResult", notificationResult);
 
             if (notificationResult.insertedId) {
               const insertedNotification = await notificationCollection.findOne(
                 { _id: notificationResult.insertedId }
               );
 
-              console.log("insertedNotification", insertedNotification);
             }
 
             const dataToSendGuest = {
               ...notificationToGuest,
               _id: notificationResult.insertedId,
             };
-            console.log("dataToSendGuest", dataToSendGuest);
 
             const socket = io(`${SOCKET_BASE_URL}`, {
               withCredentials: true,
             });
             socket.on("connect", () => {
-              console.log("Connected to WebSocket server from API");
               socket.emit("session_started_by_host", {
                 attendeeAddress,
                 dataToSendGuest,
               });
-              console.log("Message sent from API to socket server");
               socket.disconnect();
             });
 
@@ -140,7 +121,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               returnDocument: "after",
             }
           );
-          console.log("sessions::", sessions);
           if (attendeeJoinedStatus === "Pending") {
             const notificationToHost = {
               receiver_address: hostAddress,
@@ -159,7 +139,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               notificationToHost
             );
 
-            console.log("notificationResult", notificationResult);
 
             if (notificationResult.insertedId) {
               const insertedNotification = await notificationCollection.findOne(
@@ -200,7 +179,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           return NextResponse.json(sessions, { status: 200 });
         }
       } else if (sessionType === "instant-meet") {
-        console.log("inside type instant-meet");
         const sessions = await collection.findOneAndUpdate(
           { meetingId },
           {
@@ -211,7 +189,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           },
           { returnDocument: "after" }
         );
-        console.log("sessions::", sessions);
         client.close();
         return NextResponse.json(sessions, { status: 200 });
       }

@@ -27,7 +27,6 @@ export const useSidebar = () => {
       );
 
       const localStorageArr: string[] = Object.values(localJsonData);
-      // console.log("Values: ", localStorageArr);
 
       setStoredDao(localStorageArr);
     }, 100);

@@ -41,7 +41,6 @@ const RemoteScreenShare = ({ peerId,isRemoteLessScreen,setIsRemoteLessScreen ,on
 
   // useEffect(() => {
   //   setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
-  //   console.log("videoTrack-remotescreen", videoTrack);
   // }, [videoTrack]);
   useEffect(() => {
     if (videoTrack) {

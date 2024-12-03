@@ -7,9 +7,6 @@ import jwt from "jsonwebtoken";
 
 async function AccountCreate(user: any, token: any, referrer: string | null) {
   try {
-    console.log(user);
-    console.log(token);
-    console.log(referrer);
     // const referrer = sessionStorage.getItem("referrer");
     const res = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",
@@ -62,14 +59,9 @@ export const authOptions: NextAuthOptions = {
 
           const referrerMatch = siwe.statement?.match(/\(Referrer: (.*?)\)$/);
           const referrer = referrerMatch ? referrerMatch[1] : null;
-          // console.log("referrer: ", referrer);
 
           const nextAuthUrl = new URL(BASE_URL as string);
-          // console.log("credentials", credentials);
-          // console.log("req", req);
-          // console.log("siwe", siwe);
-          // console.log("nextAuthUrl", nextAuthUrl);
-          // console.log("process.env.VERCEL_URL", process.env.VERCEL_URL);
+         
           const secret = process.env.NEXTAUTH_SECRET;
           const result = await siwe.verify({
             signature: credentials?.signature || "",
@@ -77,7 +69,6 @@ export const authOptions: NextAuthOptions = {
             nonce: await getCsrfToken({ req }),
             // nonce: await getCsrfToken({ req: { headers: req.headers } }),
           });
-          console.log(result);
           if (result.success) {
             return {
               id: siwe.address,
@@ -110,7 +101,6 @@ export const authOptions: NextAuthOptions = {
         );
 
         // Add the access token to the token object
-        // console.log("Access token", accessToken);
 
         AccountCreate(token.sub, accessToken, (user as any).referrer);
         token.accessToken = accessToken;

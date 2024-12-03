@@ -18,9 +18,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     //   throw new Error("Network response was not ok");
     // }
     const result = await response.json();
-    console.log("result:::", result);
 
-    // console.log(roomId);
     // Return the found documents
     return NextResponse.json(
       { success: true, data: result.data },

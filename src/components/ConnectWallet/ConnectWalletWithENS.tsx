@@ -65,14 +65,12 @@ function ConnectWalletWithENS() {
           };
 
           // Add this debug log
-          // console.log("Headers before fetch:", Array.from(myHeaders.entries()));
 
           const res = await fetchApi(`/profile/${walletAddress2.toLowerCase()}`, requestOptions);
           const dbResponse = await res.json();
 
           if (dbResponse.data.length > 0) {
             const profileImage = dbResponse.data[0]?.image;
-            // console.log("78",profileImage)
             setUserProfileImage(
               profileImage
                 ? `https://gateway.lighthouse.storage/ipfs/${profileImage}`
@@ -86,9 +84,7 @@ function ConnectWalletWithENS() {
 
           // Get ENS name
           const displayName = await fetchEnsName(walletAddress2);
-          // console.log("Line number 64:", displayName);
           setDisplayAddress(displayName?.ensNameOrAddress || walletAddress2);
-          // console.log("Line number 66:", displayAddress);
         } catch (error) {
           console.error("Error fetching user profile:", error);
         }

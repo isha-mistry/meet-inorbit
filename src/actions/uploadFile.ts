@@ -9,7 +9,6 @@ export const uploadFile = async (
   roomId: string | undefined
 ) => {
   // const arrayBuffer = await arrayBuffer.arrayBuffer();
-  // console.log("arrayBuffer", arrayBuffer);
   try {
     const apiKey = NFT_LIGHTHOUSE_BASE_API_KEY || "";
     if (!apiKey) {
@@ -23,7 +22,6 @@ export const uploadFile = async (
     const file = new File([blob], `${roomId}-${daoName}-nft.jpg`, {
       type: "image/jpeg",
     });
-    console.log("file:::", file);
 
     const uploadResponse = await lighthouse.upload([file], apiKey);
 
@@ -31,7 +29,6 @@ export const uploadFile = async (
       throw new Error("Upload failed: Invalid response from Lighthouse");
     }
 
-    // console.log("Upload successful:", uploadResponse.data);
     return uploadResponse.data;
   } catch (error: any) {
     console.error("Error uploading to Lighthouse:", error.message);

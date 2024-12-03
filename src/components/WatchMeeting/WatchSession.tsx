@@ -60,7 +60,6 @@ function WatchSession({
   const [shareModal, setShareModal] = useState(false);
   const router = useRouter();
   const path = usePathname();
-  console.log("path: ", path);
 
   const handleShareClose = () => {
     setShareModal(false);
@@ -73,7 +72,6 @@ function WatchSession({
   }, [data.description, isExpanded]);
 
   const handleModalClose = () => {
-    console.log("Popup Closed");
     setModalOpen(false);
   };
 

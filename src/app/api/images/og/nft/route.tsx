@@ -25,9 +25,6 @@ export async function GET(req: NextRequest) {
     new URL("../assets/arb.png", import.meta.url)
   ).then((res) => res.arrayBuffer());
 
-  console.log("daoName: ", daoName);
-  console.log("meetingId: ", meetingId);
-
   const main = await fetch(new URL("../assets/nft.png", import.meta.url)).then(
     (res) => res.arrayBuffer()
   );
@@ -115,6 +112,5 @@ export async function GET(req: NextRequest) {
       ...size,
     }
   );
-  // console.log("imageResponse::", imageResponse);
   return imageResponse;
 }

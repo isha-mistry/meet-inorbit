@@ -6,11 +6,9 @@ import useAuthentication from "@/app/hooks/useAuthentication";
 // export const revalidate = 0;
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  console.log("req object::", req);
   try {
     const { meetingId, host_address, title, description, thumbnail_image } =
       await req.json();
-    console.log(meetingId, host_address, title, description, thumbnail_image);
 
     const authHeader = req.headers.get("authorization");
     const privyToken = authHeader?.replace("Bearer ", "");

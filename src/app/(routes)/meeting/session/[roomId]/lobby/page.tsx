@@ -73,19 +73,16 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     if (!authenticated) {
       login();
     }
-    console.log("Line 76:", walletAddress);
   }, [authenticated, walletAddress]);
 
   // Verify Meeting ID
   useEffect(() => {
-    console.log(params.roomId);
     const verifyMeetingId = async () => {
       if (!params.roomId) return;
       setIsApiCalling(true);
       try {
         const myHeaders = new Headers();
         const token = await getAccessToken();
-        // console.log("Line 88",token);
         myHeaders.append("Content-Type", "application/json");
         if (walletAddress) {
           myHeaders.append("x-wallet-address", walletAddress);
@@ -156,7 +153,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       try {
         setIsLoadingProfile(true);
-        console.log(isAllowToEnter, walletAddress, isConnected);
         const token = await getAccessToken();
         const response = await fetchApi(`/profile/${walletAddress}`, {
           method: "POST",
@@ -168,10 +164,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: JSON.stringify({ walletAddress }),
         });
 
-        console.log(response);
 
         const { data } = await response.json();
-        console.log("171:", data);
 
         if (Array.isArray(data)) {
           const profileWithName = data.find(
@@ -240,7 +234,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       });
 
       const result = await tokenResponse.json();
-      // console.log("token", result.token);
       const token = result.token;
       // Join room
       await joinRoom({
@@ -279,7 +272,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     } catch (error) {
       console.error("Error starting spaces:", error);
-      toast.error("Failed to join meeting");
+      // toast.error("Failed to join meeting");
     } finally {
       setIsJoining(false);
     }

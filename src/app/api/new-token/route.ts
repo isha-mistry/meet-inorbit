@@ -42,8 +42,6 @@ const createToken = async (
 export async function POST(req: NextRequest) {
   const { roomId, role, displayName, address } = await req.json();
 
-  console.log(roomId, role, displayName, address);
-
   if (!roomId) {
     return NextResponse.json("Missing roomId", { status: 400 });
   }
@@ -70,7 +68,6 @@ export async function POST(req: NextRequest) {
       }
     );
     const data = await response.json();
-    console.log(data);
     const { previewPeers } = data;
 
     token = await createToken(

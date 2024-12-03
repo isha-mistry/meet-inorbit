@@ -67,12 +67,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   // Huddle Hooks
   const { joinRoom, state, room } = useRoom();
-  // console.log("role from startspace", role);
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
 
   const handleStartSpaces = async () => {
-    // console.log("handle spaces");
     if (isDisconnected) {
       toast.error("Connect your wallet to join the meeting!");
     } else {
@@ -112,7 +110,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             // }
 
             token = await response.text(); // Change this line
-            // console.log("Token fetched successfully:", token);
           } catch (error) {
             console.error("Error fetching token:", error);
             // Handle error appropriately, e.g., show error message to user
@@ -123,8 +120,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         }
 
         try {
-          // console.log({ token });
-          console.log(params.roomId);
+          
           await joinRoom({
             roomId: params.roomId,
             token,
@@ -135,9 +131,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           toast.error("Failed to join room");
         }
 
-        console.log("Role.HOST", Role.HOST);
         if (Role.HOST) {
-          // console.log("inside put api");
           const token=await getAccessToken();
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
@@ -163,7 +157,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             requestOptions
           );
           const responseData = await response.json();
-          console.log("responseData: ", responseData);
         }
 
         setIsJoining(false);
@@ -202,27 +195,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       try {
         const response = await fetchApi(`/verify-meeting-id`, requestOptions);
         const result = await response.json();
-        // console.log("Line 203...",result);
   
         if (result.success) {
           if (result.message === "Meeting has ended") {
-            console.log("Meeting has ended");
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting is upcoming") {
-            console.log("Meeting is upcoming");
             setIsAllowToEnter(true);
           } else if (result.message === "Meeting has been denied") {
-            console.log("Meeting has been denied");
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
           } else if (result.message === "Meeting does not exist") {
             setIsAllowToEnter(false);
             setNotAllowedMessage(result.message);
-            console.log("Meeting does not exist");
           } else if (result.message === "Meeting is ongoing") {
             setIsAllowToEnter(true);
-            console.log("Meeting is ongoing");
           }
         } else {
           // Handle error scenarios

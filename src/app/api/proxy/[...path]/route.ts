@@ -19,7 +19,6 @@ async function handler(
   const path = params.path.join("/");
   const method = request.method;
   const searchParams = request.nextUrl.searchParams.toString();
-  console.log("path:::", path);
   let requestBody;
   if (["POST", "PUT", "DELETE"].includes(method)) {
     requestBody = await request.json();
@@ -71,7 +70,6 @@ async function handler(
 
   // Get all headers from the incoming request
   const headers = Object.fromEntries(request.headers);
-  // console.log("header from incoming request::", headers);
 
   try {
     const url = `${BASE_URL}/api/${path}${

@@ -10,7 +10,6 @@ const privyClient = new PrivyClient(
 
 
 async function useAuthentication(req: NextRequest, address: string, privyToken: string | undefined) {
-  console.log(req.nextUrl.origin);
   // const token = await getToken({
   //   req: req,
   //   secret: process.env.NEXTAUTH_SECRET,

@@ -13,7 +13,6 @@ export async function POST(
   res: NextResponse
 ): Promise<void | Response> {
   const roomId = request.url.split("stopRecording/")[1];
-  console.log("room ID from stop", roomId);
 
   if (!process.env.NEXT_PUBLIC_PROJECT_ID || !process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json(
@@ -29,13 +28,10 @@ export async function POST(
 
   try {
     const recording = await recorder.stop({ roomId: roomId as string });
-    console.log("recording", recording);
 
     const { msg } = recording;
-    console.log("msg: ", msg);
 
     if (msg === "Stopped") {
-      console.log("recording stopped from server");
       return NextResponse.json({ success: true }, { status: 200 });
     } else {
       return NextResponse.json({ success: false }, { status: 400 });

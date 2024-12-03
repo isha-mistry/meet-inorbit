@@ -68,7 +68,6 @@ const ChatBar = () => {
             body: formData,
           });
 
-          console.log(`${url}${fields.key}`);
 
           if (uploadResponse.ok) {
             sendData({

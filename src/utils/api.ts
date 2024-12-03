@@ -12,14 +12,11 @@ export async function fetchApi(
   endpoint: string,
   options: RequestOptions | RequestInit = {}
 ) {
-  // console.log("endpoint", endpoint);
-  // console.log("options", options);
-  
   const { method = "GET", body, headers = {}, ...otherOptions } = options;
 
   // Convert Headers object to plain object if needed
   let headersObject: Record<string, string> = {};
-  
+
   if (headers instanceof Headers) {
     // Convert Headers object to plain object
     Array.from(headers.entries()).forEach(([key, value]) => {
@@ -55,10 +52,6 @@ export async function fetchApi(
   }
 
   // Debug log to verify headers
-  // console.log("Final fetch options:", {
-  //   ...fetchOptions,
-  //   headers: mergedHeaders
-  // });
 
   const response = await fetch(`/api/proxy${endpoint}`, fetchOptions);
 

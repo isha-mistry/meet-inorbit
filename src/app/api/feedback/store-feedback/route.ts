@@ -12,14 +12,6 @@ export async function POST(
   const { address, role, feedbackType, data } = await req.json();
   let client;
 
-  console.log(
-    "address, role, feedbackType, data: ",
-    address,
-    role,
-    feedbackType,
-    data
-  );
-
   try {
     client = await connectDB();
     const db = client.db();
@@ -86,7 +78,6 @@ export async function POST(
         }
       } else {
         // Create a new document if the address doesn't exist
-        console.log("Document doesn't exists");
         updateDocument = {
           $set: {
             address,

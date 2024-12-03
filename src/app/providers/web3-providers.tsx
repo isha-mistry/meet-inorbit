@@ -152,7 +152,6 @@ export default function Web3Provider({ children }: Web3ProviderProps) {
   //   setReferrer(referrerAddress);
   // }, [searchParameter]);
 
-  // console.log("Line number 231:",referrer);
 
 
   // const getSiweMessageOptions: GetSiweMessageOptions = useCallback(() => {

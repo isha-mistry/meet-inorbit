@@ -11,13 +11,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     daoName,
   } = await req.json();
 
-  console.log(
-    "meetingId, meetingType, recordedStatus: ",
-    meetingId,
-    meetingType,
-    recordedStatus,
-    meetingStatus
-  );
   try {
     // Connect to MongoDB database
     const client = await connectDB();
@@ -55,7 +48,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       );
 
       if (sessions) {
-        console.log("sessions: ", sessions);
         const updatedDocument = sessions;
         const { host_address, attendees } = updatedDocument;
 

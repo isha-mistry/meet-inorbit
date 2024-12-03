@@ -122,7 +122,6 @@ const BottomBar = ({
     async onMessage(payload, from, label) {
       if (label === "server-message") {
         const { s3URL } = JSON.parse(payload);
-        console.log("s3URL", s3URL);
         const videoUri = s3URL;
         setS3URL(videoUri);
 
@@ -148,7 +147,6 @@ const BottomBar = ({
         try {
           const response = await fetchApi("/update-video-uri", requestOptions);
           const result = await response.json();
-          console.log(result);
         } catch (error) {
           console.error(error);
         }
@@ -183,7 +181,6 @@ const BottomBar = ({
       );
     }
 
-    console.log("s3URL in handleEndCall", s3URL);
     toast("Meeting Ended");
     if (endMeet === "leave") {
       leaveRoom();
@@ -207,8 +204,6 @@ const BottomBar = ({
           try {
             const arrayBuffer = await imageResponse.arrayBuffer();
             const result = await uploadFile(arrayBuffer, daoName, roomId);
-            console.log("Upload result:", result);
-            console.log("Hash:", result.Hash);
             nft_image = `ipfs://` + result.Hash;
           } catch (error) {
             console.error("Error in uploading file:", error);
@@ -241,7 +236,6 @@ const BottomBar = ({
             `/update-recording-status`,
             requestOptions
           );
-          console.log("Response: ", response);
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(
@@ -286,7 +280,6 @@ const BottomBar = ({
         const res_data = await res.json();
 
         // if (res_data.success) {
-        console.log("Updated", res_data);
         toast.success("Next Office hour is scheduled!");
 
         // }

@@ -34,7 +34,6 @@ function ShareMediaModal({
   const { address } = useAccount();
   const {walletAddress}=useWalletAddress();
 
-  console.log("data::", data);
 
   useEffect(() => {
     setLink(`${window.location.href}${walletAddress ? `?referrer=${walletAddress}` : ""}`);

@@ -11,7 +11,6 @@ export async function POST(request: Request, res: NextResponse) {
 
   // const roomId = req.query.roomId;
   // const roomId = "czd-virl-alv";
-  console.log("from start recording", roomId);
   if (!process.env.NEXT_PUBLIC_PROJECT_ID && !process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json(
       { error: "something went wrong" },
@@ -50,6 +49,5 @@ export async function POST(request: Request, res: NextResponse) {
     token: accessToken,
   });
 
-  console.log("recording", recording);
   return NextResponse.json({ status: 200 });
 }

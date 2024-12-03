@@ -51,7 +51,6 @@ function EditSessionDetails({
     if (selectedImage) {
       const output = await lighthouse.upload(selectedImage, apiKey);
       const imageCid = output.data.Hash;
-      console.log("image output: ", output.data.Hash);
       onSessionDetailsChange("image", imageCid);
     }
   };

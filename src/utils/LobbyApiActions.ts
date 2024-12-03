@@ -48,7 +48,6 @@ params: { roomId: string; }, additionalData: MeetingCommonData, address: string 
       }
   
       const data = await response.json();
-      console.log("Meeting status updated successfully:", data);
       return data;
     } catch (error) {
       console.error("Error updating meeting status:", error);
@@ -90,7 +89,6 @@ meetingId: string, attendeeAddress: string | undefined, Privytoken: string | nul
       }
   
       const data = await response.text();
-      console.log("Attendee status updated successfully:", data);
       return data;
     } catch (error) {
       console.error("Error updating attendee status:", error);

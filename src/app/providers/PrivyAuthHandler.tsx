@@ -5,8 +5,8 @@ import { BASE_URL } from "@/config/constants";
 
 // Helper function to handle referrer storage
 const handleReferrerStorage = (referrer: string | null) => {
-  if (referrer && typeof window !== 'undefined') {
-    sessionStorage.setItem('referrer', referrer);
+  if (referrer && typeof window !== "undefined") {
+    sessionStorage.setItem("referrer", referrer);
   }
 };
 
@@ -21,7 +21,7 @@ export function PrivyAuthHandler() {
   useEffect(() => {
     const referrerFromURL = searchParams.get("referrer");
     const storedReferrer = sessionStorage.getItem("referrer");
-    
+
     const finalReferrer = referrerFromURL || storedReferrer;
     if (finalReferrer) {
       setReferrer(finalReferrer);
@@ -39,24 +39,20 @@ export function PrivyAuthHandler() {
 
         // Wait for wallets to be properly initialized
         if (!wallets || wallets.length === 0) {
-          console.log("Waiting for wallets to initialize...");
           return;
         }
 
         // Get verified wallets from user object
         const verifiedWallets = user.linkedAccounts
-          .filter(account => account.type === 'wallet')
-          .map(account => account.address);
+          .filter((account) => account.type === "wallet")
+          .map((account) => account.address);
 
         // Find a wallet that is both connected and verified
-        const selectedWallet = wallets.find(wallet => 
-          wallet.address && 
-          verifiedWallets.includes(wallet.address)
+        const selectedWallet = wallets.find(
+          (wallet) => wallet.address && verifiedWallets.includes(wallet.address)
         );
 
         if (!selectedWallet) {
-          console.log("No verified wallet found. Available wallets:", 
-            wallets.map(w => w.address));
           return;
         }
 
@@ -68,7 +64,6 @@ export function PrivyAuthHandler() {
 
         // Check if we've already processed this wallet
         if (processedWalletRef.current === selectedWallet.address) {
-          console.log("Wallet already processed:", selectedWallet.address);
           return;
         }
 
@@ -76,11 +71,10 @@ export function PrivyAuthHandler() {
         processedWalletRef.current = selectedWallet.address;
 
         // Small delay to ensure everything is synchronized
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Create or verify account
         await createOrVerifyAccount(selectedWallet.address, token, referrer);
-
       } catch (error) {
         console.error("Error handling user login:", error);
       }
@@ -99,7 +93,6 @@ async function createOrVerifyAccount(
   referrer: string | null
 ) {
   try {
-    console.log("Creating/verifying account for address:", walletAddress);
 
     const response = await fetch(`${BASE_URL}/api/auth/accountcreate`, {
       method: "POST",

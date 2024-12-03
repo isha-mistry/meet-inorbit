@@ -63,7 +63,6 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
         );
 
         const result = await response.json();
-        console.log("result in get watch data::", result);
         setData(result.data[0]);
         setCollection(result.collection);
         setShowPopup(true);

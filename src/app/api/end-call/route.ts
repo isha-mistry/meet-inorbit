@@ -46,13 +46,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       hostAddress: string;
     } = await req.json();
 
-    console.log(
-      "inside end call::: ",
-      roomId,
-      meetingType,
-      dao_name,
-      hostAddress
-    );
+    
     if (!roomId) {
       return NextResponse.json(
         { success: false, error: "roomId parameter is required" },
@@ -93,7 +87,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const meetingsData: { meetings: Meeting[] } = await response.json();
-    console.log("meetingsData...", meetingsData);
     const meetings: Meeting[] = meetingsData.meetings;
 
     // Calculate total meeting time
@@ -108,7 +101,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       totalMeetingTimeInMinutes += durationInMinutes;
     }
 
-    console.log("Total meeting time:", totalMeetingTimeInMinutes, "minutes");
 
     const combinedParticipantLists: Participant[][] = [];
     const meetingTimePerEOA: MeetingTimePerEOA = {};
@@ -118,7 +110,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         `https://api.huddle01.com/api/v1/rooms/participant-list?meetingId=${meeting.meetingId}`,
         requestOptionsForMeeting
       );
-      console.log("response", response);
       if (!response.ok) {
         throw new Error("Failed to fetch participant list");
       }
@@ -144,10 +135,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     // Log a brief summary of meeting time for each EOA
-    console.log("Meeting time per EOA:");
-    for (const eoaAddress in meetingTimePerEOA) {
-      console.log(`${eoaAddress}: ${meetingTimePerEOA[eoaAddress]} minutes`);
-    }
+    // for (const eoaAddress in meetingTimePerEOA) {
+    //   console.log(`${eoaAddress}: ${meetingTimePerEOA[eoaAddress]} minutes`);
+    // }
 
     // Calculate minimum attendance time required
     const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;

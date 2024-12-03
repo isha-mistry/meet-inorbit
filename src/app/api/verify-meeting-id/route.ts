@@ -4,9 +4,6 @@ import { connectDB } from "@/config/connectDB";
 export async function POST(req: NextRequest, res: NextResponse) {
   const { roomId, meetingType } = await req.json(); // Assuming the request body contains the roomId and meetingType
 
-  console.log("roomId", roomId);
-  console.log("meetingType", meetingType);
-
   // Check if roomId is null or undefined
   if (roomId === null || roomId === "undefined") {
     return NextResponse.json(
@@ -28,7 +25,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Find document based on roomId
     const meeting = await collection.findOne({ meetingId: roomId });
-    console.log("verify meeting data :: ", meeting)
 
     // Check if meeting exists
     if (!meeting) {
@@ -38,7 +34,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 404 }
       );
     } else {
-      console.log("meeting data:", meeting);
       // Meeting exists
       const statusField =
         meetingType === "session" ? "meeting_status" : "meeting_status";

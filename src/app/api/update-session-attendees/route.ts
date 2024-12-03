@@ -18,28 +18,23 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     await req.json();
 
   try {
-    console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    console.log("Connected to MongoDB");
 
     const db = client.db();
     const collection = db.collection("meetings");
 
-    console.log("Fetching session document by meeting ID...");
     const existingDocument = await collection.findOne({
       meetingId: meetingId,
     });
 
     if (!existingDocument) {
       client.close();
-      console.log("MongoDB connection closed");
       return NextResponse.json(
         { success: false, error: "Document not found" },
         { status: 404 }
       );
     }
 
-    console.log("Checking if attendee already exists...");
     const attendeeExists = existingDocument.attendees.some(
       (existingAttendee: any) =>
         existingAttendee.attendee_address === attendee_address
@@ -47,14 +42,12 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     if (attendeeExists) {
       client.close();
-      console.log("Attendee already exists, returning existing document");
       return NextResponse.json(
         { success: true, data: existingDocument },
         { status: 200 }
       );
     }
 
-    console.log("Adding unique attendees...");
     const updatedDocument = await collection.updateOne(
       { meetingId },
       {
@@ -68,7 +61,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     );
 
     client.close();
-    console.log("MongoDB connection closed");
 
     if (updatedDocument.modifiedCount !== 1) {
       return NextResponse.json(
@@ -76,7 +68,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         { status: 500 }
       );
     }
-    
+
     const updatedDocumentData = await collection.findOne({ meetingId });
 
     return NextResponse.json(

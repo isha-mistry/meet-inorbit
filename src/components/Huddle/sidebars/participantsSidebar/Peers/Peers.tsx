@@ -32,7 +32,6 @@ const Peers: React.FC<PeersProps> = () => {
   // const { peerIds: speakerPeerIds } = usePeerIds({ roles: ["speaker"] });
   const { peerIds: listenerPeerIds } = usePeerIds({ roles: [Role.GUEST] });
 
-  console.log("peer ids: ", listenerPeerIds);
 
   return (
     <div>

@@ -36,13 +36,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
 
       const verifiedUserId = verifiedUser.userId;
-      
+
       // Get full user details
       const userDetails = await privyClient.getUser(verifiedUserId);
-      console.log("User linked accounts:", userDetails.linkedAccounts);
 
       // Get request wallet address from header
-      const requestWalletAddress = req.headers.get("x-wallet-address")?.toLowerCase();
+      const requestWalletAddress = req.headers
+        .get("x-wallet-address")
+        ?.toLowerCase();
       if (!requestWalletAddress) {
         return NextResponse.json(
           { error: "No wallet address provided in request" },
@@ -52,22 +53,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
       // Check all linked wallets for a match
       const linkedWallets = userDetails.linkedAccounts.filter(
-        account => account.type === 'wallet'
+        (account) => account.type === "wallet"
       );
 
       const verifiedWallet = linkedWallets.find(
-        wallet => wallet.address?.toLowerCase() === requestWalletAddress
+        (wallet) => wallet.address?.toLowerCase() === requestWalletAddress
       );
 
       if (!verifiedWallet) {
-        console.log("Verification failed. Available wallets:", 
-          linkedWallets.map(w => ({
-            address: w.address?.toLowerCase(),
-            type: w.type
-          }))
-        );
-        console.log("Requested wallet:", requestWalletAddress);
-        
         return NextResponse.json(
           { error: "Wallet address not found in user's linked accounts" },
           { status: 401 }

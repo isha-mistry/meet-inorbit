@@ -114,7 +114,6 @@ export async function GET(
     const collection = db.collection("delegates");
     const address = req.url.split("profile/")[1];
 
-    console.log("Finding documents for address:", address);
     const documents = await collection
       .find({
         address: { $regex: `^${address}$`, $options: "i" },
@@ -149,26 +148,21 @@ export async function POST(
   req: Request,
   res: NextResponse<DelegateResponseBody>
 ) {
-  // console.log("GET req call");
   const { address }: DelegateRequestBody = await req.json();
 
   try {
     // Connect to MongoDB
-    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("delegates");
 
-    // console.log("this is url", req.url);
 
     // Extract address from request parameters
     const address = req.url.split("profile/")[1];
 
     // Find documents based on address
-    console.log("Finding documents for address:", address);
     const documents = await collection
       .find({
         address: { $regex: `^${address}$`, $options: "i" },
@@ -177,9 +171,7 @@ export async function POST(
       .toArray();
 
     client.close();
-    // console.log("MongoDB connection closed");
 
-    console.log("Existing called data retrieve", documents);
 
     // Return the found documents
     return NextResponse.json(

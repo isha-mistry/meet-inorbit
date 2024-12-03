@@ -128,16 +128,13 @@ export async function POST(
 
   try {
     // Connect to your MongoDB database
-    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
     const collection = db.collection("delegates");
 
     // Insert the new delegate document
-    // console.log("Inserting delegate document...");
     const result = await collection.insertOne({
       address,
       image,
@@ -148,18 +145,14 @@ export async function POST(
       socialHandles,
       networks,
     });
-    console.log("Delegate document inserted:", result);
 
     client.close();
-    // console.log("MongoDB connection closed");
 
     if (result.insertedId) {
       // Retrieve the inserted document using the insertedId
-      // console.log("Retrieving inserted document...");
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
-      // console.log("Inserted document retrieved");
       return NextResponse.json({ result: insertedDocument }, { status: 200 });
     } else {
       return NextResponse.json(
@@ -191,20 +184,9 @@ export async function PUT(
     networks,
   }: DelegateRequestBody = await req.json();
 
-  console.log("Received Properties:");
-  console.log("address:", address);
-  console.log("image:", image);
-  console.log("isDelegate:", isDelegate);
-  console.log("displayName:", displayName);
-  console.log("networks: ", networks);
-  console.log("emailId:", emailId);
-  console.log("socialHandles:", socialHandles);
-
   try {
     // Connect to your MongoDB database
-    console.log("Connecting to MongoDB...");
     const client = await connectDB();
-    console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
@@ -223,14 +205,11 @@ export async function PUT(
     if (networks !== undefined) {
       if (documents.length > 0) {
         const document = documents[0];
-        console.log("document::", document);
         if (document.networks?.length > 0) {
           const existingNetworkIndex = document.networks.findIndex(
             (item: any) => item.dao_name === networks[0].dao_name
           );
-          console.log("existingNetworkIndex", existingNetworkIndex);
           if (existingNetworkIndex !== -1) {
-            console.log("exist call");
             const updateQuery = {
               $set: {
                 [`networks.${existingNetworkIndex}`]: networks[0],
@@ -241,7 +220,6 @@ export async function PUT(
               updateQuery
             );
           } else {
-            console.log("push call");
             const updateQuery = {
               $push: {
                 networks: networks[0],
@@ -254,7 +232,6 @@ export async function PUT(
             );
           }
         } else {
-          console.log("add networks field");
           const updateQuery = {
             $set: {
               networks: [networks[0]],
@@ -269,15 +246,12 @@ export async function PUT(
     }
 
     // Update the delegate document
-    console.log("Updating delegate document...");
     const result = await collection.updateOne(
       { address: address },
       { $set: updateFields }
     );
-    console.log("Delegate document updated:", result);
 
     client.close();
-    console.log("MongoDB connection closed");
 
     if (result.modifiedCount > 0) {
       // If at least one document was modified

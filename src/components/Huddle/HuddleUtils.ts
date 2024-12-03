@@ -4,14 +4,17 @@ import { fetchApi } from "@/utils/api";
 import toast from "react-hot-toast";
 
 export const startRecording = async (
-roomId: string | undefined, setIsRecording: (val: boolean | null) => void, address: string, token: string) => {
+  roomId: string | undefined,
+  setIsRecording: (val: boolean | null) => void,
+  address: string,
+  token: string
+) => {
   try {
-    console.log("recording started");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     if (address) {
       myHeaders.append("x-wallet-address", address);
-      myHeaders.append("Authorization",`Bearer ${token}`);
+      myHeaders.append("Authorization", `Bearer ${token}`);
     }
     const requestOptions = {
       method: "POST",
@@ -22,7 +25,6 @@ roomId: string | undefined, setIsRecording: (val: boolean | null) => void, addre
     };
 
     const status = await fetchApi(`/startRecording/${roomId}`, requestOptions);
-    console.log("Line huddle 26:",status);
     if (!status.ok) {
       console.error(`Request failed with status: ${status.status}`);
       toast.error("Failed to start recording");
@@ -39,10 +41,9 @@ roomId: string | undefined, setIsRecording: (val: boolean | null) => void, addre
 export const handleStopRecording = async (
   roomId: string | undefined,
   address: string | undefined,
-  token:string|undefined,
+  token: string | undefined,
   setIsRecording: (val: boolean | null) => void
 ) => {
-  console.log("stop recording");
   if (!roomId) {
     console.error("roomId is undefined");
     return;
@@ -53,7 +54,7 @@ export const handleStopRecording = async (
     myHeaders.append("Content-Type", "application/json");
     if (address) {
       myHeaders.append("x-wallet-address", address);
-      myHeaders.append("Authorization",`Bearer ${token}`);
+      myHeaders.append("Authorization", `Bearer ${token}`);
     }
     const requestOptions = {
       method: "POST",
@@ -62,12 +63,8 @@ export const handleStopRecording = async (
         roomId: roomId,
       }),
     };
-    const response = await fetchApi(
-      `/stopRecording/${roomId}`,
-      requestOptions
-    );
+    const response = await fetchApi(`/stopRecording/${roomId}`, requestOptions);
     const data = await response.json();
-    console.log("response: ", response);
 
     if (!response.ok) {
       console.error(`Request failed with status: ${response.status}`);
@@ -88,7 +85,15 @@ export const handleStopRecording = async (
 };
 
 export const handleCloseMeeting = async (
-address: string | undefined, token: string | null, meetingCategory: string, roomId: string | undefined, daoName: string, hostAddress: string, meetingData: SessionInterface | undefined, isRecording: boolean | null) => {
+  address: string | undefined,
+  token: string | null,
+  meetingCategory: string,
+  roomId: string | undefined,
+  daoName: string,
+  hostAddress: string,
+  meetingData: SessionInterface | undefined,
+  isRecording: boolean | null
+) => {
   // if (role === "host") {
   let meetingType;
   if (meetingCategory === "officehours") {
@@ -104,7 +109,7 @@ address: string | undefined, token: string | null, meetingCategory: string, room
     myHeaders.append("Content-Type", "application/json");
     if (address) {
       myHeaders.append("x-wallet-address", address);
-      myHeaders.append("Authorization",`Bearer ${token}`);
+      myHeaders.append("Authorization", `Bearer ${token}`);
     }
     const requestOptions = {
       method: "POST",
@@ -119,19 +124,15 @@ address: string | undefined, token: string | null, meetingCategory: string, room
 
     const response = await fetchApi(`/end-call`, requestOptions);
     const result = await response.json();
-    console.log("result in end call::", result);
 
     // const storedStatus = sessionStorage.getItem("meetingData");
     // let meetingStatus;
 
     // if (storedStatus) {
     //   const parsedStatus = JSON.parse(storedStatus);
-    //   console.log("storedStatus in end call: ", parsedStatus);
-    //   console.log("parsedStatus.meetingId: ", parsedStatus.meetingId);
-    //   console.log("roomId in end call: ", roomId);
+    //
     //   if (parsedStatus.meetingId === roomId) {
     //     meetingStatus = parsedStatus.isMeetingRecorded;
-    //     console.log("meeting status updated");
     //   }
     // }
 
@@ -142,7 +143,7 @@ address: string | undefined, token: string | null, meetingCategory: string, room
         myHeaders.append("Content-Type", "application/json");
         if (address) {
           myHeaders.append("x-wallet-address", address);
-          myHeaders.append("Authorization",`Bearer ${token}`);
+          myHeaders.append("Authorization", `Bearer ${token}`);
         }
         const response = await fetchApi(`/get-attest-data`, {
           method: "POST",
@@ -154,7 +155,6 @@ address: string | undefined, token: string | null, meetingCategory: string, room
           }),
         });
         const response_data = await response.json();
-        console.log("Updated", response_data);
         if (response_data.success) {
           toast.success("Attestation successful");
         }
@@ -172,7 +172,7 @@ address: string | undefined, token: string | null, meetingCategory: string, room
 export const handleRecording = async (
   roomId: string | undefined,
   address: string | undefined,
-  privyToken:string|undefined,
+  privyToken: string | undefined,
   isRecording: boolean | null,
   setIsRecording: (val: boolean | null) => void,
   meetingRecordingStatus: boolean,
@@ -180,11 +180,10 @@ export const handleRecording = async (
 ) => {
   if (meetingRecordingStatus) {
     setMeetingRecordingStatus(false);
-    handleStopRecording(roomId, address,privyToken, setIsRecording);
+    handleStopRecording(roomId, address, privyToken, setIsRecording);
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
-      // console.log("parsedValue: ", parsedValue);
       parsedValue.recordingStatus = false;
 
       // Step 3: Store the updated value back in sessionStorage
@@ -193,11 +192,15 @@ export const handleRecording = async (
   } else {
     setMeetingRecordingStatus(true);
 
-    startRecording(roomId, setIsRecording,address?address:'',privyToken?privyToken:'');
+    startRecording(
+      roomId,
+      setIsRecording,
+      address ? address : "",
+      privyToken ? privyToken : ""
+    );
     let existingValue = sessionStorage.getItem("meetingData");
     if (existingValue) {
       let parsedValue = JSON.parse(existingValue);
-      console.log("parsedValue: ", parsedValue);
       if (parsedValue.meetingId === roomId) {
         if (parsedValue.isMeetingRecorded === false) {
           parsedValue.isMeetingRecorded = true;

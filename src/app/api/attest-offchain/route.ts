@@ -37,7 +37,6 @@ interface MyError {
 
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  console.log("log1");
   (BigInt.prototype as any).toJSON = function () {
     return this.toString();
   };
@@ -45,10 +44,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
-  console.log("requestData in attest-offchain API", requestData);
 
   try {
-    console.log("log2");
 
     const atstUrl =
       requestData.daoName === "optimism"
@@ -56,14 +53,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
         : requestData.daoName === "arbitrum"
         ? ATTESTATION_ARB_URL
         : "";
-    console.log("atstUrl", atstUrl);
     // Set up your ethers provider and signer
     const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
       staticNetwork: true,
     });
     const privateKey = process.env.PVT_KEY ?? "";
     const signer = new ethers.Wallet(privateKey, provider);
-    console.log("signer", signer);
 
     const EASContractAddress =
       requestData.daoName === "optimism"
@@ -74,15 +69,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const eas = new EAS(EASContractAddress);
 
     eas.connect(signer);
-    console.log("Connected");
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
-    // console.log(offchain);
     const schemaEncoder = new SchemaEncoder(
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
-    // console.log(schemaEncoder);
 
     const encodedData = schemaEncoder.encodeData([
       {
@@ -95,16 +87,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
 
-    // console.log(encodedData);
 
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
-    // console.log(expirationTime);
-    // console.log(currentTime);
-
-    // console.log("---------");
-    // console.log(typeof currentTime);
-    // console.log("---------");
 
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
@@ -139,27 +124,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
       textJson: JSON.stringify(pkg),
     };
 
-    console.log("base url: ", baseUrl);
 
     let uploadstatus = false;
-    // console.log("data: ", data);
     try {
       const response = await axios.post(`${baseUrl}/offchain/store`, data);
       if (response.data) {
         uploadstatus = true;
       }
-      console.log("response data", response.data);
-      // console.log(
-      //   "requestData.meetingId.split",
-      //   requestData.meetingId.split("/")[0]
-      // );
+      
 
       if (requestData.meetingType === 1) {
         const client = await connectDB();
 
         const db = client.db();
         const collection = db.collection("meetings");
-        console.log("in meeting type 1");
         await collection.findOneAndUpdate(
           { meetingId: requestData.meetingId.split("/")[0] },
           {
@@ -183,7 +161,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const db = client.db();
         const collection = db.collection("meetings");
-        console.log("meeting type 2");
         await collection.findOneAndUpdate(
           {
             meetingId: requestData.meetingId.split("/")[0],
@@ -254,12 +231,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Rest of your code remains the same
 
-    console.log(
-      "inside attest-offchain success: true",
-      offchainAttestation,
-      url,
-      uploadstatus
-    );
+   
 
     let offchainAttestationLink = "";
     if (requestData.daoName === "optimism") {
@@ -295,7 +267,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     };
 
     const client = await connectDB();
-    console.log("Connected to MongoDB");
 
     const db = client.db();
     const notificationCollection = db.collection("notifications");
@@ -304,32 +275,27 @@ export async function POST(req: NextRequest, res: NextResponse) {
       notificationToSend
     );
 
-    console.log("notificationResult", notificationResult);
 
     if (notificationResult.insertedId) {
       const insertedNotification = await notificationCollection.findOne({
         _id: notificationResult.insertedId,
       });
 
-      console.log("insertedNotification", insertedNotification);
     }
 
     const dataToSend = {
       ...notificationToSend,
       _id: notificationResult.insertedId,
     };
-    console.log("dataToSend", dataToSend);
     const receiver_address = notificationToSend.receiver_address;
     const socket = io(`${SOCKET_BASE_URL}`, {
       withCredentials: true,
     });
     socket.on("connect", () => {
-      console.log("Connected to WebSocket server from API");
       socket.emit("received_offchain_attestation", {
         receiver_address,
         dataToSend,
       });
-      console.log("Message sent from API to socket server");
       socket.disconnect();
     });
 
