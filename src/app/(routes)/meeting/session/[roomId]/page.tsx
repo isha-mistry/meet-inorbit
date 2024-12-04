@@ -57,6 +57,35 @@ import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
 import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
 
+const GlobalScrollbarStyles = `
+  /* Webkit (Chrome, Safari, newer versions of Opera) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color: #2a2a2a;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #0a0a0a; /* Blue shade matching your design */
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #0a0a0a; /* Lighter blue on hover */
+  }
+  
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #44474e #2a2a2a;
+  }
+`;
+
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
   const {
@@ -119,6 +148,17 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [remoteVideoTracks, setRemoteVideoTracks] = useState<
     Record<string, MediaStreamTrack | null>
   >({});
+
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = GlobalScrollbarStyles;
+    document.head.appendChild(styleSheet);
+    
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
 
   const handleVideoTrackUpdate = useCallback(
     (peerId: string, videoTrack: MediaStreamTrack | null) => {
@@ -653,12 +693,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     isRemoteLessScreen || !isScreenShared
                       ? "grid"
                       : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
-                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto ${
+                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
                     peerIds.length === 0
                       ? "grid-cols-1"
                       : peerIds.length === 1
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 "
-                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 1.5xl:grid-cols-2"
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
+                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
                   }`}
                 >
                   {role !== Role.BOT && (
