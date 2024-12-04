@@ -40,6 +40,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const { address } = useAccount();
+  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1"
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
@@ -139,32 +140,25 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
     <div className="font-poppins">
       {!dataLoading ? (
         address?.toLowerCase() === data?.host_address.toLowerCase() ? (
-          <div className="py-5 px-16 ">
+          <div className="py-5 px-4 sm:px-6 lg:px-16">
             {showPopup && (
               <div
-                className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-4 py-3 rounded-lg w-fit mb-4"
+                className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-2 xm:px-4 py-3 rounded-lg w-fit mb-4"
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
-                <div className="flex items-center font-semibold text-sm justify-between">
+                <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">
                   <span>🙂 Thank you for taking the session on Chora Club</span>
                   <button
-                    className="ml-4 rounded-full flex items-center"
+                    className="ml-auto rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}
                   >
-                    <IoClose className="text-white font-semibold bg-black size-4 rounded-full" />
+                    <IoClose className="text-white font-semibold bg-black size-3 xm:size-4 rounded-full " />
                   </button>
                 </div>
               </div>
             )}
-            <div className="justify-between flex border rounded-3xl py-6 px-8 gap-10 items-center mb-10">
-              <div
-                className={`text-lg transition-all duration-300 ease-in-out`}
-              >
-                Please add a title and description for your session so that
-                other users can easily understand what it&apos;s about before
-                watching. You can edit this information later if needed.
-              </div>
-              <div className="flex">
+            <div className="justify-between flex flex-col md:flex-row-reverse border rounded-3xl py-4 xl:py-6 px-3 sm:px-6 xl:px-8 gap-3 md:gap-6 xl:gap-10 items-center mb-10">
+            <div className="flex">
                 <Button
                   onClick={() => setViewMode("edit")}
                   className={`rounded-l-full ${
@@ -186,11 +180,18 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   Preview
                 </Button>
               </div>
+              <div
+                className={`text-[13px] xs:text-sm sm:text-base xl:text-lg transition-all duration-300 ease-in-out`}
+              >
+                Please add a title and description for your session so that
+                other users can easily understand what it&apos;s about before
+                watching. You can edit this information later if needed.
+              </div>
             </div>
             <div>
               {viewMode === "edit" ? (
                 <div
-                  className="rounded-3xl px-8 py-6"
+                  className="rounded-3xl px-3 sm:px-6 xl:px-8 py-6"
                   style={{
                     boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)",
                   }}
@@ -200,7 +201,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     sessionDetails={sessionDetails}
                     onSessionDetailsChange={handleSessionDetailsChange}
                   />
-                  <div className="flex justify-center gap-3">
+                  <div className="flex items-center justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
@@ -220,7 +221,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col w-[70%] mx-auto">
+                <div className="flex flex-col w-full 1.7md:w-[70%] mx-auto">
                   <SessionPreview
                     data={data}
                     collection={collection}
@@ -228,13 +229,13 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   />
                   <div className="flex justify-center gap-3">
                     <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      className="bg-black xm:bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() => setViewMode("edit")}
                     >
                       Continue Editing
                     </Button>
                     <Button
-                      className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
+                      className="hidden xm:block bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
                       onClick={() =>
                         router.push(
                           `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
@@ -244,7 +245,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       Back to Profile
                     </Button>
                     <Button
-                      className="bg-blue-shade-200 text-white font-semibold rounded-full px-10"
+                      className="bg-black xm:bg-blue-shade-200 text-white font-semibold rounded-full px-10"
                       onClick={() => handleUpdate()}
                     >
                       {loading ? (
@@ -260,6 +261,16 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                       )}
                     </Button>
                   </div>
+                  <Button
+                      className="xm:hidden bg-blue-shade-200 rounded-full font-semibold px-10 text-white w-fit mx-auto mt-2"
+                      onClick={() =>
+                        router.push(
+                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
+                        )
+                      }
+                    >
+                      Back to Profile
+                    </Button>
                 </div>
               )}
             </div>

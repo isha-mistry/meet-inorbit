@@ -26,6 +26,7 @@ const config: Config = {
         "2sm":"670px",
         "0.5md": "700px",
         "1.5md":"830px",
+        "1.7md":"900px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
