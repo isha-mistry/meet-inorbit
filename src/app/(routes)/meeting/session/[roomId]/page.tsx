@@ -56,6 +56,7 @@ import {
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
 import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
+import interact from "interactjs";
 
 const GlobalScrollbarStyles = `
   /* Webkit (Chrome, Safari, newer versions of Opera) */
@@ -145,6 +146,42 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [isLessScreen, setIsLessScreen] = useState(false);
   const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
 
+  const draggableRef = useRef(null);
+  const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    console.log("Draggable ref:", draggableRef.current);
+    if (draggableRef.current) {
+      const position = { x: 0, y: 0 };
+      const interactable = interact(draggableRef.current).draggable({
+        listeners: {
+          start(event) {
+            console.log(event.type, event.target);
+          },
+          move(event) {
+            position.x += event.dx;
+            position.y += event.dy;
+
+            event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
+
+            setDraggablePosition(position);
+          },
+        },
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrictRect({
+            restriction: "parent",
+            // endOnly: true
+          }),
+        ],
+      });
+
+      return () => {
+        interactable.unset();
+      };
+    }
+  }, [shareStream, isLessScreen]);
+
   const [remoteVideoTracks, setRemoteVideoTracks] = useState<
     Record<string, MediaStreamTrack | null>
   >({});
@@ -154,7 +191,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     styleSheet.type = "text/css";
     styleSheet.innerText = GlobalScrollbarStyles;
     document.head.appendChild(styleSheet);
-    
+
     return () => {
       document.head.removeChild(styleSheet);
     };
@@ -626,6 +663,30 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <main
               className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
             >
+              {shareStream && !isLessScreen && (
+                <div
+                  ref={draggableRef}
+                  className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
+                  style={{
+                    transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
+                  }}
+                >
+                  {metadata?.avatarUrl && (
+                    <div className=" rounded-full w-20 h-20">
+                      <Image
+                        alt="image"
+                        src={metadata?.avatarUrl}
+                        className="maskAvatar object-cover object-center"
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                  )}
+                  <span className="absolute bottom-2 left-2 text-white">
+                    You
+                  </span>
+                </div>
+              )}
               <div
                 className={`relative flex flex-col lg:flex-row w-full h-full ${
                   isRemoteLessScreen || !isScreenShared
@@ -657,9 +718,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         />
                       </>
                     </GridContainer>
-                    {!isLessScreen && (
+                    {/* {!isLessScreen && (
                       <div
-                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}
+                      ref={draggableRef}
+                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
+                        style={{
+                          transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
+                        }}
                       >
                         {metadata?.avatarUrl && (
                           <div className=" rounded-full w-20 h-20">
@@ -676,7 +741,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           You
                         </span>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 )}
                 {peerIds.map((peerId) => (
