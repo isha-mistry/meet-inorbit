@@ -3,7 +3,7 @@ import { useStudioState } from "@/store/studioState";
 
 interface IAudioProps {
   stream: MediaStream;
-  name: string;
+  // name: string;
 }
 
 type HTMLAudioElementWithSetSinkId = HTMLAudioElement & {
@@ -16,7 +16,7 @@ const Audio: React.FC<
       React.AudioHTMLAttributes<HTMLAudioElementWithSetSinkId>,
       HTMLAudioElementWithSetSinkId
     >
-> = ({ stream, name }) => {
+> = ({ stream }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { isRecordAudio, audioOutputDevice } = useStudioState();
 

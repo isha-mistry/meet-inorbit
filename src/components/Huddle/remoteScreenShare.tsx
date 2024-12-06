@@ -14,10 +14,18 @@ interface RemotePeerProps {
   peerId: string;
   isRemoteLessScreen: boolean;
   setIsRemoteLessScreen: (value: boolean) => void;
-  onVideoTrackUpdate: (peerId: string, videoTrack: MediaStreamTrack | null) => void;
+  onVideoTrackUpdate: (
+    peerId: string,
+    videoTrack: MediaStreamTrack | null
+  ) => void;
 }
 
-const RemoteScreenShare = ({ peerId,isRemoteLessScreen,setIsRemoteLessScreen ,onVideoTrackUpdate }: RemotePeerProps) => {
+const RemoteScreenShare = ({
+  peerId,
+  isRemoteLessScreen,
+  setIsRemoteLessScreen,
+  onVideoTrackUpdate,
+}: RemotePeerProps) => {
   // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
@@ -56,16 +64,18 @@ const RemoteScreenShare = ({ peerId,isRemoteLessScreen,setIsRemoteLessScreen ,on
   return (
     <>
       {videoTrack && (
-         <div className={`w-full`}>
+        <div className={`w-full`}>
           <GridContainer className="w-full h-full relative">
             <>
-            <Tooltip content={(isRemoteLessScreen ) ? "Full Screen": "Less Screen"}>
-              <Button
-                className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
-                onClick={toggleFullScreen}
+              <Tooltip
+                content={isRemoteLessScreen ? "Full Screen" : "Less Screen"}
               >
-                {isRemoteLessScreen ? <Maximize2 /> : < Minimize2/>}
-              </Button>
+                <Button
+                  className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
+                  onClick={toggleFullScreen}
+                >
+                  {isRemoteLessScreen ? <Maximize2 /> : <Minimize2 />}
+                </Button>
               </Tooltip>
               <Video
                 stream={videoStreamTrack}
@@ -74,7 +84,7 @@ const RemoteScreenShare = ({ peerId,isRemoteLessScreen,setIsRemoteLessScreen ,on
               {audioTrack && (
                 <Audio
                   stream={audioTrack && new MediaStream([audioTrack])}
-                  name={metadata?.displayName ?? "guest"}
+                  // name={metadata?.displayName ?? "guest"}
                 />
               )}
             </>

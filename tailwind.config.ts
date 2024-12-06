@@ -13,8 +13,8 @@ const config: Config = {
       screens: {
         xm: "550px",
         xs: "470px",
-        "0.2xs":"370px",
-        "0.5xs":"400px",
+        "0.2xs": "370px",
+        "0.5xs": "400px",
         "2.5xl": "2100px",
         "1.5xl": "1350px",
         "1.7xl": "1450px",
@@ -23,9 +23,9 @@ const config: Config = {
         "1.3lg": "1100px",
         "0.5xm": "500px",
         "2md": "950px",
-        "2sm":"670px",
+        "2sm": "670px",
         "0.5md": "700px",
-        "1.5md":"830px",
+        "1.5md": "830px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -99,6 +99,10 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "gradient-border": {
+          "0%, 100%": { "background-position": "0% 50%" },
+          "50%": { "background-position": "100% 50%" },
+        },
       },
       animation: {
         fadeIn: "fadeIn 1s ease-out",
@@ -109,6 +113,7 @@ const config: Config = {
         "gradient-x": "gradient-x 5s ease infinite",
         float: "float 3s ease-in-out infinite",
         "bounce-slow": "bounce 2s infinite",
+        "gradient-border": "gradient-border 3s ease infinite",
       },
     },
   },

@@ -12,6 +12,8 @@ import {
   useLocalScreenShare,
   useLocalVideo,
   usePeerIds,
+  useRemoteAudio,
+  useRemotePeer,
   useRemoteScreenShare,
   useRoom,
 } from "@huddle01/react/hooks";
@@ -58,6 +60,8 @@ import {
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
 import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
+import Audio from "@/components/Huddle/Media/Audio";
+import AudioController from "@/components/Huddle/Media/AudioController";
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -674,47 +678,55 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 >
                   {role !== Role.BOT && (
                     <div
-                      className={`bg-[#202020] bg-opacity-80 relative rounded-lg flex  flex-col items-center justify-center min-w-[150px] min-h-[150px]`}
+                      className={`relative 
+                        ${
+                          isAudioOn
+                            ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                            : "bg-[#202020] bg-opacity-80"
+                        }
+                      rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
                     >
-                      <div className="absolute left-4 top-4 text-3xl z-10">
-                        {reaction}
-                      </div>
-                      {metadata?.isHandRaised && (
-                        <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
-                          ✋
-                        </span>
-                      )}
-
-                      {stream ? (
-                        <>
-                          <Camera
-                            stream={stream}
-                            name={metadata?.displayName ?? "guest"}
-                          />
-                        </>
-                      ) : (
-                        <div className="flex w-24 h-24 rounded-full">
-                          {metadata?.avatarUrl && (
-                            <div className=" rounded-full w-24 h-24">
-                              <Image
-                                alt="image"
-                                src={metadata?.avatarUrl}
-                                className="maskAvatar object-cover object-center"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
-                          )}
+                      <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
+                        <div className="absolute left-4 top-4 text-3xl z-10">
+                          {reaction}
                         </div>
-                      )}
-                      <span className="absolute bottom-4 left-4 text-white font-medium">
-                        {`${metadata?.displayName} (You)`}
-                      </span>
-                      <span className="absolute bottom-4 right-4">
-                        {isAudioOn
-                          ? NestedPeerListIcons.active.mic
-                          : NestedPeerListIcons.inactive.mic}
-                      </span>
+                        {metadata?.isHandRaised && (
+                          <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
+                            ✋
+                          </span>
+                        )}
+
+                        {stream ? (
+                          <>
+                            <Camera
+                              stream={stream}
+                              name={metadata?.displayName ?? "guest"}
+                            />
+                          </>
+                        ) : (
+                          <div className="flex w-24 h-24 rounded-full">
+                            {metadata?.avatarUrl && (
+                              <div className=" rounded-full w-24 h-24">
+                                <Image
+                                  alt="image"
+                                  src={metadata?.avatarUrl}
+                                  className="maskAvatar object-cover object-center"
+                                  width={100}
+                                  height={100}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <span className="absolute bottom-4 left-4 text-white font-medium">
+                          {`${metadata?.displayName} (You)`}
+                        </span>
+                        <span className="absolute bottom-4 right-4">
+                          {isAudioOn
+                            ? NestedPeerListIcons.active.mic
+                            : NestedPeerListIcons.inactive.mic}
+                        </span>
+                      </div>
                     </div>
                   )}
 
@@ -749,6 +761,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                               className={clsx("hidden sm:flex md:hidden")}
                             />
                           ))}
+
                           <ParticipantTile
                             className={clsx("hidden sm:flex md:hidden")}
                           />
@@ -812,6 +825,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       {peerIds.slice(0, 2).map((peerId) => (
                         <RemotePeer key={peerId} peerId={peerId} />
                       ))}
+
                       <GridContainer
                         className={clsx(
                           "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] border-none"
@@ -840,6 +854,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               meetingData={meetingData}
               meetingCategory={meetingCategory}
             />
+            <AudioController />
           </div>
         </div>
       ) : (
