@@ -1,19 +1,29 @@
 import { PeerMetadata } from "@/utils/types";
-import { useRemotePeer, useRemoteScreenShare } from "@huddle01/react/hooks";
+import {
+  useRemotePeer,
+  useRemoteScreenShare,
+  useLocalPeer,
+} from "@huddle01/react/hooks";
 import Video from "./Media/Video";
 import Audio from "./Media/Audio";
 import GridContainer from "./GridContainer";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStudioState } from "@/store/studioState";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@nextui-org/react";
+import Image from "next/image";
+import interact from "interactjs";
 
 interface RemotePeerProps {
   peerId: string;
   isRemoteLessScreen: boolean;
+<<<<<<< HEAD
   setIsRemoteLessScreen: (value: boolean) => void;
+=======
+  setIsRemoteLessScreen: (isScreenShared: boolean) => void;
+>>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   onVideoTrackUpdate: (
     peerId: string,
     videoTrack: MediaStreamTrack | null
@@ -26,7 +36,10 @@ const RemoteScreenShare = ({
   setIsRemoteLessScreen,
   onVideoTrackUpdate,
 }: RemotePeerProps) => {
+<<<<<<< HEAD
   // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
+=======
+>>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
     peerId,
@@ -40,21 +53,60 @@ const RemoteScreenShare = ({
     },
   });
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
+  const { metadata: localMetadata } = useLocalPeer<PeerMetadata>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
-  // const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
+  const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
+  const draggableRef = useRef(null);
+
+  useEffect(() => {
+    console.log("Draggable ref:", draggableRef.current);
+    if (draggableRef.current) {
+      const position = { x: 0, y: 0 };
+      const interactable = interact(draggableRef.current).draggable({
+        listeners: {
+          start(event) {
+            console.log(event.type, event.target);
+          },
+          move(event) {
+            position.x += event.dx;
+            position.y += event.dy;
+
+            event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
+
+            setDraggablePosition(position);
+          },
+        },
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrictRect({
+            restriction: "parent",
+            // endOnly: true
+          }),
+        ],
+      });
+
+      return () => {
+        interactable.unset();
+      };
+    }
+  }, [videoTrack, isRemoteLessScreen]);
 
   const toggleFullScreen = () => {
     setIsRemoteLessScreen(!isRemoteLessScreen);
   };
 
+<<<<<<< HEAD
   // useEffect(() => {
   //   setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
   // }, [videoTrack]);
+=======
+>>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   useEffect(() => {
     if (videoTrack) {
       const newVideoStreamTrack = new MediaStream([videoTrack]);
       setVideoStreamTrack(newVideoStreamTrack);
       onVideoTrackUpdate(peerId, videoTrack);
+      setIsScreenShared(true);
     } else {
       setVideoStreamTrack(null);
       onVideoTrackUpdate(peerId, null);
@@ -63,6 +115,28 @@ const RemoteScreenShare = ({
 
   return (
     <>
+      {videoTrack && !isRemoteLessScreen && (
+        <div
+          ref={draggableRef}
+          className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
+          style={{
+            transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
+          }}
+        >
+          {localMetadata?.avatarUrl && (
+            <div className=" rounded-full w-20 h-20">
+              <Image
+                alt="image"
+                src={localMetadata?.avatarUrl}
+                className="maskAvatar object-cover object-center"
+                width={100}
+                height={100}
+              />
+            </div>
+          )}
+          <span className="absolute bottom-2 left-2 text-white">You</span>
+        </div>
+      )}
       {videoTrack && (
         <div className={`w-full`}>
           <GridContainer className="w-full h-full relative">

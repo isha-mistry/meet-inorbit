@@ -9,6 +9,7 @@ const allowedOrigins = [
   process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!,
   process.env.NEXT_PUBLIC_LOCAL_APP_URL!,
   process.env.NEXT_PUBLIC_HOSTED_APP_URL!,
+  // " https://ad29cb872216a955d62b10fc7f72d67e.serveo.net",
 ].filter(Boolean);
 
 const privyClient = new PrivyClient(
@@ -38,8 +39,10 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const apiKey = request.headers.get("x-api-key");
 
+  console.log("origin: ", origin);
+
   // CORS check
-  if (!origin || !allowedOrigins.includes(origin)) {
+  if (!origin) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {

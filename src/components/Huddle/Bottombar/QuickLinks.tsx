@@ -27,7 +27,7 @@ function QuickLinks({ daoName }: { daoName: string }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="w-full bg-[#202020] text-white p-2 rounded-lg"
+          className="w-full bg-[#202020] text-white p-2 rounded-lg ml-4"
           sideOffset={8}
         >
           <div className="space-y-2">

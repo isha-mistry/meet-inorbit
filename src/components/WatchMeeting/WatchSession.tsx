@@ -123,18 +123,18 @@ function WatchSession({
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
         <div
-          className={`px-6 pt-4 pb-4 ${
+          className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 ${
             data.description.length > 0 ? "border-b" : ""
           }  border-[#CCCCCC]`}
         >
           <div className="text-lg font-semibold pb-3">
             {sessionDetails.title || data.title}
           </div>
-          <div className="flex justify-between text-sm pe-4 pb-4">
-            <div className="flex gap-6">
+          <div className="flex flex-col 2sm:flex-row justify-between text-xs xs:text-sm lg:text-base 1.5lg:text-sm 1.5xl:text-base pb-4">
+            <div className="flex gap-4">
               <div className="flex items-center gap-2 ">
                 <div
-                  className="flex gap-2 cursor-pointer"
+                  className="flex gap-2 cursor-pointer items-center"
                   onClick={() =>
                     router.push(
                       `/${data.dao_name}/${data.host_address}?active=info`
@@ -190,7 +190,7 @@ function WatchSession({
                         alt="image"
                         height={100}
                         width={100}
-                        className="w-6 h-6"
+                        className="size-4 xs:size-6"
                         priority
                         quality={100}
                       />
@@ -228,7 +228,7 @@ function WatchSession({
                       <Image
                         alt="image"
                         src={onChain_link}
-                        className="w-6 h-6"
+                        className="size-4 xs:size-6"
                         quality={100}
                         width={100}
                         height={100}
@@ -373,7 +373,7 @@ function WatchSession({
                               alt="image"
                               height={100}
                               width={100}
-                              className="w-6 h-6"
+                              className="size-4 xs:size-6"
                               priority
                               quality={100}
                             />
@@ -408,7 +408,7 @@ function WatchSession({
                             <Image
                               alt="image"
                               src={onChain_link}
-                              className="w-6 h-6"
+                              className="size-4 xs:size-6"
                               width={100}
                               height={100}
                               priority
@@ -432,14 +432,14 @@ function WatchSession({
 
         {sessionDetails.description.length > 0 ? (
           <div
-            className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
+            className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E] text-xs xs:text-sm `}
           >
             {sessionDetails.description}
           </div>
         ) : (
           data.description.length > 0 && (
             <div
-              className={`px-6 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E]`}
+              className={`px-4 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E] text-xs xs:text-sm `}
             >
               <>
                 <div

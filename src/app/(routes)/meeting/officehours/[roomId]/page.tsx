@@ -32,7 +32,7 @@ import { Role } from "@huddle01/server-sdk/auth";
 import clsx from "clsx";
 import GridContainer from "@/components/Huddle/GridContainer";
 // import ShowCaptions from "@/components/Caption/showCaptions";
-import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
+// import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
 
 export default function Component({ params }: { params: { roomId: string } }) {
@@ -213,6 +213,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </GridContainer>
             </div>
           )}
+<<<<<<< HEAD
           {peerIds.map((peerId) => (
             <RemoteScreenShare
               key={peerId}
@@ -222,6 +223,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
               onVideoTrackUpdate={handleVideoTrackUpdate}
             />
           ))}
+=======
+          {/* {peerIds.map((peerId) => (
+            <RemoteScreenShare key={peerId} peerId={peerId} />
+          ))} */}
+>>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
           <section
             className={clsx(
               "justify-center px-4",

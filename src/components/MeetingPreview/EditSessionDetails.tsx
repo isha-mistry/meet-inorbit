@@ -57,21 +57,19 @@ function EditSessionDetails({
 
   return (
     <div className="relative">
-      <div className="absolute top-0 right-0">
-        <Button
-          className="border-blue-shade-100 text-blue-shade-100 border rounded-full font-poppins font-semibold text-xs bg-white"
-          onClick={() => toast("Coming Soon! 🚀")}
-        >
-          Generate Title and Description
-        </Button>
-      </div>
       <div>
         <div className="">
-          <div className="text-xl font-semibold mb-2 text-blue-shade-100 font-poppins">
+          <div className="text-xl font-semibold mb-2 text-blue-shade-100 font-poppins flex flex-col gap-3 xm:gap-0 xm:flex-row-reverse xm:justify-between">
+            <Button
+              className="border-blue-shade-100 text-blue-shade-100 border rounded-full font-poppins font-semibold text-xs bg-white w-fit ml-auto"
+              onClick={() => toast("Coming Soon! 🚀")}
+            >
+              Generate Title and Description
+            </Button>
             Thumbnail Image
           </div>
-          <div className="flex gap-3 items-center">
-            <div className="w-40 h-24 bg-gray-100 mb-5 rounded-lg flex items-center justify-center">
+          <div className="flex flex-col xm:flex-row gap-3 xm:items-center">
+            <div className="w-40 h-24 bg-gray-100 xm:mb-5 rounded-lg flex items-center justify-center">
               {sessionDetails.image ? (
                 <Image
                   src={`https://gateway.lighthouse.storage/ipfs/${sessionDetails.image}`}
@@ -98,10 +96,12 @@ function EditSessionDetails({
               )}
             </div>
             <div className="flex items-end">
-              <div className="flex bg-[#EEF8FF] items-center gap-6 rounded-lg p-3">
-                <label className="bg-[#EEF8FF]  text-blue-shade-100 font-medium text-sm py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center ">
-                  <CgAttachment />
-                  <span>Upload Image</span>
+              <div className="flex bg-[#EEF8FF] items-center gap-2 xm:gap-4 rounded-lg p-3">
+                <label className="bg-[#EEF8FF]  text-blue-shade-100 font-medium text-xs xm:text-sm py-[11px] xm:py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center ">
+                  <CgAttachment className="size-4" />
+                  <span className="flex gap-1">
+                    Upload <span className="hidden xm:block">Image</span>
+                  </span>
                   <input
                     type="file"
                     name="image"
@@ -118,7 +118,6 @@ function EditSessionDetails({
                   Add Random Image
                 </Button>
               </div>
-              {/* </div> */}
             </div>
           </div>
         </div>
@@ -126,16 +125,16 @@ function EditSessionDetails({
           <div className="text-xl mb-2 font-semibold text-blue-shade-100 font-poppins">
             Session Title
           </div>
-          <div className="relative">
+          <div className="flex flex-col-reverse xs:flex-row items-center justify-between w-full border bg-[#F9F9F9] py-3 px-4 rounded-lg  xs:gap-4">
             <input
               type="text"
-              className="border bg-[#F9F9F9] w-full py-3 px-4 text-sm rounded-lg outline-none pr-20"
+              className=" text-xs xs:text-sm w-full bg-[#F9F9F9] xm:p-1 rounded-lg outline-none "
               placeholder="Enter a descriptive title for your session"
               value={sessionDetails.title}
               onChange={handleTitleChange}
               maxLength={100}
             />
-            <div className="absolute top-3 right-4 text-[14px] font-medium text-[#7C7C7C] pe-1 font-poppins">
+            <div className="text-[10px] xm:text-sm font-medium text-[#7C7C7C] font-poppins ml-auto">
               {sessionDetails.title.length}/100
             </div>
           </div>
@@ -148,7 +147,7 @@ function EditSessionDetails({
               </div>
             </div>
             <div
-              className={`rounded-lg  px-4 py-1 text-xs border ${
+              className={`rounded-lg px-2 xm:px-4 py-1 text-xs border ${
                 sessionDetails.description.length < 600
                   ? "bg-red-500"
                   : sessionDetails.description.length <= 1000
@@ -161,16 +160,16 @@ function EditSessionDetails({
               {getDescriptionStatus(sessionDetails.description.length)}
             </div>
           </div>
-          <div className="relative ">
+          <div className="flex flex-col-reverse items-start justify-between w-full border bg-[#F9F9F9] py-3 px-4 rounded-lg">
             <textarea
               rows={8}
-              className="border bg-[#F9F9F9] w-full p-4 text-sm rounded-lg outline-none pr-20"
+              className=" bg-[#F9F9F9] w-full xm:p-4 text-xs xs:text-sm rounded-lg outline-none"
               placeholder="Briefly describe what your session covers"
               value={sessionDetails.description}
               onChange={handleDescriptionChange}
               maxLength={2000}
             ></textarea>
-            <div className="absolute top-4 right-4 text-[14px] font-medium text-[#7C7C7C] pe-1">
+            <div className="text-[10px] xm:text-sm font-medium text-[#7C7C7C] ml-auto">
               {sessionDetails.description.length}/2000
             </div>
           </div>
