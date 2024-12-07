@@ -14,7 +14,7 @@ type ListenersDataProps = {
 
 const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
   const { leaveRoom, kickPeer } = useRoom();
-  // const { updateRole } = useRemotePeer({ peerId });
+  const { updateRole } = useRemotePeer({ peerId });
   const me = useLocalPeer();
 
   return (
@@ -41,13 +41,19 @@ const ListenersData: React.FC<ListenersDataProps> = ({ peerId }) => {
                 updateRole(Role.SPEAKER);
               }}
             /> */}
+
           <Strip
-            type="leave"
-            title="Remove from spaces"
+            title="Invite as Co-Host"
+            variant="normal"
+            onClick={() => updateRole(Role.CO_HOST)}
+            type="personSpeaker"
+          />
+
+          <Strip
+            title="Remove from space"
             variant="danger"
-            onClick={() => {
-              kickPeer(peerId);
-            }}
+            onClick={() => kickPeer(peerId)}
+            type="leave"
           />
         </div>
       )}

@@ -98,7 +98,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   } = useStudioState();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { peerIds } = usePeerIds({
-    roles: [Role.HOST, Role.GUEST],
+    roles: [Role.HOST, Role.GUEST, Role.CO_HOST],
   });
   const [isCopied, setIsCopied] = useState(false);
   const router = useRouter();

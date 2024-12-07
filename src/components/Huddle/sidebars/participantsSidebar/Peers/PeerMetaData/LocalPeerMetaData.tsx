@@ -6,7 +6,11 @@ import HostData from "../PeerRole/HostData";
 import CoHostData from "../PeerRole/CoHostData";
 import SpeakerData from "../PeerRole/SpeakerData";
 import ListenersData from "../PeerRole/ListenersData";
-import { useLocalAudio, useLocalPeer } from "@huddle01/react/hooks";
+import {
+  useLocalAudio,
+  useLocalPeer,
+  useRemotePeer,
+} from "@huddle01/react/hooks";
 // import useStore from "@/components/store/slices";
 import { Role } from "@huddle01/server-sdk/auth";
 import { memo } from "react";
@@ -49,7 +53,9 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
   } = useLocalAudio();
 
   const { address } = useAccount();
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
+
+  // const { peerId: remotePeerIds } = useRemotePeer({ peerId });
 
   // const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
 
@@ -106,15 +112,15 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             ? NestedPeerListIcons.active.mic
             : NestedPeerListIcons.inactive.mic}
         </div>
-        {/* {role === "host" && ( */}
-        <div className="flex items-center cursor-pointer">
-          <Dropdown
-            triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
-            align="end"
-          >
-            {role && RoleData[role as keyof typeof RoleData]}
-          </Dropdown>
-        </div>
+        {/* {role !== "guest" && ( */}
+          <div className="flex items-center cursor-pointer">
+            <Dropdown
+              triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
+              align="end"
+            >
+              {role && RoleData[role as keyof typeof RoleData]}
+            </Dropdown>
+          </div>
         {/* )} */}
       </div>
     </div>

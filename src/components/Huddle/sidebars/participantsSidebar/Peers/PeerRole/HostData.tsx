@@ -8,7 +8,7 @@ type HostDataProps = {
 };
 
 const HostData: React.FC<HostDataProps> = ({ peerId }) => {
-  const { leaveRoom, closeRoom } = useRoom();
+  const { leaveRoom, closeRoom, kickPeer } = useRoom();
   const { updateRole } = useRemotePeer({ peerId });
 
   const me = useLocalPeer();
@@ -32,6 +32,19 @@ const HostData: React.FC<HostDataProps> = ({ peerId }) => {
             onClick={() => {
               leaveRoom();
             }}
+          /> */}
+          {/* <Strip
+            title="Invite as Co-Host"
+            variant="normal"
+            onClick={() => updateRole(Role.CO_HOST)}
+            type="personSpeaker"
+          />
+
+          <Strip
+            title="Remove from space"
+            variant="danger"
+            onClick={() => kickPeer(peerId)}
+            type="leave"
           /> */}
         </div>
       )}

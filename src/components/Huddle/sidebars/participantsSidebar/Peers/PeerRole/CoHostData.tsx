@@ -1,6 +1,11 @@
 import React from "react";
 import Strip from "./Strip";
-import { useRoom, useHuddle01, useRemotePeer, useLocalPeer } from "@huddle01/react/hooks";
+import {
+  useRoom,
+  useHuddle01,
+  useRemotePeer,
+  useLocalPeer,
+} from "@huddle01/react/hooks";
 import { Role } from "@huddle01/server-sdk/auth";
 
 type CoHostDataProps = {
@@ -8,7 +13,6 @@ type CoHostDataProps = {
 };
 
 const CoHostData: React.FC<CoHostDataProps> = ({ peerId }) => {
-  
   const { updateRole } = useRemotePeer({ peerId });
 
   const me = useLocalPeer();
@@ -25,7 +29,7 @@ const CoHostData: React.FC<CoHostDataProps> = ({ peerId }) => {
             variant="danger"
             onClick={() => {
               if (me.role === "host" || me.role === "coHost") {
-                updateRole(Role.LISTENER);
+                updateRole(Role.GUEST);
               }
             }}
           />
@@ -54,7 +58,7 @@ const CoHostData: React.FC<CoHostDataProps> = ({ peerId }) => {
             title="Leave co-host role"
             variant="danger"
             onClick={() => {
-              updateRole(Role.LISTENER);
+              me.updateRole({ role: "guest" });
             }}
           />
         </div>

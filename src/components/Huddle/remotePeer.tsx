@@ -30,7 +30,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   const { metadata } = useRemotePeer<PeerMetadata>({ peerId });
   const { isScreenShared } = useStudioState();
   const { peerIds } = usePeerIds({
-    roles: [Role.HOST, Role.GUEST],
+    roles: [Role.HOST, Role.GUEST, Role.CO_HOST],
   });
   const [reaction, setReaction] = useState("");
 

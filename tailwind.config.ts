@@ -99,10 +99,6 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
-        "gradient-border": {
-          "0%, 100%": { "background-position": "0% 50%" },
-          "50%": { "background-position": "100% 50%" },
-        },
       },
       animation: {
         fadeIn: "fadeIn 1s ease-out",
@@ -113,7 +109,6 @@ const config: Config = {
         "gradient-x": "gradient-x 5s ease infinite",
         float: "float 3s ease-in-out infinite",
         "bounce-slow": "bounce 2s infinite",
-        "gradient-border": "gradient-border 3s ease infinite",
       },
     },
   },
