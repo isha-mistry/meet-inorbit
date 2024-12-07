@@ -42,11 +42,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const { address } = useAccount();
-<<<<<<< HEAD
   const {walletAddress}=useWalletAddress();
-=======
   // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1"
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
@@ -146,13 +143,8 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   return (
     <div className="font-poppins">
       {!dataLoading ? (
-<<<<<<< HEAD
         walletAddress?.toLowerCase() === data?.host_address.toLowerCase() ? (
-          <div className="py-5 px-16 ">
-=======
-        address?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-4 sm:px-6 lg:px-16">
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
             {showPopup && (
               <div
                 className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-2 xm:px-4 py-3 rounded-lg w-fit mb-4"

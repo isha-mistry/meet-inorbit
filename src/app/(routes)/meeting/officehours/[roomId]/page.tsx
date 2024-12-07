@@ -213,21 +213,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
               </GridContainer>
             </div>
           )}
-<<<<<<< HEAD
-          {peerIds.map((peerId) => (
-            <RemoteScreenShare
-              key={peerId}
-              peerId={peerId}
-              isRemoteLessScreen={true}
-              setIsRemoteLessScreen={setIsRemoteLessScreen}
-              onVideoTrackUpdate={handleVideoTrackUpdate}
-            />
-          ))}
-=======
           {/* {peerIds.map((peerId) => (
             <RemoteScreenShare key={peerId} peerId={peerId} />
           ))} */}
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
           <section
             className={clsx(
               "justify-center px-4",

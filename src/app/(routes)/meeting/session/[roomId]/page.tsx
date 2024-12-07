@@ -60,10 +60,8 @@ import {
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
 import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
-<<<<<<< HEAD
 import Audio from "@/components/Huddle/Media/Audio";
 import AudioController from "@/components/Huddle/Media/AudioController";
-=======
 import interact from "interactjs";
 
 const GlobalScrollbarStyles = `
@@ -94,7 +92,6 @@ const GlobalScrollbarStyles = `
     scrollbar-color: #44474e #2a2a2a;
   }
 `;
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
 
 export default function Component({ params }: { params: { roomId: string } }) {
   const { isVideoOn, enableVideo, disableVideo, stream } = useLocalVideo();
@@ -704,41 +701,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       }`
                 } `}
               >
-<<<<<<< HEAD
-                {/* {(!isLessScreen || isScreenShared) &&  ( */}
-                {/* <div className={`${(!isLessScreen && isScreenShared) ? "flex" : `${!isRemoteLessScreen && isScreenShared ? "flex" : ""}`} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
-                    {metadata?.avatarUrl && (
-                            <div className=" rounded-full w-20 h-20">
-                              <Image
-                                alt="image"
-                                src={metadata?.avatarUrl}
-                                className="maskAvatar object-cover object-center"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
-                          )}
-                  <span className="absolute bottom-2 left-2">You</span>
-                 </div> */}
-                {/* )} */}
-                {/* {(!isRemoteLessScreen && isScreenShared) &&  (
-                  <div className={`${!isLessScreen && isScreenShared} absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20`}>
-                    {metadata?.avatarUrl && (
-                            <div className=" rounded-full w-20 h-20">
-                              <Image
-                                alt="image"
-                                src={metadata?.avatarUrl}
-                                className="maskAvatar object-cover object-center"
-                                width={100}
-                                height={100}
-                              />
-                            </div>
-                          )}
-                  <span className="absolute bottom-2 left-2">You</span>
-                 </div>
-                )} */}
-=======
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
                 {shareStream && (
                   <div className={`w-full `}>
                     <GridContainer className="w-full h-full relative">
@@ -825,7 +787,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         <div className="absolute left-4 top-4 text-3xl z-10">
                           {reaction}
                         </div>
-<<<<<<< HEAD
                         {metadata?.isHandRaised && (
                           <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
                             ✋
@@ -863,17 +824,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             : NestedPeerListIcons.inactive.mic}
                         </span>
                       </div>
-=======
-                      )}
-                      <span className="absolute bottom-4 left-4 text-white font-medium text-xs 0.2xs:text-base">
-                        {`${metadata?.displayName} (You)`}
-                      </span>
-                      <span className="absolute bottom-4 right-4">
-                        {isAudioOn
-                          ? NestedPeerListIcons.active.mic
-                          : NestedPeerListIcons.inactive.mic}
-                      </span>
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
+                     
                     </div>
                   )}
 
