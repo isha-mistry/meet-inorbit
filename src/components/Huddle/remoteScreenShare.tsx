@@ -19,7 +19,7 @@ import interact from "interactjs";
 interface RemotePeerProps {
   peerId: string;
   isRemoteLessScreen: boolean;
-  setIsRemoteLessScreen: (value: boolean) => void;
+  setIsRemoteLessScreen: (isScreenShared: boolean) => void;
   onVideoTrackUpdate: (
     peerId: string,
     videoTrack: MediaStreamTrack | null
@@ -32,7 +32,6 @@ const RemoteScreenShare = ({
   setIsRemoteLessScreen,
   onVideoTrackUpdate,
 }: RemotePeerProps) => {
-  // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
     peerId,
@@ -88,15 +87,12 @@ const RemoteScreenShare = ({
     setIsRemoteLessScreen(!isRemoteLessScreen);
   };
 
-  // useEffect(() => {
-  //   setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
-  //   console.log("videoTrack-remotescreen", videoTrack);
-  // }, [videoTrack]);
   useEffect(() => {
     if (videoTrack) {
       const newVideoStreamTrack = new MediaStream([videoTrack]);
       setVideoStreamTrack(newVideoStreamTrack);
       onVideoTrackUpdate(peerId, videoTrack);
+      setIsScreenShared(true);
     } else {
       setVideoStreamTrack(null);
       onVideoTrackUpdate(peerId, null);
@@ -153,28 +149,6 @@ const RemoteScreenShare = ({
               )}
             </>
           </GridContainer>
-          {/* {!isRemoteLessScreen && (
-            <div
-            ref={draggableRef}
-              className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
-              style={{
-                transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
-              }}
-            >
-              {localMetadata?.avatarUrl && (
-                <div className=" rounded-full w-20 h-20">
-                  <Image
-                    alt="image"
-                    src={localMetadata?.avatarUrl}
-                    className="maskAvatar object-cover object-center"
-                    width={100}
-                    height={100}
-                  />
-                </div>
-              )}
-              <span className="absolute bottom-2 left-2 text-white">You</span>
-            </div>
-          )} */}
         </div>
       )}
     </>

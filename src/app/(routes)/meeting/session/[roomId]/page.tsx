@@ -71,7 +71,7 @@ const GlobalScrollbarStyles = `
   }
   
   ::-webkit-scrollbar-thumb {
-    background-color: #0a0a0a; /* Blue shade matching your design */
+    background-color: #7b7b7b; /* Blue shade matching your design */
     border-radius: 10px;
     transition: background-color 0.3s ease;
   }
@@ -753,6 +753,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     onVideoTrackUpdate={handleVideoTrackUpdate}
                   />
                 ))}
+                {/* {console.log(isRemoteLessScreen, "remote screen share")}
+                {console.log(isScreenShared,"local screen share")}
+                {console.log(isLessScreen,"islessscreen")}
+                {console.log(isRemoteLessScreen,"isremotelessscreen")} */}
                 <section
                   className={`${
                     isRemoteLessScreen || !isScreenShared
@@ -801,7 +805,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                           )}
                         </div>
                       )}
-                      <span className="absolute bottom-4 left-4 text-white font-medium">
+                      <span className="absolute bottom-4 left-4 text-white font-medium text-xs 0.2xs:text-base">
                         {`${metadata?.displayName} (You)`}
                       </span>
                       <span className="absolute bottom-4 right-4">

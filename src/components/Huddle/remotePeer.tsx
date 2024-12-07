@@ -77,7 +77,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
           )}
         </div>
       )}
-      <span className="absolute bottom-4 left-4 text-white font-medium">
+      <span className="absolute bottom-4 left-4 text-white font-medium text-xs 0.2xs:text-base">
         {metadata?.displayName}
       </span>
       <span className="absolute bottom-4 right-4">
