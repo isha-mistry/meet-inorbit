@@ -19,11 +19,7 @@ import interact from "interactjs";
 interface RemotePeerProps {
   peerId: string;
   isRemoteLessScreen: boolean;
-<<<<<<< HEAD
-  setIsRemoteLessScreen: (value: boolean) => void;
-=======
   setIsRemoteLessScreen: (isScreenShared: boolean) => void;
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   onVideoTrackUpdate: (
     peerId: string,
     videoTrack: MediaStreamTrack | null
@@ -36,10 +32,6 @@ const RemoteScreenShare = ({
   setIsRemoteLessScreen,
   onVideoTrackUpdate,
 }: RemotePeerProps) => {
-<<<<<<< HEAD
-  // const RemoteScreenShare = ({ peerId, isFullScreen, setIsFullScreen }: RemotePeerProps) => {
-=======
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   const { setIsScreenShared } = useStudioState();
   const { videoTrack, audioTrack } = useRemoteScreenShare({
     peerId,
@@ -95,12 +87,6 @@ const RemoteScreenShare = ({
     setIsRemoteLessScreen(!isRemoteLessScreen);
   };
 
-<<<<<<< HEAD
-  // useEffect(() => {
-  //   setVideoStreamTrack(videoTrack && new MediaStream([videoTrack]));
-  // }, [videoTrack]);
-=======
->>>>>>> fe1761ac72acd28338f170123844f052d4f0987f
   useEffect(() => {
     if (videoTrack) {
       const newVideoStreamTrack = new MediaStream([videoTrack]);
