@@ -141,12 +141,12 @@ const RemoteScreenShare = ({
                 stream={videoStreamTrack}
                 name={metadata?.displayName ?? "guest"}
               />
-              {audioTrack && (
+              {/* {audioTrack && (
                 <Audio
                   stream={audioTrack && new MediaStream([audioTrack])}
                   // name={metadata?.displayName ?? "guest"}
                 />
-              )}
+              )} */}
             </>
           </GridContainer>
         </div>

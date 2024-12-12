@@ -692,13 +692,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
               )}
               <div
                 className={`relative flex flex-col lg:flex-row w-full h-full ${
-                  isRemoteLessScreen || !isScreenShared
-                    ? ""
-                    : `${
-                        isLessScreen || !isScreenShared
-                          ? ""
-                          : "bg-[#202020] rounded-lg justify-center"
-                      }`
+                  !isRemoteLessScreen && isScreenShared && !isLessScreen
+                    ? "bg-[#202020] rounded-lg justify-center"
+                    : ""
                 } `}
               >
                 {shareStream && (
@@ -824,7 +820,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             : NestedPeerListIcons.inactive.mic}
                         </span>
                       </div>
-                     
                     </div>
                   )}
 
