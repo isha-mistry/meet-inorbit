@@ -151,12 +151,18 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
   const { walletAddress } = useWalletAddress();
-  const [isLessScreen, setIsLessScreen] = useState(false);
-  const [isRemoteLessScreen, setIsRemoteLessScreen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isRemoteFullScreen, setIsRemoteFullScreen] = useState(false);
 
   const draggableRef = useRef(null);
   const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
 
+  useEffect(() => {
+    if (!isScreenShared) {
+      setIsFullScreen(false);
+      setIsRemoteFullScreen(false);
+    }
+  });
   useEffect(() => {
     console.log("Draggable ref:", draggableRef.current);
     if (draggableRef.current) {
@@ -188,7 +194,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         interactable.unset();
       };
     }
-  }, [shareStream, isLessScreen]);
+  }, [shareStream, !isFullScreen]);
 
   const [remoteVideoTracks, setRemoteVideoTracks] = useState<
     Record<string, MediaStreamTrack | null>
@@ -216,7 +222,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   );
 
   const toggleFullScreen = () => {
-    setIsLessScreen(!isLessScreen);
+    setIsFullScreen(!isFullScreen);
   };
 
   const handleCopy = () => {
@@ -666,7 +672,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <main
               className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
             >
-              {shareStream && !isLessScreen && (
+              {shareStream && isFullScreen && (
                 <div
                   ref={draggableRef}
                   className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
@@ -692,7 +698,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               )}
               <div
                 className={`relative flex flex-col lg:flex-row w-full h-full ${
-                  !isRemoteLessScreen && isScreenShared && !isLessScreen
+                  isRemoteFullScreen && isScreenShared && isFullScreen
                     ? "bg-[#202020] rounded-lg justify-center"
                     : ""
                 } `}
@@ -702,13 +708,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     <GridContainer className="w-full h-full relative">
                       <>
                         <Tooltip
-                          content={isLessScreen ? "Full Screen" :"Exit Full Screen"}
+                          content={
+                            isFullScreen ? "Exit Full Screen" : "Full Screen"
+                          }
                         >
                           <Button
                             className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
                             onClick={toggleFullScreen}
                           >
-                            {isLessScreen ? <Maximize2 /> : <Minimize2 />}
+                            {isFullScreen ? <Minimize2 /> : <Maximize2 />}
                           </Button>
                         </Tooltip>
                         <Video
@@ -723,16 +731,43 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   <RemoteScreenShare
                     key={peerId}
                     peerId={peerId}
-                    isRemoteLessScreen={isRemoteLessScreen}
-                    setIsRemoteLessScreen={setIsRemoteLessScreen}
+                    isRemoteFullScreen={isRemoteFullScreen}
+                    setIsRemoteFullScreen={setIsRemoteFullScreen}
                     onVideoTrackUpdate={handleVideoTrackUpdate}
                   />
                 ))}
-                <section
+                {console.log("is full screen", isFullScreen)}
+                {console.log("is remote full screen", isRemoteFullScreen)}
+                {console.log("screen share", isScreenShared)}
+                {/* <section
                   className={`${
                     isRemoteLessScreen || !isScreenShared
                       ? "grid"
                       : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
+                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
+                    isScreenShared
+                      ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
+                      : peerIds.length === 0
+                      ? "grid-cols-1"
+                      : peerIds.length === 1
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
+                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
+                  }
+                   `}
+                > */}
+                <section
+                  className={`${
+                    !isScreenShared
+                      ? "grid"
+                      : `${
+                          isRemoteFullScreen && isScreenShared
+                            ? "hidden"
+                            : `${
+                                isFullScreen && isScreenShared
+                                  ? "hidden"
+                                  : "grid"
+                              }`
+                        }`
                   } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
                     isScreenShared
                       ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared

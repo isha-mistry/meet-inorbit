@@ -18,8 +18,8 @@ import interact from "interactjs";
 
 interface RemotePeerProps {
   peerId: string;
-  isRemoteLessScreen: boolean;
-  setIsRemoteLessScreen: (isScreenShared: boolean) => void;
+  isRemoteFullScreen: boolean;
+  setIsRemoteFullScreen: (isScreenShared: boolean) => void;
   onVideoTrackUpdate: (
     peerId: string,
     videoTrack: MediaStreamTrack | null
@@ -28,8 +28,8 @@ interface RemotePeerProps {
 
 const RemoteScreenShare = ({
   peerId,
-  isRemoteLessScreen,
-  setIsRemoteLessScreen,
+  isRemoteFullScreen,
+  setIsRemoteFullScreen,
   onVideoTrackUpdate,
 }: RemotePeerProps) => {
   const { setIsScreenShared } = useStudioState();
@@ -81,10 +81,10 @@ const RemoteScreenShare = ({
         interactable.unset();
       };
     }
-  }, [videoTrack, isRemoteLessScreen]);
+  }, [videoTrack, isRemoteFullScreen]);
 
   const toggleFullScreen = () => {
-    setIsRemoteLessScreen(!isRemoteLessScreen);
+    setIsRemoteFullScreen(!isRemoteFullScreen);
   };
 
   useEffect(() => {
@@ -101,7 +101,7 @@ const RemoteScreenShare = ({
 
   return (
     <>
-      {videoTrack && !isRemoteLessScreen && (
+      {videoTrack && isRemoteFullScreen && (
         <div
           ref={draggableRef}
           className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex  items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
@@ -128,13 +128,15 @@ const RemoteScreenShare = ({
           <GridContainer className="w-full h-full relative">
             <>
               <Tooltip
-                content={isRemoteLessScreen ? "Full Screen" : "Exit Full Screen"}
+                content={
+                  isRemoteFullScreen ? "Exit Full Screen" : "Full Screen"
+                }
               >
                 <Button
                   className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
                   onClick={toggleFullScreen}
                 >
-                  {isRemoteLessScreen ? <Maximize2 /> : <Minimize2 />}
+                  {isRemoteFullScreen ? <Minimize2 /> : <Maximize2 />}
                 </Button>
               </Tooltip>
               <Video
