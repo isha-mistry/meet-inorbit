@@ -17,7 +17,7 @@ function ParticipantTile({ className }: participantTileProps) {
   return (
     <GridContainer
       className={clsx(
-        "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] border-none",
+        "min-w-[150px] min-h-[150px]",
         className
       )}
     >

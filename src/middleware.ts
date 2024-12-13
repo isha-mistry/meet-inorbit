@@ -9,7 +9,7 @@ const allowedOrigins = [
   process.env.NEXT_PUBLIC_MIDDLEWARE_BASE_URL!,
   process.env.NEXT_PUBLIC_LOCAL_APP_URL!,
   process.env.NEXT_PUBLIC_HOSTED_APP_URL!,
-  // " https://ad29cb872216a955d62b10fc7f72d67e.serveo.net",
+  // " https://abed6a15ccdd06d692f1a22ba866947a.serveo.net/",
 ].filter(Boolean);
 
 const privyClient = new PrivyClient(

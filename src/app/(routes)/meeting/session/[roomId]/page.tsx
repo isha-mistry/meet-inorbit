@@ -702,7 +702,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     <GridContainer className="w-full h-full relative">
                       <>
                         <Tooltip
-                          content={isLessScreen ? "Full Screen" : "Less Screen"}
+                          content={isLessScreen ? "Full Screen" :"Exit Full Screen"}
                         >
                           <Button
                             className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
@@ -717,30 +717,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         />
                       </>
                     </GridContainer>
-                    {/* {!isLessScreen && (
-                      <div
-                      ref={draggableRef}
-                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
-                        style={{
-                          transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
-                        }}
-                      >
-                        {metadata?.avatarUrl && (
-                          <div className=" rounded-full w-20 h-20">
-                            <Image
-                              alt="image"
-                              src={metadata?.avatarUrl}
-                              className="maskAvatar object-cover object-center"
-                              width={100}
-                              height={100}
-                            />
-                          </div>
-                        )}
-                        <span className="absolute bottom-2 left-2 text-white">
-                          You
-                        </span>
-                      </div>
-                    )} */}
                   </div>
                 )}
                 {peerIds.map((peerId) => (
@@ -752,75 +728,77 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     onVideoTrackUpdate={handleVideoTrackUpdate}
                   />
                 ))}
-                {/* {console.log(isRemoteLessScreen, "remote screen share")}
-                {console.log(isScreenShared,"local screen share")}
-                {console.log(isLessScreen,"islessscreen")}
-                {console.log(isRemoteLessScreen,"isremotelessscreen")} */}
                 <section
                   className={`${
                     isRemoteLessScreen || !isScreenShared
                       ? "grid"
                       : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
-                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
-                    peerIds.length === 0
+                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
+                    isScreenShared
+                      ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
+                      : peerIds.length === 0
                       ? "grid-cols-1"
                       : peerIds.length === 1
                       ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
                       : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
-                  }`}
+                  }
+                   `}
                 >
                   {role !== Role.BOT && (
-                    <div
-                      className={`relative 
+                    <>
+                      <div
+                        className={`relative 
                         ${
                           isAudioOn
                             ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
                             : "bg-[#202020] bg-opacity-80"
                         }
                       rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
-                    >
-                      <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
-                        <div className="absolute left-4 top-4 text-3xl z-10">
-                          {reaction}
-                        </div>
-                        {metadata?.isHandRaised && (
-                          <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
-                            ✋
-                          </span>
-                        )}
-
-                        {stream ? (
-                          <>
-                            <Camera
-                              stream={stream}
-                              name={metadata?.displayName ?? "guest"}
-                            />
-                          </>
-                        ) : (
-                          <div className="flex w-24 h-24 rounded-full">
-                            {metadata?.avatarUrl && (
-                              <div className=" rounded-full w-24 h-24">
-                                <Image
-                                  alt="image"
-                                  src={metadata?.avatarUrl}
-                                  className="maskAvatar object-cover object-center"
-                                  width={100}
-                                  height={100}
-                                />
-                              </div>
-                            )}
+                      >
+                        <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
+                          <div className="absolute left-4 top-4 text-3xl z-10">
+                            {reaction}
                           </div>
-                        )}
-                        <span className="absolute bottom-4 left-4 text-white font-medium">
-                          {`${metadata?.displayName} (You)`}
-                        </span>
-                        <span className="absolute bottom-4 right-4">
-                          {isAudioOn
-                            ? NestedPeerListIcons.active.mic
-                            : NestedPeerListIcons.inactive.mic}
-                        </span>
+                          {metadata?.isHandRaised && (
+                            <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
+                              ✋
+                            </span>
+                          )}
+                          {stream && (
+                            <span className="absolute top-0 bottom-0 right-0 left-0">
+                              <Camera
+                                stream={stream}
+                                name={metadata?.displayName ?? "guest"}
+                              />
+                            </span>
+                          )}
+
+                          {!stream && (
+                            <div className="flex w-24 h-24 rounded-full">
+                              {metadata?.avatarUrl && (
+                                <div className=" rounded-full w-24 h-24">
+                                  <Image
+                                    alt="image"
+                                    src={metadata?.avatarUrl}
+                                    className="maskAvatar object-cover object-center"
+                                    width={100}
+                                    height={100}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <span className="absolute bottom-4 left-4 text-white font-medium">
+                            {`${metadata?.displayName} (You)`}
+                          </span>
+                          <span className="absolute bottom-4 right-4">
+                            {isAudioOn
+                              ? NestedPeerListIcons.active.mic
+                              : NestedPeerListIcons.inactive.mic}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
 
                   {isScreenShared ? (

@@ -128,7 +128,7 @@ const RemoteScreenShare = ({
           <GridContainer className="w-full h-full relative">
             <>
               <Tooltip
-                content={isRemoteLessScreen ? "Full Screen" : "Less Screen"}
+                content={isRemoteLessScreen ? "Full Screen" : "Exit Full Screen"}
               >
                 <Button
                   className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"

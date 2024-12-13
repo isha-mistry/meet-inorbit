@@ -65,12 +65,15 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
             ✋
           </span>
         )}
-        {videoStream ? (
-          <Camera
-            stream={videoStream}
-            name={metadata?.displayName ?? "guest"}
-          />
-        ) : (
+        {videoStream && (
+          <span className="absolute top-0 bottom-0 right-0 left-0">
+            <Camera
+              stream={videoStream}
+              name={metadata?.displayName ?? "guest"}
+            />
+          </span>
+        )}
+        {!videoStream && (
           <div className="flex w-24 h-24 rounded-full">
             {metadata?.avatarUrl && (
               <div className=" rounded-full w-24 h-24">
@@ -93,9 +96,6 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
             ? NestedPeerListIcons.active.mic
             : NestedPeerListIcons.inactive.mic}
         </span>
-        {/* {audioStream && (
-        <Audio stream={audioStream} name={metadata?.displayName ?? "guest"} />
-      )} */}
       </div>
     </div>
   );

@@ -160,7 +160,7 @@ const Video = ({ stream, name }: VideoProps) => {
         onTouchEnd={handleTouchEnd}
       >
         <video
-          className="h-full w-full object-cover"
+          className="w-full object-cover"
           ref={videoRef}
           autoPlay
           muted
