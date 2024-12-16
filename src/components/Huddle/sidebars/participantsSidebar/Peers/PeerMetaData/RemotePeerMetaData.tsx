@@ -46,6 +46,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
 
   const { isAudioOn } = useRemoteAudio({ peerId });
   const { peerId: localPeerId } = useLocalPeer();
+  const me = useLocalPeer();
 
   // const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
 
@@ -73,7 +74,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
       <div className="flex items-center gap-2">
         {metadata?.avatarUrl &&
         metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
-          <div className="bg-pink-50 border border-pink-100 rounded-full w-6 h-6">
+          <div className="w-6 h-6">
             <Image
               src={metadata?.avatarUrl}
               alt="image"
@@ -102,7 +103,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             ? NestedPeerListIcons.active.mic
             : NestedPeerListIcons.inactive.mic}
         </div>
-        {/* {role !== "host" || role === "guest" && ( */}
+        {me.role === Role.HOST && (
           <div className="cursor-pointer flex items-center">
             <Dropdown
               triggerChild={<div>{NestedPeerListIcons.inactive.more}</div>}
@@ -111,7 +112,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               {role && RoleData[role as keyof typeof RoleData]}
             </Dropdown>
           </div>
-        {/* )} */}
+         )} 
       </div>
       {/* )}  */}
     </div>

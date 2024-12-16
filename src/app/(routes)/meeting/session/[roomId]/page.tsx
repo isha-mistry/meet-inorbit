@@ -776,7 +776,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             {reaction}
                           </div>
                           {metadata?.isHandRaised && (
-                            <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium">
+                            <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
                               ✋
                             </span>
                           )}
