@@ -736,25 +736,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     onVideoTrackUpdate={handleVideoTrackUpdate}
                   />
                 ))}
-                {console.log("is full screen", isFullScreen)}
-                {console.log("is remote full screen", isRemoteFullScreen)}
-                {console.log("screen share", isScreenShared)}
-                {/* <section
-                  className={`${
-                    isRemoteLessScreen || !isScreenShared
-                      ? "grid"
-                      : `${isLessScreen || !isScreenShared ? "grid" : "hidden"}`
-                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
-                    isScreenShared
-                      ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
-                      : peerIds.length === 0
-                      ? "grid-cols-1"
-                      : peerIds.length === 1
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
-                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
-                  }
-                   `}
-                > */}
                 <section
                   className={`${
                     !isScreenShared

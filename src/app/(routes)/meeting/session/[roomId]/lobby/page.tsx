@@ -70,7 +70,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   // }, [isConnected, isPageLoading, isSessionLoading]);
 
   useEffect(() => {
-    if (!authenticated) {
+    if (!walletAddress) {
       login();
     }
   }, [authenticated, walletAddress]);
