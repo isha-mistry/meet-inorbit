@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   console.log("origin: ", origin);
 
   // CORS check
-  if (!origin) {
+  if (!origin || !allowedOrigins.includes(origin)) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {

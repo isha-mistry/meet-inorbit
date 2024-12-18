@@ -14,18 +14,18 @@ const Speaker: React.FC<SpeakerDataProps> = ({ peerId }) => {
 
   return (
     <>
-      {/* {me.role === "host" && (
-          <div>
-            <Strip
-              type="personNormal"
-              title="Invite as Co-Host"
-              variant="normal"
-              onClick={() => {
-                  updateRole(Role.CO_HOST);
-              }}
-            />
-            </div>
-            )} */}
+      {me.role === "host" && (
+        <div>
+          <Strip
+            type="personNormal"
+            title="Invite as Co-Host"
+            variant="normal"
+            onClick={() => {
+              updateRole(Role.CO_HOST);
+            }}
+          />
+        </div>
+      )}
       {me.role && ["host", "coHost"].includes(me.role) && (
         <div>
           <Strip
@@ -54,7 +54,7 @@ const Speaker: React.FC<SpeakerDataProps> = ({ peerId }) => {
             title="Leave speaker role"
             variant="danger"
             onClick={() => {
-              updateRole(Role.LISTENER);
+              me.updateRole({ role: "listener" });
             }}
           />
           <Strip

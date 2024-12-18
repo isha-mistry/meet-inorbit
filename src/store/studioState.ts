@@ -14,6 +14,8 @@ export interface BoxPosition {
   height: string;
 }
 
+export type TPromptView = "close" | "request-to-speak";
+
 interface StudioState {
   name: string;
   setName: (name: string) => void;
@@ -66,6 +68,8 @@ interface StudioState {
   setIsRoomClosed: (val: boolean) => void;
   meetingRecordingStatus: boolean;
   setMeetingRecordingStatus: (val: boolean) => void;
+  promptView: TPromptView;
+  setPromptView: (val: TPromptView) => void;
 }
 
 export const useStudioState = create<StudioState>((set) => ({
@@ -169,4 +173,10 @@ export const useStudioState = create<StudioState>((set) => ({
   meetingRecordingStatus: false,
   setMeetingRecordingStatus: (val: boolean) =>
     set({ meetingRecordingStatus: val }),
+  promptView: "close",
+  setPromptView: (val: TPromptView) => {
+    set(() => ({
+      promptView: val,
+    }));
+  },
 }));

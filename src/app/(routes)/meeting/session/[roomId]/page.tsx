@@ -63,6 +63,7 @@ import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
 import Audio from "@/components/Huddle/Media/Audio";
 import AudioController from "@/components/Huddle/Media/AudioController";
 import interact from "interactjs";
+import { IoCopy } from "react-icons/io5";
 
 const GlobalScrollbarStyles = `
   /* Webkit (Chrome, Safari, newer versions of Opera) */
@@ -156,6 +157,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const draggableRef = useRef(null);
   const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
+  const [tooltipContent, setTooltipContent] = useState("Copy");
+  const [animatingButtons, setAnimatingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     if (!isScreenShared) {
@@ -599,6 +604,24 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //   }
   // }, [isRecording]);
 
+  const handleAddrCopy = (addr: string) => {
+    navigator.clipboard.writeText(addr);
+    setTooltipContent("Copied");
+
+    setAnimatingButtons((prev) => ({
+      ...prev,
+      [addr]: true,
+    }));
+
+    setTimeout(() => {
+      setTooltipContent("Copy");
+      setAnimatingButtons((prev) => ({
+        ...prev,
+        [addr]: false,
+      }));
+    }, 4000);
+  };
+
   return (
     <>
       {isAllowToEnter ? (
@@ -805,7 +828,33 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             </div>
                           )}
                           <span className="absolute bottom-4 left-4 text-white font-medium">
-                            {`${metadata?.displayName} (You)`}
+                            <div className="flex">
+                              {`${metadata?.displayName} (You)`}
+                              <Tooltip
+                                content={tooltipContent}
+                                placement="right"
+                                closeDelay={1}
+                                showArrow
+                              >
+                                <div
+                                  className={`pl-2 pt-[2px] cursor-pointer  ${
+                                    animatingButtons[
+                                      metadata?.walletAddress || ""
+                                    ]
+                                      ? "text-blue-500"
+                                      : "text-[#3E3D3D]"
+                                  }`}
+                                >
+                                  <IoCopy
+                                    onClick={() =>
+                                      handleAddrCopy(
+                                        `${metadata?.walletAddress}`
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </Tooltip>
+                            </div>
                           </span>
                           <span className="absolute bottom-4 right-4">
                             {isAudioOn
@@ -931,7 +980,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </section>
               </div>
               {isChatOpen && <ChatBar />}
-              {isParticipantsOpen && <ParticipantsBar />}
+              {isParticipantsOpen && (
+                <ParticipantsBar meetingCategory={meetingCategory} />
+              )}
             </main>
             <BottomBar
               daoName={daoName}

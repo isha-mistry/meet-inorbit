@@ -230,6 +230,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           role,
           displayName: name,
           walletAddress,
+          meetingType: "session"
         }),
       });
 

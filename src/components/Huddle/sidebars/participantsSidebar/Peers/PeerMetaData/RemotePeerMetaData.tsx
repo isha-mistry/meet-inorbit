@@ -19,6 +19,9 @@ import clsx from "clsx";
 import { cn } from "@/utils/helpers";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import { useStudioState } from "@/store/studioState";
+import GuestData from "../PeerRole/GuestData";
+import { IoCopy } from "react-icons/io5";
+import { Tooltip } from "@nextui-org/react";
 
 interface PeerMetaDatProps {
   isRequested?: boolean;
@@ -35,38 +38,43 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
     host: <HostData peerId={peerId} />,
     coHost: <CoHostData peerId={peerId} />,
     speaker: <SpeakerData peerId={peerId} />,
-    guest: <ListenersData peerId={peerId} />,
+    listener: <ListenersData peerId={peerId} />,
+    guest: <GuestData peerId={peerId} />,
   } as const;
 
   const { role, metadata, updateRole } = useRemotePeer<{
     displayName: string;
     avatarUrl: string;
     isHandRaised: boolean;
+    walletAddress: string;
   }>({ peerId });
 
   const { isAudioOn } = useRemoteAudio({ peerId });
   const { peerId: localPeerId } = useLocalPeer();
   const me = useLocalPeer();
+  const [tooltipContent, setTooltipContent] = useState("Copy");
+  const [animatingButtons, setAnimatingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   // const removeRequestedPeers = useStore((state) => state.removeRequestedPeers);
 
-  const renderRoleData = () => {
-    if (role === "host") {
-      return (
-        <>
-          {RoleData.host}
-          {RoleData.coHost}
-          {RoleData.speaker}
-          {RoleData.guest}
-        </>
-      );
-    } else if (role === "coHost") {
-      return RoleData.coHost;
-    } else if (role === "speaker") {
-      return RoleData.speaker;
-    } else {
-      return null; // For guest and other roles, do not render anything
-    }
+  const handleAddrCopy = (addr: string) => {
+    navigator.clipboard.writeText(addr);
+    setTooltipContent("Copied");
+
+    setAnimatingButtons((prev) => ({
+      ...prev,
+      [addr]: true,
+    }));
+
+    setTimeout(() => {
+      setTooltipContent("Copy");
+      setAnimatingButtons((prev) => ({
+        ...prev,
+        [addr]: false,
+      }));
+    }, 4000);
   };
 
   return (
@@ -88,8 +96,26 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             {metadata?.displayName[0]?.toUpperCase()}
           </div>
         )}
-        <div className="text-slate-400 text-sm font-normal">
+        <div className="flex text-slate-400 text-sm font-normal">
           {metadata?.displayName}
+          <Tooltip
+            content={tooltipContent}
+            placement="right"
+            closeDelay={1}
+            showArrow
+          >
+            <div
+              className={`pl-2 pt-[2px] cursor-pointer  ${
+                animatingButtons[metadata?.walletAddress || ""]
+                  ? "text-blue-500"
+                  : "text-[#3E3D3D]"
+              }`}
+            >
+              <IoCopy
+                onClick={() => handleAddrCopy(`${metadata?.walletAddress}`)}
+              />
+            </div>
+          </Tooltip>
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -98,11 +124,13 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             ? NestedPeerListIcons.active.hand
             : NestedPeerListIcons.inactive.hand}
         </div>
-        <div>
-          {isAudioOn
-            ? NestedPeerListIcons.active.mic
-            : NestedPeerListIcons.inactive.mic}
-        </div>
+        {role !== "listener" && (
+          <div>
+            {isAudioOn
+              ? NestedPeerListIcons.active.mic
+              : NestedPeerListIcons.inactive.mic}
+          </div>
+        )}
         {me.role === Role.HOST && (
           <div className="cursor-pointer flex items-center">
             <Dropdown
@@ -112,7 +140,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               {role && RoleData[role as keyof typeof RoleData]}
             </Dropdown>
           </div>
-         )} 
+        )}
       </div>
       {/* )}  */}
     </div>

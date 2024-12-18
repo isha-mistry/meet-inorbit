@@ -40,46 +40,68 @@ const createToken = async (
 };
 
 export async function POST(req: NextRequest) {
-  const { roomId, role, displayName, address } = await req.json();
-
-  if (!roomId) {
-    return NextResponse.json("Missing roomId", { status: 400 });
-  }
-
-  if (!role) {
-    // return new Response("Missing role", { status: 400 });
-    return NextResponse.json("Missing role", { status: 400 });
-  }
-
-  if (!displayName) {
-    // return new Response("Missing displayName", { status: 400 });
-    return NextResponse.json("Missing displayName", { status: 400 });
-  }
-
-  let token: string;
-
   try {
-    const response = await fetch(
-      `https://api.huddle01.com/api/v1/live-meeting/preview-peers?roomId=${roomId}`,
-      {
-        headers: {
-          "x-api-key": process.env.NEXT_PUBLIC_API_KEY ?? "",
-        },
+    const { roomId, role, displayName, address, meetingType } =
+      await req.json();
+
+    if (!roomId) {
+      return NextResponse.json(
+        { success: false, message: "Missing roomId" },
+        { status: 400 }
+      );
+    }
+
+    if (!role) {
+      return NextResponse.json(
+        { success: false, message: "Missing role" },
+        { status: 400 }
+      );
+    }
+
+    if (!displayName) {
+      return NextResponse.json(
+        { success: false, message: "Missing displayName" },
+        { status: 400 }
+      );
+    }
+
+    let token: string;
+
+    try {
+      if (meetingType === "session") {
+        token = await createToken(
+          roomId,
+          role === "host" ? Role.HOST : Role.GUEST,
+          displayName,
+          address
+        );
+      } else if (meetingType === "officehours") {
+        token = await createToken(
+          roomId,
+          role === "host" ? Role.HOST : Role.LISTENER,
+          displayName,
+          address
+        );
+      } else {
+        return NextResponse.json(
+          { success: false, message: "Invalid meetingType" },
+          { status: 400 }
+        );
       }
-    );
-    const data = await response.json();
-    const { previewPeers } = data;
+    } catch (error) {
+      console.error("Error in createToken:", error);
+      return NextResponse.json(
+        { success: false, message: "Failed to create token" },
+        { status: 500 }
+      );
+    }
 
-    token = await createToken(
-      roomId,
-      role === "host" ? Role.HOST : Role.GUEST,
-      displayName,
-      address
-    );
+    return NextResponse.json({ success: true, token }, { status: 200 });
   } catch (error) {
-    token = await createToken(roomId, Role.HOST, displayName, address);
+    console.error("Error parsing request:", error);
+    return NextResponse.json(
+      { success: false, message: "Invalid request body" },
+      { status: 400 }
+    );
   }
-
-  // return new Response(token, { status: 200 });
-  return NextResponse.json({ success: true, token }, { status: 200 });
 }
