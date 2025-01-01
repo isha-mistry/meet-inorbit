@@ -5,7 +5,7 @@ import React from "react";
 
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
-  process.env.NEXT_PUBLIC_PRIVY_SECRET!
+  process.env.PRIVY_SECRET!
 );
 
 
