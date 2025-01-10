@@ -452,11 +452,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
     setModalOpen(false);
     if (walletAddress === hostAddress) {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
+        `${APP_BASE_URL}/profile/${walletAddress}?active=officeHours&hours=hosted`
       );
     } else {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=attended`
+        `${APP_BASE_URL}/profile/${walletAddress}?active=officeHours&hours=attended`
       );
     }
   };
@@ -474,7 +474,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         }
         const raw = JSON.stringify({
           roomId: params.roomId,
-          meetingType: "session",
+          meetingType: "office_hours",
         });
 
         const requestOptions: any = {

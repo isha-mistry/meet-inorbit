@@ -136,7 +136,11 @@ export const handleCloseMeeting = async (
     //   }
     // }
 
-    if (isRecording === true && result.success) {
+    if (
+      meetingCategory === "session" &&
+      isRecording === true &&
+      result.success
+    ) {
       try {
         toast.success("Giving Attestations");
         const myHeaders = new Headers();

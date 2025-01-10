@@ -42,6 +42,7 @@ import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 import { fetchApi } from "@/utils/api";
 import MobileMenuDropdown from "./MobileMenuDropdown";
+import { updateOfficeHoursData } from "@/utils/LobbyApiActions";
 
 const BottomBar = ({
   daoName,
@@ -55,7 +56,7 @@ const BottomBar = ({
   hostAddress: string;
   // meetingStatus: boolean | undefined;
   // currentRecordingStatus: boolean | undefined;
-  meetingData?: SessionInterface;
+  meetingData?: any;
   meetingCategory: string;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
@@ -147,11 +148,26 @@ const BottomBar = ({
           body: raw,
         };
 
-        try {
-          const response = await fetchApi("/update-video-uri", requestOptions);
-          const result = await response.json();
-        } catch (error) {
-          console.error(error);
+        if (meetingCategory === "session") {
+          try {
+            const response = await fetchApi(
+              "/update-video-uri",
+              requestOptions
+            );
+            const result = await response.json();
+          } catch (error) {
+            console.error(error);
+          }
+        } else if (meetingCategory === "officehours") {
+          const requestBody = {
+            host_address: hostAddress,
+            dao_name: daoName,
+            reference_id: meetingData.reference_id,
+            video_uri: videoUri,
+          };
+
+          walletAddress &&
+            (await updateOfficeHoursData(walletAddress, token, requestBody));
         }
       }
     },
@@ -235,10 +251,25 @@ const BottomBar = ({
             }),
           };
 
-          const response = await fetchApi(
-            `/update-recording-status`,
-            requestOptions
-          );
+          if (meetingCategory === "session") {
+            const response = await fetchApi(
+              `/update-recording-status`,
+              requestOptions
+            );
+          } else if (meetingCategory === "officehours") {
+            const requestBody = {
+              host_address: hostAddress,
+              dao_name: daoName,
+              reference_id: meetingData.reference_id,
+              meeting_status: isRecording === true ? "Recorded" : "Finished",
+              nft_image: nft_image,
+              isMeetingRecorded: isRecording,
+            };
+
+            walletAddress &&
+              (await updateOfficeHoursData(walletAddress, token, requestBody));
+          }
+
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(

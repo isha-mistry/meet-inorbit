@@ -14,7 +14,7 @@ const allowedOrigins = [
 
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
-  process.env.NEXT_PUBLIC_PRIVY_SECRET!
+  process.env.PRIVY_SECRET!
 );
 
 const routeConfig = {
@@ -162,6 +162,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 export const config = {
   matcher: [
     "/api/proxy/:path*",
+    "/api/edit-office-hours/:path*",
     "/api/end-call/:path*",
     "/api/update-meeting-status/:path*",
     "/api/update-recorded-session/:path*",

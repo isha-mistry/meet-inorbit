@@ -5,7 +5,7 @@ import { AuthTokenClaims, PrivyClient } from "@privy-io/server-auth";
 
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
-  process.env.NEXT_PUBLIC_PRIVY_SECRET!
+  process.env.PRIVY_SECRET!
 );
 
 interface DelegateRequestBody {

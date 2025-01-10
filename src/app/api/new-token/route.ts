@@ -44,6 +44,14 @@ export async function POST(req: NextRequest) {
     const { roomId, role, displayName, address, meetingType } =
       await req.json();
 
+    console.log("Request body:", {
+      roomId,
+      role,
+      displayName,
+      address,
+      meetingType,
+    });
+
     if (!roomId) {
       return NextResponse.json(
         { success: false, message: "Missing roomId" },

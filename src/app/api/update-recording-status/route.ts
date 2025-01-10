@@ -15,26 +15,26 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     // Connect to MongoDB database
     const client = await connectDB();
 
-    const collectionName =
-      meetingType === "session" ? "meetings" : "office_hours";
+    // const collectionName =
+    //   meetingType === "session" ? "meetings" : "office_hours";
     const db = client.db();
-    const collection = db.collection(collectionName);
+    const collection = db.collection("meetings");
 
-    if (collectionName === "office_hours") {
-      const officeHours = await collection.findOneAndUpdate(
-        { meetingId },
-        {
-          $set: {
-            isMeetingRecorded: recordedStatus,
-          },
-        },
-        { returnDocument: "after" }
-      );
+    // if (collectionName === "office_hours") {
+    //   const officeHours = await collection.findOneAndUpdate(
+    //     { meetingId },
+    //     {
+    //       $set: {
+    //         isMeetingRecorded: recordedStatus,
+    //       },
+    //     },
+    //     { returnDocument: "after" }
+    //   );
 
-      client.close();
+    //   client.close();
 
-      return NextResponse.json(officeHours, { status: 200 });
-    } else if (collectionName === "meetings") {
+    //   return NextResponse.json(officeHours, { status: 200 });
+    // } else if (collectionName === "meetings") {
       const sessions = await collection.findOneAndUpdate(
         { meetingId },
         {
@@ -89,7 +89,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       client.close();
 
       return NextResponse.json(sessions, { status: 200 });
-    }
+    // }
   } catch (error) {
     console.error("Error fetching office hours:", error);
     return NextResponse.json(

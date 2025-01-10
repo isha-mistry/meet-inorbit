@@ -164,7 +164,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           body: JSON.stringify({ walletAddress }),
         });
 
-
         const { data } = await response.json();
 
         if (Array.isArray(data)) {
@@ -229,8 +228,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           roomId: params.roomId,
           role,
           displayName: name,
-          walletAddress,
-          meetingType: "session"
+          address: walletAddress,
+          meetingType: "session",
         }),
       });
 

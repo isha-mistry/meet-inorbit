@@ -23,8 +23,10 @@ import { truncateAddress } from "@/utils/text";
 import {
   updateAttendeeStatus,
   updateMeetingStatus,
+  updateOfficeHoursData,
 } from "@/utils/LobbyApiActions";
 import { APP_BASE_URL } from "@/config/constants";
+import { m } from "framer-motion";
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // State Management
@@ -94,7 +96,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           headers: myHeaders,
           body: JSON.stringify({
             roomId: params.roomId,
-            meetingType: "session",
+            meetingType: "office_hours",
           }),
         });
 
@@ -228,13 +230,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           roomId: params.roomId,
           role,
           displayName: name,
-          walletAddress,
+          address: walletAddress,
           meetingType: "officehours",
         }),
       });
 
       const result = await tokenResponse.json();
       const token = result.token;
+      console;
       // Join room
       await joinRoom({
         roomId: params.roomId,
@@ -243,31 +246,34 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
       // Update meeting status
       if (Role.HOST) {
-        const commonData = {
-          callerAddress: walletAddress ?? "",
-          daoName,
-          sessionType,
-          hostAddress,
-          attendeeAddress,
-          hostJoinedStatus,
-          attendeeJoinedStatus,
-          meetingData,
+        const requestBody = {
+          host_address: hostAddress,
+          dao_name: daoName,
+          reference_id: meetingData.reference_id,
+          meeting_status: "Ongoing",
         };
 
-        await updateMeetingStatus(
-          params,
-          commonData,
+        await updateOfficeHoursData(
           walletAddress ?? "",
-          privyToken
+          privyToken,
+          requestBody
         );
       }
 
       // Update attendee status if guest
       if (role === "listener") {
-        await updateAttendeeStatus(
-          params.roomId,
+        const requestBody = {
+          host_address: hostAddress,
+          dao_name: daoName,
+          reference_id: meetingData.reference_id,
+          attendees: {
+            attendee_address: walletAddress,
+          },
+        };
+        await updateOfficeHoursData(
           walletAddress ?? "",
-          privyToken
+          privyToken,
+          requestBody
         );
       }
     } catch (error) {

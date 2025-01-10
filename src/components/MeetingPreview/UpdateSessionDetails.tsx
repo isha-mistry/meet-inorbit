@@ -19,7 +19,7 @@ import { APP_BASE_URL } from "@/config/constants";
 import { getToken } from "next-auth/jwt";
 import { fetchApi } from "@/utils/api";
 
-function UpdateSessionDetails({ roomId }: { roomId: string }) {
+function UpdateSessionDetails({ roomId, meetingType }: { roomId: string, meetingType: string }) {
   // useEffect(() => {
   //   const storedStatus = sessionStorage.getItem("meetingData");
   //   if (storedStatus) {
