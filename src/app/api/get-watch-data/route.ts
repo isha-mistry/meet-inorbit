@@ -18,10 +18,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
     //   throw new Error("Network response was not ok");
     // }
     const result = await response.json();
-
     // Return the found documents
     return NextResponse.json(
-      { success: true, data: result.data },
+      { success: true, collection: result.collection, data: result.data },
       { status: 200 }
     );
   } catch (error) {

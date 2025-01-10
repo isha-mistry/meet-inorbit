@@ -122,7 +122,7 @@ export async function PUT(req: Request) {
         if (existingIndex === -1) {
           // Add new attendee with only address if no UIDs provided
           currentAttendees.push({
-            address: newAttendee.attendee_address,
+            attendee_address: newAttendee.attendee_address,
             ...(newAttendee.attendee_uid && { uid: newAttendee.attendee_uid }),
             ...(newAttendee.attendee_onchain_uid && {
               onchain_uid: newAttendee.attendee_onchain_uid,

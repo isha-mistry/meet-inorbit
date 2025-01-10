@@ -6,7 +6,7 @@ import { BsTwitterX } from "react-icons/bs";
 import { IoClose, IoCopy } from "react-icons/io5";
 import Confetti from "react-confetti";
 
-function SessionHostedModal({ data }: any) {
+function SessionHostedModal({ data, collection }: any) {
   const router = useRouter();
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -51,6 +51,19 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
     }
   };
 
+  const handleRedirection = () => {
+    console.log("collection", collection);
+    if (collection === "meetings") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
+      );
+    } else if (collection === "office_hours") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=officeHours&hours=hosted`
+      );
+    }
+  };
+
   return (
     <>
       <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
@@ -60,11 +73,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
           <Confetti recycle={true} className="size-[100%]" />
           <IoClose
             className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"
-            onClick={() =>
-              router.push(
-                `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
-              )
-            }
+            onClick={() => handleRedirection()}
           />
           <h2 className="text-[40px] font-bold mb-4 text-blue-shade-200">
             Congratulations for taking the Session!
@@ -104,11 +113,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
             <div>
               <button
                 className="bg-black hover:bg-blue-shade-200 text-white flex items-center justify-center py-4 rounded-full w-[178px]"
-                onClick={() =>
-                  router.push(
-                    `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
-                  )
-                }
+                onClick={() => handleRedirection()}
               >
                 Back to Profile
               </button>

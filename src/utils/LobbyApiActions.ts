@@ -118,9 +118,10 @@ export const updateOfficeHoursData = async (
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
+    } else {
+      const data = await response.text();
+      return data;
     }
-
-    const data = await response.text();
   } catch (error) {
     console.error("Error updating office hours data:", error);
     throw error;
