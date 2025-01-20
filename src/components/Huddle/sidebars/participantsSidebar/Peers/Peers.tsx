@@ -49,7 +49,7 @@ const Peers: React.FC<PeersProps> = ({ meetingCategory }) => {
 
       {meetingCategory === "officehours" &&
         uniqueRequestedPeers.length > 0 &&
-        me.role === Role.HOST && (
+        (me.role === Role.HOST || me.role === Role.CO_HOST) && (
           <PeerList className="mt-5" title="Requested to Speak">
             {uniqueRequestedPeers.map((peerId) => {
               return (

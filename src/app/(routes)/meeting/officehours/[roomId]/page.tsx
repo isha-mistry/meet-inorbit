@@ -628,7 +628,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       ...prev,
       [addr]: true,
     }));
-    
+
     setTimeout(() => {
       setTooltipContent("Copy");
       setAnimatingButtons((prev) => ({
@@ -1001,7 +1001,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               )}
             </main>
             <div className="absolute right-4 bottom-20">
-              {showAcceptRequest && role === "host" && (
+              {showAcceptRequest && (role === "host" || role === "coHost") && (
                 <AcceptRequest peerId={requestedPeerId} />
               )}
             </div>
