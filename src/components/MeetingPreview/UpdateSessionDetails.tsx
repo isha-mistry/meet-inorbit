@@ -48,7 +48,6 @@ function UpdateSessionDetails({
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const { address } = useAccount();
   const { walletAddress } = useWalletAddress();
   // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1"
   const router = useRouter();
@@ -172,6 +171,19 @@ function UpdateSessionDetails({
     }
   };
 
+  const handleRedirection = () => {
+    console.log("collection", collection);
+    if (collection === "meetings") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
+      );
+    } else if (collection === "office_hours") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=officeHours&hours=hosted`
+      );
+    }
+  };
+
   return (
     <div className="font-poppins">
       {!dataLoading ? (
@@ -240,11 +252,7 @@ function UpdateSessionDetails({
                   <div className="flex items-center justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
-                        )
-                      }
+                      onClick={handleRedirection}
                     >
                       Back to Profile
                     </Button>
@@ -272,11 +280,7 @@ function UpdateSessionDetails({
                     </Button>
                     <Button
                       className="hidden xm:block bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
-                        )
-                      }
+                      onClick={handleRedirection}
                     >
                       Back to Profile
                     </Button>
@@ -299,11 +303,7 @@ function UpdateSessionDetails({
                   </div>
                   <Button
                     className="xm:hidden bg-blue-shade-200 rounded-full font-semibold px-10 text-white w-fit mx-auto mt-2"
-                    onClick={() =>
-                      router.push(
-                        `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
-                      )
-                    }
+                    onClick={handleRedirection}
                   >
                     Back to Profile
                   </Button>

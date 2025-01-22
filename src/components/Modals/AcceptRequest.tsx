@@ -1,5 +1,9 @@
 import Image from "next/image";
-import { usePeerIds, useRemotePeer } from "@huddle01/react/hooks";
+import {
+  useDataMessage,
+  usePeerIds,
+  useRemotePeer,
+} from "@huddle01/react/hooks";
 import { Role } from "@huddle01/server-sdk/auth";
 import { useStudioState } from "@/store/studioState";
 import { X, CheckCircle, XCircle } from "lucide-react";
@@ -17,6 +21,18 @@ const AcceptRequest: React.FC<AcceptRequestProps> = ({ peerId, onClose }) => {
   }>({ peerId });
 
   const { setShowAcceptRequest, removeRequestedPeers } = useStudioState();
+  const { sendData } = useDataMessage();
+
+  useDataMessage({
+    onMessage: (payload, from, label) => {
+      if (label === "speakerRequestResponse") {
+        const { action, targetPeerId } = JSON.parse(payload);
+        if (targetPeerId === peerId) {
+          removeRequestedPeers(targetPeerId);
+        }
+      }
+    },
+  });
 
   const handleAccept = () => {
     updateRole(Role.SPEAKER, {
@@ -35,12 +51,28 @@ const AcceptRequest: React.FC<AcceptRequestProps> = ({ peerId, onClose }) => {
       },
     });
     setShowAcceptRequest(false);
+    sendData({
+      to: "*", // Send to all peers
+      payload: JSON.stringify({
+        action: "ACCEPT",
+        targetPeerId: peerId,
+      }),
+      label: "speakerRequestResponse",
+    });
     removeRequestedPeers(peerId);
     onClose?.();
   };
 
   const handleDeny = () => {
     setShowAcceptRequest(false);
+    sendData({
+      to: "*", // Send to all peers
+      payload: JSON.stringify({
+        action: "REJECT",
+        targetPeerId: peerId,
+      }),
+      label: "speakerRequestResponse",
+    });
     removeRequestedPeers(peerId);
     onClose?.();
   };

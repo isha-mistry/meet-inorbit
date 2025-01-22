@@ -20,68 +20,31 @@ async function handler(
   const method = request.method;
   const searchParams = request.nextUrl.searchParams.toString();
   let requestBody;
+
   if (["POST", "PUT", "DELETE"].includes(method)) {
     requestBody = await request.json();
   }
 
-  //verify authentication
-  // if (["POST", "PUT", "DELETE"].includes(request.method)) {
-  //   const walletAddress = request.headers.get("x-wallet-address");
-  //   const token = await getToken({
-  //     req: request,
-  //     secret: process.env.NEXTAUTH_SECRET,
-  //   });
+  // Get headers but filter out problematic ones
+  const headers = new Headers(request.headers);
 
-  //   // If no token is present
-  //   if (!token) {
-  //     return new NextResponse(
-  //       JSON.stringify({ error: "Unauthorized - No token present" }),
-  //       {
-  //         status: 401,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Access-Control-Allow-Origin": origin || "*",
-  //           "Access-Control-Allow-Credentials": "true",
-  //         },
-  //       }
-  //     );
-  //   }
+  // Remove problematic headers
+  headers.delete("connection");
+  headers.delete("host");
+  headers.delete("accept-encoding");
 
-  //   const UserAddress = token.sub;
-
-  //   // If wallet address doesn't match
-  //   if (walletAddress && UserAddress !== walletAddress) {
-  //     console.log(
-  //       `Forbidden access attempt: By user with address :- ${UserAddress}`
-  //     );
-  //     return new NextResponse(
-  //       JSON.stringify({ error: "Forbidden - Address mismatch" }),
-  //       {
-  //         status: 403,
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Access-Control-Allow-Origin": origin || "*",
-  //           "Access-Control-Allow-Credentials": "true",
-  //         },
-  //       }
-  //     );
-  //   }
-  // }
-
-  // Get all headers from the incoming request
-  const headers = Object.fromEntries(request.headers);
+  // Add required headers
+  headers.set("x-api-key", `${process.env.MEETING_APP_API_KEY}`);
+  headers.set("Content-Type", "application/json");
 
   try {
     const url = `${BASE_URL}/api/${path}${
       searchParams ? `?${searchParams}` : ""
     }`;
+
     const response = await fetch(url, {
       method,
-      headers: {
-        ...headers,
-        "x-api-key": `${process.env.MEETING_APP_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       ...(requestBody && { body: JSON.stringify(requestBody) }),
     });
 
