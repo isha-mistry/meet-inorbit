@@ -32,9 +32,8 @@ interface AttestOffchainRequestBody {
 
 interface MyError {
   message: string;
-  code?: number; 
+  code?: number;
 }
-
 
 export async function POST(req: NextRequest, res: NextResponse) {
   (BigInt.prototype as any).toJSON = function () {
@@ -44,9 +43,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
-
   try {
-
     const atstUrl =
       requestData.daoName === "optimism"
         ? ATTESTATION_OP_URL
@@ -75,7 +72,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
-
     const encodedData = schemaEncoder.encodeData([
       {
         name: "MeetingId",
@@ -86,7 +82,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "StartTime", value: requestData.startTime, type: "uint32" },
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
-
 
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
@@ -124,14 +119,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
       textJson: JSON.stringify(pkg),
     };
 
-
     let uploadstatus = false;
     try {
       const response = await axios.post(`${baseUrl}/offchain/store`, data);
       if (response.data) {
         uploadstatus = true;
       }
-      
 
       if (requestData.meetingType === 1) {
         const client = await connectDB();
@@ -151,7 +144,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
-            $inc: { [`meetingRecords.${requestData.daoName}.sessionHosted.offchainCounts`]: 1 },
+            $inc: {
+              [`meetingRecords.${requestData.daoName}.sessionHosted.offchainCounts`]: 1,
+            },
           }
         );
 
@@ -179,7 +174,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
-            $inc: { [`meetingRecords.${requestData.daoName}.sessionAttended.offchainCounts`]: 1 },
+            $inc: {
+              [`meetingRecords.${requestData.daoName}.sessionAttended.offchainCounts`]: 1,
+            },
           }
         );
 
@@ -195,6 +192,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             $set: {
               uid_host: response.data.offchainAttestationId,
+            },
+          }
+        );
+
+        const usersCollection = db.collection("delegates");
+        await usersCollection.findOneAndUpdate(
+          { address: requestData.recipient },
+          {
+            $inc: {
+              [`meetingRecords.${requestData.daoName}.sessionHosted.offchainCounts`]: 1,
             },
           }
         );
@@ -218,6 +225,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
+        const usersCollection = db.collection("delegates");
+        await usersCollection.findOneAndUpdate(
+          { address: requestData.recipient },
+          {
+            $inc: {
+              [`meetingRecords.${requestData.daoName}.officeHoursAttended.offchainCounts`]: 1,
+            },
+          }
+        );
+
         client.close();
       }
     } catch (error) {
@@ -230,8 +247,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     // Rest of your code remains the same
-
-   
 
     let offchainAttestationLink = "";
     if (requestData.daoName === "optimism") {
@@ -275,12 +290,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
       notificationToSend
     );
 
-
     if (notificationResult.insertedId) {
       const insertedNotification = await notificationCollection.findOne({
         _id: notificationResult.insertedId,
       });
-
     }
 
     const dataToSend = {

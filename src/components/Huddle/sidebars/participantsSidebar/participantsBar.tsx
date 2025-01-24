@@ -18,7 +18,7 @@ const ParticipantsBar = ({ meetingCategory }: { meetingCategory: string }) => {
             {BasicIcons.close}
           </button>
         </div>
-        <div className="flex flex-col gap-2 mt-2 px-4 py-2">
+        <div className="flex flex-col gap-2 mt-2 px-4 py-2 overflow-y-auto">
           {/* {peerIds.map((peerId) => (
             <PeerData peerId={peerId} key={peerId} />
           ))} */}

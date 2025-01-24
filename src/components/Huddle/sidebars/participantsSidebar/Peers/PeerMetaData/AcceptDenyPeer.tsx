@@ -31,6 +31,53 @@ const AcceptDenyPeer: FC<AcceptDenyPeerProps> = ({ peerId }) => {
     },
   });
 
+  const handleAccept = async () => {
+    try {
+      // Update the peer's role
+      await updateRole(Role.SPEAKER, {
+        custom: {
+          admin: true,
+          canConsume: true,
+          canProduce: true,
+          canProduceSources: {
+            cam: true,
+            mic: true,
+            screen: true,
+          },
+          canRecvData: true,
+          canSendData: true,
+          canUpdateMetadata: true,
+        },
+      });
+
+      sendData({
+        to: "*",
+        payload: JSON.stringify({
+          action: "ACCEPT",
+          targetPeerId: peerId,
+        }),
+        label: "speakerRequestResponse",
+      });
+
+      removeRequestedPeers(peerId);
+    } catch (error) {
+      console.error("Error accepting speaker request:", error);
+    }
+  };
+
+  const handleReject = () => {
+    sendData({
+      to: "*",
+      payload: JSON.stringify({
+        action: "REJECT",
+        targetPeerId: peerId,
+      }),
+      label: "speakerRequestResponse",
+    });
+
+    removeRequestedPeers(peerId);
+  };
+
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
@@ -50,49 +97,14 @@ const AcceptDenyPeer: FC<AcceptDenyPeerProps> = ({ peerId }) => {
       <div className="flex items-center gap-4">
         <div
           role="presentation"
-          onClick={() => {
-            updateRole(Role.SPEAKER, {
-              custom: {
-                admin: true,
-                canConsume: true,
-                canProduce: true,
-                canProduceSources: {
-                  cam: true,
-                  mic: true,
-                  screen: true,
-                },
-                canRecvData: true,
-                canSendData: true,
-                canUpdateMetadata: true,
-              },
-            });
-            sendData({
-              to: "*", // Send to all peers
-              payload: JSON.stringify({
-                action: "ACCEPT",
-                targetPeerId: peerId,
-              }),
-              label: "speakerRequestResponse",
-            });
-            removeRequestedPeers(peerId);
-          }}
+          onClick={handleAccept}
           className="cursor-pointer"
         >
           {PeerListIcons.accept}
         </div>
         <div
           role="presentation"
-          onClick={() => {
-            sendData({
-              to: "*", // Send to all peers
-              payload: JSON.stringify({
-                action: "REJECT",
-                targetPeerId: peerId,
-              }),
-              label: "speakerRequestResponse",
-            });
-            removeRequestedPeers(peerId);
-          }}
+          onClick={handleReject}
           className="cursor-pointer"
         >
           {PeerListIcons.deny}

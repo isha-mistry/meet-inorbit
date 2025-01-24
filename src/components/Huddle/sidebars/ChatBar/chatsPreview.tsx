@@ -1,3 +1,4 @@
+import React, { useRef, useEffect } from "react";
 import { IChatMessage, useStudioState } from "@/store/studioState";
 import { BasicIcons } from "@/utils/BasicIcons";
 import clsx from "clsx";
@@ -5,6 +6,12 @@ import Link from "next/link";
 
 const ChatsPreview = () => {
   const { chatMessages } = useStudioState();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom whenever chat messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
   const validateUrl = (text: string) => {
     const urlRegex =
@@ -13,7 +20,7 @@ const ChatsPreview = () => {
   };
 
   return (
-    <>
+    <div className="h-full overflow-y-auto">
       {chatMessages.map((chat: IChatMessage) => {
         return (
           <div
@@ -41,7 +48,8 @@ const ChatsPreview = () => {
           </div>
         );
       })}
-    </>
+      <div ref={messagesEndRef} />
+    </div>
   );
 };
 
