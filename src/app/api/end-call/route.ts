@@ -1,9 +1,8 @@
-//older end-call
-
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
 import { BASE_URL } from "@/config/constants";
 
+// Interfaces
 interface Meeting {
   meetingId: string;
   startTime: number;
@@ -32,6 +31,8 @@ interface MeetingTimePerEOA {
   [key: string]: number;
 }
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const {
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       hostAddress: string;
     } = await req.json();
 
-    
+    // Validate roomId
     if (!roomId) {
       return NextResponse.json(
         { success: false, error: "roomId parameter is required" },
@@ -54,11 +55,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
+    // Determine meeting type
     let meetingTypeName: string;
+    let initialDelay = 0;
+
     if (meetingType === 1) {
       meetingTypeName = "session";
     } else if (meetingType === 2) {
       meetingTypeName = "officehours";
+      initialDelay =  15 * 1000;
     } else {
       return NextResponse.json(
         { success: false, error: "Invalid meetingType" },
@@ -66,6 +71,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
+    if (initialDelay > 0) {
+      console.log(
+        `Applying ${initialDelay / 1000} seconds delay for office hours meeting`
+      );
+      await delay(initialDelay);
+    }
+
+    // Prepare API headers
     const myHeadersForMeeting = new Headers();
     myHeadersForMeeting.append(
       "x-api-key",
@@ -77,6 +90,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       headers: myHeadersForMeeting,
     };
 
+    // Fetch meetings data
     const response = await fetch(
       `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
       requestOptionsForMeeting
@@ -89,19 +103,35 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const meetingsData: { meetings: Meeting[] } = await response.json();
     const meetings: Meeting[] = meetingsData.meetings;
 
+    // Check if meetings have valid start and end times
+    const hasValidTimes = meetings.some(
+      (meeting) => meeting.startTime && meeting.endTime
+    );
+
     // Calculate total meeting time
     let totalMeetingTimeInMinutes = 0;
+    let earliestStartTime = Infinity;
+    let latestEndTime = -Infinity;
 
-    for (const meeting of meetings) {
-      const startTime = new Date(meeting.startTime);
-      const endTime = new Date(meeting.endTime);
-      const durationInMinutes = Math.floor(
-        (endTime.valueOf() - startTime.valueOf()) / (1000 * 60)
-      );
-      totalMeetingTimeInMinutes += durationInMinutes;
+    if (hasValidTimes) {
+      for (const meeting of meetings) {
+        const startTime = new Date(meeting.startTime);
+        const endTime = new Date(meeting.endTime);
+        const durationInMinutes = Math.floor(
+          (endTime.valueOf() - startTime.valueOf()) / (1000 * 60)
+        );
+        totalMeetingTimeInMinutes += durationInMinutes;
+
+        earliestStartTime = Math.min(earliestStartTime, meeting.startTime);
+        latestEndTime = Math.max(latestEndTime, meeting.endTime);
+      }
+    } else {
+      // If no valid times, use current timestamp as a placeholder
+      earliestStartTime = Date.now();
+      latestEndTime = Date.now();
     }
 
-
+    // Fetch participant lists
     const combinedParticipantLists: Participant[][] = [];
     const meetingTimePerEOA: MeetingTimePerEOA = {};
 
@@ -134,13 +164,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
-    // Log a brief summary of meeting time for each EOA
-    // for (const eoaAddress in meetingTimePerEOA) {
-    //   console.log(`${eoaAddress}: ${meetingTimePerEOA[eoaAddress]} minutes`);
-    // }
-
     // Calculate minimum attendance time required
     const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;
+
     // Filter out participants with display name "No name"
     const validParticipants: Participant[] = [];
     for (const participantList of combinedParticipantLists) {
@@ -163,6 +189,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         });
       }
     }
+
     // Remove host from participants with sufficient attendance
     participantsWithSufficientAttendance =
       participantsWithSufficientAttendance.filter(
@@ -196,32 +223,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
-    let earliestStartTime = Infinity;
-    let latestEndTime = -Infinity;
-
-    // Find earliest startTime and latest endTime
-    meetings.forEach((meeting) => {
-      earliestStartTime = Math.min(earliestStartTime, meeting.startTime);
-      latestEndTime = Math.max(latestEndTime, meeting.endTime);
-    });
-
-    console.log("Earliest Start Time:", earliestStartTime);
-    console.log("Latest End Time:", latestEndTime);
-
-    console.log("Earliest Start Time:", new Date(earliestStartTime));
-    console.log("Latest End Time:", new Date(latestEndTime));
-
+    // Connect to MongoDB
     const client = await connectDB();
-
-    // Access the collection
     const db = client.db();
     const collection = db.collection("attestation");
 
     // Check if data with same roomId exists
     const existingData = await collection.findOne({ roomId });
 
-    const earliestStartTimeEpoch = Math.floor(earliestStartTime / 1000);
-    const latestEndTimeEpoch = Math.floor(latestEndTime / 1000);
+    // Convert times to epoch seconds
+    const earliestStartTimeEpoch = hasValidTimes
+      ? Math.floor(earliestStartTime / 1000)
+      : 0;
+    const latestEndTimeEpoch = hasValidTimes
+      ? Math.floor(latestEndTime / 1000)
+      : 0;
 
     // Prepare the data to store
     const dataToStore = {
@@ -235,12 +251,19 @@ export async function POST(req: NextRequest, res: NextResponse) {
       meetingType: meetingTypeName,
       attestation: "pending",
       dao_name: dao_name,
+      timeUpdateStatus: hasValidTimes ? "complete" : "pending",
     };
 
     if (existingData) {
-      // If data exists, update it
-      await collection.updateOne({ roomId }, { $set: dataToStore });
-      console.log(`Data with roomId ${roomId} updated.`);
+      // If data exists and we have valid times, or if times were previously 0
+      if (
+        !existingData.startTime ||
+        existingData.startTime === 0 ||
+        hasValidTimes
+      ) {
+        await collection.updateOne({ roomId }, { $set: dataToStore });
+        console.log(`Data with roomId ${roomId} updated.`);
+      }
     } else {
       // If data doesn't exist, insert new data
       await collection.insertOne(dataToStore);
@@ -261,6 +284,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         endTime: latestEndTimeEpoch,
         meetingType: meetingTypeName,
         dao_name: dao_name,
+        timeUpdateStatus: hasValidTimes ? "complete" : "pending",
       },
       { status: 200 }
     );

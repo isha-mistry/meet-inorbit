@@ -6,11 +6,14 @@ import Link from "next/link";
 
 const ChatsPreview = () => {
   const { chatMessages } = useStudioState();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom whenever chat messages change
+  // Set scroll position to bottom when component mounts or messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = containerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight - container.clientHeight;
+    }
   }, [chatMessages]);
 
   const validateUrl = (text: string) => {
@@ -20,7 +23,7 @@ const ChatsPreview = () => {
   };
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div ref={containerRef} className="h-full overflow-y-auto">
       {chatMessages.map((chat: IChatMessage) => {
         return (
           <div
@@ -48,7 +51,6 @@ const ChatsPreview = () => {
           </div>
         );
       })}
-      <div ref={messagesEndRef} />
     </div>
   );
 };
