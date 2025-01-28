@@ -730,6 +730,26 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   <div className={`w-full `}>
                     <GridContainer className="w-full h-full relative">
                       <>
+                        <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg ">
+                          <span className="text-sm flex items-center">
+                            <Tooltip
+                              content={tooltipContent}
+                              placement="bottom"
+                              closeDelay={1}
+                              showArrow
+                            >
+                              <div
+                                className="pl-2 pt-[2px] cursor-pointer hover:text-blue-500 hover:underline"
+                                onClick={() =>
+                                  handleAddrCopy(`${metadata?.walletAddress}`)
+                                }
+                              >
+                                {name}
+                              </div>
+                            </Tooltip>{" "}
+                            &nbsp; is presenting
+                          </span>
+                        </div>
                         <Tooltip
                           content={
                             isFullScreen ? "Exit Full Screen" : "Full Screen"
@@ -745,6 +765,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         <Video
                           stream={videoStreamTrack}
                           name={metadata?.displayName ?? "guest"}
+                          walletAddress={metadata?.walletAddress}
                         />
                       </>
                     </GridContainer>

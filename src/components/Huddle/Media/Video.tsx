@@ -5,9 +5,10 @@ import { Maximize } from "lucide-react";
 interface VideoProps {
   stream: MediaStream | null;
   name: string;
+  walletAddress?: string;
 }
 
-const Video = ({ stream, name }: VideoProps) => {
+const Video = ({ stream, name, walletAddress }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { isRecordVideo } = useStudioState();
