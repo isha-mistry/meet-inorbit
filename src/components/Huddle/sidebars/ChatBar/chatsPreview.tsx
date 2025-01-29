@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import { IChatMessage, useStudioState } from "@/store/studioState";
-import { BasicIcons } from "@/utils/BasicIcons";
-import clsx from "clsx";
+import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
+import clsx from "clsx";
 
 const ChatsPreview = () => {
   const { chatMessages, hasUnreadMessages, setHasUnreadMessages } =
@@ -12,7 +12,6 @@ const ChatsPreview = () => {
     chatMessages.length
   );
 
-  // Set scroll position to bottom when component mounts or messages change
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
@@ -20,7 +19,6 @@ const ChatsPreview = () => {
     }
   }, [chatMessages]);
 
-  // Update last read index when new messages arrive
   useEffect(() => {
     if (hasUnreadMessages) {
       setLastReadIndex((prevIndex) =>
@@ -31,7 +29,6 @@ const ChatsPreview = () => {
     }
   }, [hasUnreadMessages, chatMessages.length]);
 
-  // Reset unread state when user scrolls to bottom
   const handleScroll = () => {
     const container = containerRef.current;
     if (container) {
@@ -47,10 +44,71 @@ const ChatsPreview = () => {
     }
   };
 
-  const validateUrl = (text: string) => {
-    const urlRegex =
-      /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/;
-    return urlRegex.test(text);
+  const validateUrl = (text: string): boolean => {
+    try {
+      if (text.length > 2083) return false;
+      if (!text.includes(".")) return false;
+
+      const simpleUrlRegex =
+        /^(https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?$/i;
+
+      const timeoutMs = 100;
+      const startTime = Date.now();
+
+      while (Date.now() - startTime < timeoutMs) {
+        if (simpleUrlRegex.test(text)) {
+          try {
+            new URL(text.startsWith("http") ? text : `https://${text}`);
+            return true;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  // Modified formatDisplayUrl to return the full URL
+  const formatDisplayUrl = (url: string): string => {
+    try {
+      const urlObject = new URL(
+        url.startsWith("http") ? url : `https://${url}`
+      );
+      // Return full URL path without protocol
+      return `${urlObject.hostname}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
+    } catch {
+      return url;
+    }
+  };
+
+  const formatTextWithUrls = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    return parts.map((part, index) => {
+      if (validateUrl(part)) {
+        return (
+          <React.Fragment key={index}>
+            <Link
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-blue-200 transition-colors"
+            >
+              <LinkIcon size={16} className="flex-shrink-0" />
+              <span className="text-sm underline break-all">
+                {formatDisplayUrl(part)}
+              </span>
+            </Link>
+          </React.Fragment>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
   };
 
   return (
@@ -77,23 +135,13 @@ const ChatsPreview = () => {
             className={clsx(
               chat.isUser
                 ? "ml-auto text-md break-words max-w-xs w-fit py-1 px-2 mb-2 bg-[#216CFC] rounded-lg items-center flex"
-                : "w-fit py-1 px-2 break-words max-w-xs text-md mb-2 rounded-lg bg-gray-600/50",
-              validateUrl(chat.text) && "hover:bg-blue-500/50"
+                : "w-fit py-1 px-2 break-words max-w-xs text-md mb-2 rounded-lg bg-gray-600/50"
             )}
           >
             <div className="text-xs text-blue-300">
               {chat.isUser ? null : chat.name}
             </div>
-            {validateUrl(chat.text) ? (
-              <Link href={chat.text} target="_blank" rel="noreferrer">
-                <div className="flex gap-2 items-center justify-center">
-                  <span>{BasicIcons.folder}</span>
-                  <span>{chat?.fileName}</span>
-                </div>
-              </Link>
-            ) : (
-              <div className="text-sm">{chat.text}</div>
-            )}
+            <div className="text-sm">{formatTextWithUrls(chat.text)}</div>
           </div>
         </React.Fragment>
       ))}
