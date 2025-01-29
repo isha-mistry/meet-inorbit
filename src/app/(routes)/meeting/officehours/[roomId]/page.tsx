@@ -226,7 +226,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         interactable.unset();
       };
     }
-  }, [shareStream, !isFullScreen]);
+  }, [shareStream, !isFullScreen, isSmallScreen]);
 
   const [remoteVideoTracks, setRemoteVideoTracks] = useState<
     Record<string, MediaStreamTrack | null>
