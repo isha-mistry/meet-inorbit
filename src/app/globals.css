@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .noScrollbar::-webkit-scrollbar {
   width: 0px;
 }
@@ -33,4 +32,15 @@ body::-webkit-scrollbar-thumb {
   border-radius: 5rem;
 }
 
+.swiper-pagination-bullet {
+  background-color: white;
+  opacity: 0.8;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+}
 
+.swiper-pagination-bullet-active {
+  background-color: #0356fc !important;
+}
