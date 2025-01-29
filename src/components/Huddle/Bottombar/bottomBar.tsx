@@ -65,6 +65,7 @@ const BottomBar = ({
   const { leaveRoom, closeRoom, room } = useRoom();
   const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
+  const { peerId } = useLocalPeer();
 
   const roomId = params.roomId as string | undefined;
   const [s3URL, setS3URL] = useState<string>("");
@@ -96,7 +97,12 @@ const BottomBar = ({
     meetingRecordingStatus,
     setMeetingRecordingStatus,
     setPromptView,
+    hasUnreadMessages,
+    setHasUnreadMessages,
   } = useStudioState();
+
+  console.log("hasUnreadMessages", hasUnreadMessages, !isChatOpen);
+
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -168,6 +174,35 @@ const BottomBar = ({
 
           walletAddress &&
             (await updateOfficeHoursData(walletAddress, token, requestBody));
+        }
+      }
+    },
+  });
+
+  useDataMessage({
+    onMessage(payload: string, from: string, label?: string) {
+      console.log("Message received:", { label, isChatOpen });
+
+      if (label === "chat") {
+        try {
+          const parsedPayload = JSON.parse(payload);
+          console.log("Parsed message:", {
+            fromUser: parsedPayload.name,
+            currentUser: metadata?.displayName,
+            isChatOpen,
+          });
+
+          console.log("from, peerId:", from, peerId);
+
+          const isDifferentUser = from !== peerId;
+          console.log("isDifferentUser:", isDifferentUser);
+
+          if (isDifferentUser) {
+            console.log("Setting hasUnreadMessages to true");
+            setHasUnreadMessages(true);
+          }
+        } catch (error) {
+          console.error("Error parsing message:", error);
         }
       }
     },
@@ -567,13 +602,23 @@ const BottomBar = ({
               </span>
             </div>
           </ButtonWithIcon>
-          <ButtonWithIcon
-            content="Chat"
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
-          >
-            {BasicIcons.chat}
-          </ButtonWithIcon>
+          <div className="relative">
+            <ButtonWithIcon
+              content="Chat"
+              onClick={() => {
+                setIsChatOpen(!isChatOpen);
+                if (hasUnreadMessages) {
+                  setHasUnreadMessages(false);
+                }
+              }}
+              className={clsx("bg-[#202020] hover:bg-gray-500/50")}
+            >
+              {BasicIcons.chat}
+            </ButtonWithIcon>
+            {hasUnreadMessages && !isChatOpen && (
+              <div className="absolute -top-1 -right-1 bg-red-600 rounded-full w-3 h-3 animate-pulse" />
+            )}
+          </div>
         </div>
       </footer>
     </>
