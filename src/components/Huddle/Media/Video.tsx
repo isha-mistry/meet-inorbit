@@ -161,7 +161,7 @@ const Video = ({ stream, name, walletAddress }: VideoProps) => {
         onTouchEnd={handleTouchEnd}
       >
         <video
-          className="h-full w-full object-cover"
+          className="h-[calc(100vh-135px)] w-full object-contain"
           ref={videoRef}
           autoPlay
           muted
