@@ -31,13 +31,25 @@ body::-webkit-scrollbar-thumb {
   background-color: #5d6069;
   border-radius: 5rem;
 }
-
+.swiper-pagination {
+  position: absolute;
+  bottom: 0px !important;
+  left: 48% !important;
+  transform: translateX(-50%);
+  background: rgba(36, 39, 50,0.9); 
+  padding: 8px 12px;
+  border-radius: 20px;
+  width: fit-content !important;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
 .swiper-pagination-bullet {
-  background-color: white;
+  background-color: white !important;
   opacity: 0.8;
   border-radius: 50%;
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   display: inline-block;
 }
 
