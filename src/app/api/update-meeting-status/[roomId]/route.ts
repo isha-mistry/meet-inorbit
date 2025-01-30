@@ -73,12 +73,10 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               notificationToGuest
             );
 
-
             if (notificationResult.insertedId) {
               const insertedNotification = await notificationCollection.findOne(
                 { _id: notificationResult.insertedId }
               );
-
             }
 
             const dataToSendGuest = {
@@ -139,13 +137,10 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               notificationToHost
             );
 
-
             if (notificationResult.insertedId) {
               const insertedNotification = await notificationCollection.findOne(
                 { _id: notificationResult.insertedId }
               );
-
-              console.log("insertedNotification", insertedNotification);
             }
 
             const dataToSendHost = {
@@ -153,7 +148,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
               _id: notificationResult.insertedId,
             };
 
-            console.log("dataToSendHost", dataToSendHost);
             const socket = io(`${SOCKET_BASE_URL}`, {
               withCredentials: true,
             });

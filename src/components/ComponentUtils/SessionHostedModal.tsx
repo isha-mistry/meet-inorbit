@@ -52,7 +52,6 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
   };
 
   const handleRedirection = () => {
-    console.log("collection", collection);
     if (collection === "meetings") {
       router.push(
         `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`

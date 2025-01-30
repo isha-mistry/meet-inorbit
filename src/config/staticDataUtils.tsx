@@ -44,7 +44,7 @@ export const arbBlock = [
   },
   {
     title: "Arbitrum DAO Twitter Profile",
-    link: "https://twitter.com/DAO_Arbitrum",
+    link: "https://x.com/arbitrumdao_gov",
   },
 ];
 

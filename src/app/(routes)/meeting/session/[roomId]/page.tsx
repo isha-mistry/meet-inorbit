@@ -189,14 +189,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }
   });
   useEffect(() => {
-    console.log("Draggable ref:", draggableRef.current);
     if (draggableRef.current) {
       const position = { x: 0, y: 0 };
       const interactable = interact(draggableRef.current).draggable({
         listeners: {
-          start(event) {
-            console.log(event.type, event.target);
-          },
+          start(event) {},
           move(event) {
             position.x += event.dx;
             position.y += event.dy;

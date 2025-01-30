@@ -101,8 +101,6 @@ const BottomBar = ({
     setHasUnreadMessages,
   } = useStudioState();
 
-  console.log("hasUnreadMessages", hasUnreadMessages, !isChatOpen);
-
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -181,24 +179,13 @@ const BottomBar = ({
 
   useDataMessage({
     onMessage(payload: string, from: string, label?: string) {
-      console.log("Message received:", { label, isChatOpen });
-
       if (label === "chat") {
         try {
           const parsedPayload = JSON.parse(payload);
-          console.log("Parsed message:", {
-            fromUser: parsedPayload.name,
-            currentUser: metadata?.displayName,
-            isChatOpen,
-          });
-
-          console.log("from, peerId:", from, peerId);
 
           const isDifferentUser = from !== peerId;
-          console.log("isDifferentUser:", isDifferentUser);
 
           if (isDifferentUser) {
-            console.log("Setting hasUnreadMessages to true");
             setHasUnreadMessages(true);
           }
         } catch (error) {

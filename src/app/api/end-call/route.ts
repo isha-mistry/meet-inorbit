@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       meetingTypeName = "session";
     } else if (meetingType === 2) {
       meetingTypeName = "officehours";
-      initialDelay =  15 * 1000;
+      initialDelay = 15 * 1000;
     } else {
       return NextResponse.json(
         { success: false, error: "Invalid meetingType" },
@@ -72,9 +72,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     if (initialDelay > 0) {
-      console.log(
-        `Applying ${initialDelay / 1000} seconds delay for office hours meeting`
-      );
       await delay(initialDelay);
     }
 

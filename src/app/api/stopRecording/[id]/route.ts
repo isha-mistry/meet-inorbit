@@ -10,9 +10,10 @@ interface Recordings {
 
 export async function POST(
   request: Request,
+  { params }: { params: { id: string } },
   res: NextResponse
 ): Promise<void | Response> {
-  const roomId = request.url.split("stopRecording/")[1];
+  const { id: roomId } = params;
 
   if (!process.env.NEXT_PUBLIC_PROJECT_ID || !process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json(
@@ -27,7 +28,10 @@ export async function POST(
   );
 
   try {
+    console.log("roomId:", roomId, typeof roomId);
     const recording = await recorder.stop({ roomId: roomId as string });
+
+    console.log("Recording stopped:", recording);
 
     const { msg } = recording;
 

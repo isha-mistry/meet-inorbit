@@ -44,7 +44,7 @@ const Peers: React.FC<PeersProps> = ({ meetingCategory }) => {
   }, [requestedPeers]);
 
   return (
-    <div>
+    <div className="flex-1 overflow-y-auto">
       {me.role === Role.HOST && <MuteMicDiv onClick={muteEveryone} />}
 
       {meetingCategory === "officehours" &&
