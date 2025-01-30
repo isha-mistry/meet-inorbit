@@ -6,6 +6,7 @@ export interface IChatMessage {
   isUser: boolean;
   fileName?: string;
   isRead?: boolean;
+  timestamp: Date;
 }
 
 export interface BoxPosition {

@@ -6,6 +6,7 @@ import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
 import { useState } from "react";
 import { PeerMetadata } from "@/utils/types";
 import { useStudioState } from "@/store/studioState";
+import { timeStamp } from "console";
 
 const ChatBar = () => {
   const { sendData } = useDataMessage();
@@ -21,6 +22,7 @@ const ChatBar = () => {
         payload: JSON.stringify({
           message,
           name: metadata?.displayName,
+          timestamp: new Date().toISOString(),
         }),
         label: "chat",
       });

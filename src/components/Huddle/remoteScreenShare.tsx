@@ -139,6 +139,28 @@ const RemoteScreenShare = ({
         <div className={`w-full`}>
           <GridContainer className="w-full h-full relative">
             <>
+              <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg ">
+                <span className="text-sm flex items-center">
+                  <Tooltip
+                    content="copy"
+                    placement="bottom"
+                    closeDelay={1}
+                    showArrow
+                  >
+                    <div
+                      className="pl-2 pt-[2px] cursor-pointer hover:text-blue-500 hover:underline"
+                      onClick={() =>
+                        navigator.clipboard.writeText(
+                          `${metadata?.walletAddress}`
+                        )
+                      }
+                    >
+                      {metadata?.displayName}
+                    </div>
+                  </Tooltip>{" "}
+                  &nbsp; is presenting
+                </span>
+              </div>
               {!isSmallScreen && (
                 <Tooltip
                   content={

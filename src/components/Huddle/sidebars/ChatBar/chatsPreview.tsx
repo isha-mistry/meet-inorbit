@@ -4,6 +4,14 @@ import { Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 
+// First, update the IChatMessage interface in your types (if you have access to it)
+// interface IChatMessage {
+//   name: string;
+//   text: string;
+//   isUser: boolean;
+//   timestamp: Date; // Add this field
+// }
+
 const ChatsPreview = () => {
   const { chatMessages, hasUnreadMessages, setHasUnreadMessages } =
     useStudioState();
@@ -11,6 +19,14 @@ const ChatsPreview = () => {
   const [lastReadIndex, setLastReadIndex] = useState<number>(
     chatMessages.length
   );
+
+  const formatTime = (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,13 +88,11 @@ const ChatsPreview = () => {
     }
   };
 
-  // Modified formatDisplayUrl to return the full URL
   const formatDisplayUrl = (url: string): string => {
     try {
       const urlObject = new URL(
         url.startsWith("http") ? url : `https://${url}`
       );
-      // Return full URL path without protocol
       return `${urlObject.hostname}${urlObject.pathname}${urlObject.search}${urlObject.hash}`;
     } catch {
       return url;
@@ -133,15 +147,24 @@ const ChatsPreview = () => {
           )}
           <div
             className={clsx(
-              chat.isUser
-                ? "ml-auto text-md break-words max-w-xs w-fit py-1 px-2 mb-2 bg-[#216CFC] rounded-lg items-center flex"
-                : "w-fit py-1 px-2 break-words max-w-xs text-md mb-2 rounded-lg bg-gray-600/50"
+              "flex flex-col mb-2",
+              chat.isUser ? "items-end" : "items-start"
             )}
           >
-            <div className="text-xs text-blue-300">
-              {chat.isUser ? null : chat.name}
+            <div
+              className={clsx(
+                "break-words max-w-xs w-fit py-1 px-2 rounded-lg",
+                chat.isUser ? "bg-[#216CFC]" : "bg-gray-600/50"
+              )}
+            >
+              {!chat.isUser && (
+                <div className="text-xs text-blue-300">{chat.name}</div>
+              )}
+              <div className="text-sm">{formatTextWithUrls(chat.text)}</div>
             </div>
-            <div className="text-sm">{formatTextWithUrls(chat.text)}</div>
+            <div className="text-[0.6rem] text-gray-400 mt-1 px-2">
+              {formatTime(new Date(chat.timestamp))}
+            </div>
           </div>
         </React.Fragment>
       ))}
