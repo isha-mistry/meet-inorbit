@@ -847,7 +847,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                         : "hidden lg:grid"
                                     }`
                               }`
-                        } py-4 lg:py-0 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${
+                        } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${
                           isScreenShared
                             ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
                             : peerIds.length === 0
@@ -1049,7 +1049,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             className={`relative flex flex-col lg:flex-row w-full h-full`}
                           >
                             <section
-                              className={`py-4 lg:py-0 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2 `}
+                              className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2 `}
                             >
                               {i === 0 && role !== Role.BOT && (
                                 <>
@@ -1182,7 +1182,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                 className={`relative flex flex-col lg:flex-row w-full h-full`}
                               >
                                 <section
-                                  className={`py-4 lg:py-0 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2`}
+                                  className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2`}
                                 >
                                   {slidePeers.map((peerId) => (
                                     <RemotePeer key={peerId} peerId={peerId} />
