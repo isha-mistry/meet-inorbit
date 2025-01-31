@@ -6,82 +6,89 @@ interface Meeting {
   endTime: number;
 }
 
+const MAX_RETRIES = 30; // Maximum number of polling attempts
+const POLLING_INTERVAL = 60000; // Poll every minute
 
 export async function pollMeetingTimes(
   roomId: string,
   apiKey: string
-): Promise<{ success: boolean; error?: string }> {
-  const maxAttempts = 5;
-  const delayBetweenAttempts = 30000; // 30 seconds
+): Promise<void> {
+  let retries = 0;
 
-  const fetchMeetingData = async (): Promise<Meeting[]> => {
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", apiKey);
+  const pollOnce = async (): Promise<boolean> => {
+    try {
+      const myHeadersForMeeting = new Headers();
+      myHeadersForMeeting.append("x-api-key", apiKey);
 
-    const response = await fetch(
-      `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
-      {
+      const requestOptionsForMeeting = {
         method: "GET",
-        headers: myHeaders,
+        headers: myHeadersForMeeting,
+      };
+
+      // Fetch meeting data
+      const response = await fetch(
+        `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
+        requestOptionsForMeeting
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch meeting data");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch meeting data");
-    }
+      const meetingsData: { meetings: Meeting[] } = await response.json();
+      const meetings: Meeting[] = meetingsData.meetings;
 
-    const data = await response.json();
-    return data.meetings;
-  };
-
-  try {
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      console.log(`Polling attempt ${attempt + 1} for roomId: ${roomId}`);
-
-      const meetings = await fetchMeetingData();
-      const validMeeting = meetings.find(
+      const hasValidTimes = meetings.some(
         (meeting) => meeting.startTime && meeting.endTime
       );
 
-      if (validMeeting) {
-        const client = await connectDB();
-        const db = client.db();
+      if (hasValidTimes) {
+        // When valid times are found, trigger the main endpoint again
+        const mainEndpointResponse = await fetch("/api/end-call", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomId,
+            meetingType: 2, // office hours
+            dao_name: "", // This will be handled by the main endpoint
+            hostAddress: "", // This will be handled by the main endpoint
+          }),
+        });
 
-        await db.collection("attestation").updateOne(
-          { roomId },
-          {
-            $set: {
-              startTime: Math.floor(validMeeting.startTime / 1000),
-              endTime: Math.floor(validMeeting.endTime / 1000),
-              timeUpdateStatus: "complete",
-            },
-          }
-        );
+        if (!mainEndpointResponse.ok) {
+          throw new Error("Failed to process meeting data");
+        }
 
-        await client.close();
-        console.log(`Successfully updated meeting times for roomId: ${roomId}`);
-        return { success: true };
+        return true; // Successfully found times and triggered processing
       }
 
-      if (attempt < maxAttempts - 1) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, delayBetweenAttempts)
-        );
-      }
+      return false; // No valid times found yet
+    } catch (error) {
+      console.error("Error in polling meeting times:", error);
+      return false;
+    }
+  };
+
+  const poll = async () => {
+    const success = await pollOnce();
+
+    if (success) {
+      console.log(`Successfully found meeting times for roomId ${roomId}`);
+      return;
     }
 
-    console.log(
-      `Failed to get valid meeting times after ${maxAttempts} attempts for roomId: ${roomId}`
-    );
-    return {
-      success: false,
-      error: "Max polling attempts reached without valid times",
-    };
-  } catch (error) {
-    console.error(`Error in pollMeetingTimes for roomId ${roomId}:`, error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
+    retries++;
+
+    if (retries < MAX_RETRIES) {
+      console.log(`Polling attempt ${retries} for roomId ${roomId}`);
+      setTimeout(poll, POLLING_INTERVAL);
+    } else {
+      console.log(`Max retries reached for roomId ${roomId}`);
+    }
+  };
+
+  // Start polling
+  await poll();
 }
