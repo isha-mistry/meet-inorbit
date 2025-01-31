@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/config/connectDB";
-import { BASE_URL } from "@/config/constants";
+import { pollMeetingTimes } from "./polling-service";
 
-// Interfaces
 interface Meeting {
   meetingId: string;
   startTime: number;
@@ -47,7 +46,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       hostAddress: string;
     } = await req.json();
 
-    // Validate roomId
     if (!roomId) {
       return NextResponse.json(
         { success: false, error: "roomId parameter is required" },
@@ -55,7 +53,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
-    // Determine meeting type
     let meetingTypeName: string;
     let initialDelay = 0;
 
@@ -75,7 +72,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       await delay(initialDelay);
     }
 
-    // Prepare API headers
     const myHeadersForMeeting = new Headers();
     myHeadersForMeeting.append(
       "x-api-key",
@@ -87,7 +83,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       headers: myHeadersForMeeting,
     };
 
-    // Fetch meetings data
     const response = await fetch(
       `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
       requestOptionsForMeeting
@@ -100,12 +95,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const meetingsData: { meetings: Meeting[] } = await response.json();
     const meetings: Meeting[] = meetingsData.meetings;
 
-    // Check if meetings have valid start and end times
     const hasValidTimes = meetings.some(
       (meeting) => meeting.startTime && meeting.endTime
     );
 
-    // Calculate total meeting time
     let totalMeetingTimeInMinutes = 0;
     let earliestStartTime = Infinity;
     let latestEndTime = -Infinity;
@@ -123,12 +116,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         latestEndTime = Math.max(latestEndTime, meeting.endTime);
       }
     } else {
-      // If no valid times, use current timestamp as a placeholder
       earliestStartTime = Date.now();
       latestEndTime = Date.now();
     }
 
-    // Fetch participant lists
     const combinedParticipantLists: Participant[][] = [];
     const meetingTimePerEOA: MeetingTimePerEOA = {};
 
@@ -145,7 +136,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         await response.json();
       combinedParticipantLists.push(participantList.participants);
 
-      // Calculate meeting time per participant
       participantList.participants.forEach((participant) => {
         const eoaAddress: string = participant?.metadata?.walletAddress;
         const joinedAt: Date = new Date(participant.joinTime);
@@ -161,10 +151,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
-    // Calculate minimum attendance time required
     const minimumAttendanceTime = totalMeetingTimeInMinutes * 0.5;
 
-    // Filter out participants with display name "No name"
     const validParticipants: Participant[] = [];
     for (const participantList of combinedParticipantLists) {
       for (const participant of participantList) {
@@ -174,7 +162,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       }
     }
 
-    // Filter participants based on attendance
     let participantsWithSufficientAttendance: ParticipantWithAttestation[] = [];
     for (const participant of validParticipants) {
       const participantMeetingTime =
@@ -187,7 +174,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       }
     }
 
-    // Remove host from participants with sufficient attendance
     participantsWithSufficientAttendance =
       participantsWithSufficientAttendance.filter(
         (participant) =>
@@ -196,7 +182,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
             hostAddress.toLowerCase()
       );
 
-    // Add the "attestation" field with value "pending" to each host
     const hosts: ParticipantWithAttestation[] = [];
     if (
       hostAddress &&
@@ -220,15 +205,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
-    // Connect to MongoDB
     const client = await connectDB();
     const db = client.db();
     const collection = db.collection("attestation");
 
-    // Check if data with same roomId exists
     const existingData = await collection.findOne({ roomId });
 
-    // Convert times to epoch seconds
     const earliestStartTimeEpoch = hasValidTimes
       ? Math.floor(earliestStartTime / 1000)
       : 0;
@@ -236,7 +218,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       ? Math.floor(latestEndTime / 1000)
       : 0;
 
-    // Prepare the data to store
     const dataToStore = {
       roomId,
       participants: participantsWithSufficientAttendance,
@@ -252,7 +233,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     };
 
     if (existingData) {
-      // If data exists and we have valid times, or if times were previously 0
       if (
         !existingData.startTime ||
         existingData.startTime === 0 ||
@@ -262,13 +242,19 @@ export async function POST(req: NextRequest, res: NextResponse) {
         console.log(`Data with roomId ${roomId} updated.`);
       }
     } else {
-      // If data doesn't exist, insert new data
       await collection.insertOne(dataToStore);
       console.log(`New data with roomId ${roomId} inserted.`);
     }
 
-    // Close the MongoDB client connection
     await client.close();
+
+    // Start polling for office hours meetings if times are not available
+    if (meetingType === 2 && !hasValidTimes) {
+      console.log(`Starting polling for office hours meeting: ${roomId}`);
+      pollMeetingTimes(roomId, process.env.NEXT_PUBLIC_API_KEY ?? "").catch(
+        (error) => console.error("Error initiating polling:", error)
+      );
+    }
 
     return NextResponse.json(
       {
