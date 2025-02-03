@@ -154,4 +154,5 @@ export interface OfficeHoursProps {
   reference_id: string;
   views?: number;
   nft_image?: string;
+  deployedContractAddress: string;
 }
