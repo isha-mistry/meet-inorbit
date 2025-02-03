@@ -18,8 +18,15 @@ import SessionHostedModal from "@/components/ComponentUtils/SessionHostedModal";
 import { APP_BASE_URL } from "@/config/constants";
 import { getToken } from "next-auth/jwt";
 import { fetchApi } from "@/utils/api";
+import { updateOfficeHoursData } from "@/utils/LobbyApiActions";
 
-function UpdateSessionDetails({ roomId }: { roomId: string }) {
+function UpdateSessionDetails({
+  roomId,
+  meetingType,
+}: {
+  roomId: string;
+  meetingType: string;
+}) {
   // useEffect(() => {
   //   const storedStatus = sessionStorage.getItem("meetingData");
   //   if (storedStatus) {
@@ -41,8 +48,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const { address } = useAccount();
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
   // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1"
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
@@ -98,45 +104,83 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
     try {
       if (walletAddress?.toLowerCase() === data.host_address.toLowerCase()) {
         setLoading(true);
-        const myHeaders = new Headers();
-        const token=await getAccessToken();
-        myHeaders.append("Content-Type", "application/json");
-        if (walletAddress) {
-          myHeaders.append("x-wallet-address", walletAddress);
-          myHeaders.append("Authorization",`Bearer ${token}`);
-        }
 
-        const raw = JSON.stringify({
-          meetingId: roomId,
-          host_address: data.host_address,
-          title: sessionDetails.title,
-          description: sessionDetails.description,
-          thumbnail_image: sessionDetails.image,
-        });
+        if (collection === "meetings") {
+          const myHeaders = new Headers();
+          const token = await getAccessToken();
+          myHeaders.append("Content-Type", "application/json");
+          if (walletAddress) {
+            myHeaders.append("x-wallet-address", walletAddress);
+            myHeaders.append("Authorization", `Bearer ${token}`);
+          }
 
-        const requestOptions: any = {
-          method: "POST",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
-        };
-        const response = await fetchApi(
-          `/update-recorded-session`,
-          requestOptions
-        );
-        if (response) {
-          const responseData = await response.json();
-          setLoading(false);
-          setShowHostPopup(true);
-          // router.push(`/profile/${address}?active=sessions&session=hosted`);
-        } else {
-          setLoading(false);
-          // setData(null);
+          const raw = JSON.stringify({
+            meetingId: roomId,
+            host_address: data.host_address,
+            title: sessionDetails.title,
+            description: sessionDetails.description,
+            thumbnail_image: sessionDetails.image,
+          });
+
+          const requestOptions: any = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
+          };
+          const response = await fetchApi(
+            `/update-recorded-session`,
+            requestOptions
+          );
+          if (response) {
+            const responseData = await response.json();
+            setLoading(false);
+            setShowHostPopup(true);
+            // router.push(`/profile/${address}?active=sessions&session=hosted`);
+          } else {
+            setLoading(false);
+            // setData(null);
+          }
+        } else if (collection === "office_hours") {
+          const requestBody = {
+            host_address: data.host_address,
+            title: sessionDetails.title,
+            description: sessionDetails.description,
+            thumbnail_image: sessionDetails.image,
+            dao_name: data.dao_name,
+            reference_id: data.reference_id,
+          };
+          const responseData =
+            walletAddress &&
+            (await updateOfficeHoursData(
+              walletAddress,
+              await getAccessToken(),
+              requestBody
+            ));
+          if (responseData) {
+            setLoading(false);
+            setShowHostPopup(true);
+          } else {
+            setLoading(false);
+          }
         }
       }
     } catch (e) {
       console.log("Error:", e);
       setLoading(true);
+    }
+  };
+
+  const handleRedirection = () => {
+    console.log("collection", collection);
+    if (collection === "meetings") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
+      );
+    } else if (collection === "office_hours") {
+      router.push(
+        `${APP_BASE_URL}/profile/${data.host_address}?active=officeHours&hours=hosted`
+      );
     }
   };
 
@@ -162,7 +206,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
               </div>
             )}
             <div className="justify-between flex flex-col md:flex-row-reverse border rounded-3xl py-4 xl:py-6 px-3 sm:px-6 xl:px-8 gap-3 md:gap-6 xl:gap-10 items-center mb-10">
-            <div className="flex">
+              <div className="flex">
                 <Button
                   onClick={() => setViewMode("edit")}
                   className={`rounded-l-full ${
@@ -208,11 +252,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                   <div className="flex items-center justify-center gap-3">
                     <Button
                       className="bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
-                        )
-                      }
+                      onClick={handleRedirection}
                     >
                       Back to Profile
                     </Button>
@@ -240,11 +280,7 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     </Button>
                     <Button
                       className="hidden xm:block bg-blue-shade-200 rounded-full font-semibold px-10 text-white"
-                      onClick={() =>
-                        router.push(
-                          `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
-                        )
-                      }
+                      onClick={handleRedirection}
                     >
                       Back to Profile
                     </Button>
@@ -266,15 +302,11 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
                     </Button>
                   </div>
                   <Button
-                      className="xm:hidden bg-blue-shade-200 rounded-full font-semibold px-10 text-white w-fit mx-auto mt-2"
-                      onClick={() =>
-                        router.push(
-                          `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
-                        )
-                      }
-                    >
-                      Back to Profile
-                    </Button>
+                    className="xm:hidden bg-blue-shade-200 rounded-full font-semibold px-10 text-white w-fit mx-auto mt-2"
+                    onClick={handleRedirection}
+                  >
+                    Back to Profile
+                  </Button>
                 </div>
               )}
             </div>
@@ -285,7 +317,9 @@ function UpdateSessionDetails({ roomId }: { roomId: string }) {
       ) : (
         <UpdateSessionDetailsSkeletonLoader />
       )}
-      {showHostPopup && <SessionHostedModal data={data} />}
+      {showHostPopup && (
+        <SessionHostedModal data={data} collection={collection} />
+      )}
     </div>
   );
 }

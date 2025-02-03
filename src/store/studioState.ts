@@ -5,6 +5,8 @@ export interface IChatMessage {
   text: string;
   isUser: boolean;
   fileName?: string;
+  isRead?: boolean;
+  timestamp: Date;
 }
 
 export interface BoxPosition {
@@ -13,6 +15,8 @@ export interface BoxPosition {
   width: string;
   height: string;
 }
+
+export type TPromptView = "close" | "request-to-speak";
 
 interface StudioState {
   name: string;
@@ -44,6 +48,7 @@ interface StudioState {
   removeRequestedPeers: (val: string) => void;
   chatMessages: IChatMessage[];
   addChatMessage: (val: IChatMessage) => void;
+  setMessagesToRead: () => void;
   activeBg: string;
   setActiveBg: (val: string) => void;
   boxPosition: BoxPosition;
@@ -66,6 +71,10 @@ interface StudioState {
   setIsRoomClosed: (val: boolean) => void;
   meetingRecordingStatus: boolean;
   setMeetingRecordingStatus: (val: boolean) => void;
+  promptView: TPromptView;
+  setPromptView: (val: TPromptView) => void;
+  hasUnreadMessages: boolean;
+  setHasUnreadMessages: (value: boolean) => void;
 }
 
 export const useStudioState = create<StudioState>((set) => ({
@@ -146,6 +155,13 @@ export const useStudioState = create<StudioState>((set) => ({
       chatMessages: [...state.chatMessages, val],
     }));
   },
+  setMessagesToRead: () =>
+    set((state) => ({
+      chatMessages: state.chatMessages.map((message) => ({
+        ...message,
+        isRead: true,
+      })),
+    })),
   activeBg: "bg-black",
   setActiveBg: (val: string) => set({ activeBg: val }),
   boxPosition: { x: 0, y: 0, width: "200", height: "200" },
@@ -169,4 +185,12 @@ export const useStudioState = create<StudioState>((set) => ({
   meetingRecordingStatus: false,
   setMeetingRecordingStatus: (val: boolean) =>
     set({ meetingRecordingStatus: val }),
+  promptView: "close",
+  setPromptView: (val: TPromptView) => {
+    set(() => ({
+      promptView: val,
+    }));
+  },
+  hasUnreadMessages: false,
+  setHasUnreadMessages: (value) => set({ hasUnreadMessages: value }),
 }));

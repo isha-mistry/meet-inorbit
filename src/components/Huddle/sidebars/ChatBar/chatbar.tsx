@@ -6,12 +6,12 @@ import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
 import { useState } from "react";
 import { PeerMetadata } from "@/utils/types";
 import { useStudioState } from "@/store/studioState";
+import { timeStamp } from "console";
 
 const ChatBar = () => {
   const { sendData } = useDataMessage();
   const [message, setMessage] = useState("");
   const { metadata } = useLocalPeer<PeerMetadata>();
-  const [isFileUploading, setIsFileUploading] = useState(false);
 
   const { setIsChatOpen } = useStudioState();
 
@@ -22,6 +22,7 @@ const ChatBar = () => {
         payload: JSON.stringify({
           message,
           name: metadata?.displayName,
+          timestamp: new Date().toISOString(),
         }),
         label: "chat",
       });
@@ -33,58 +34,6 @@ const ChatBar = () => {
     if (e.key === "Enter") {
       sendMessage();
     }
-  };
-
-  const handleUpload = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        setIsFileUploading(true);
-
-        const response = await fetch("/uploadFile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            filename: file.name,
-            contentType: file.type,
-          }),
-        });
-
-        if (response.ok) {
-          const { url, fields } = await response.json();
-          const formData = new FormData();
-          Object.entries(fields).forEach(([key, value]) => {
-            formData.append(key, value as string);
-          });
-          formData.append("file", file);
-
-          const uploadResponse = await fetch(url, {
-            method: "POST",
-            body: formData,
-          });
-
-
-          if (uploadResponse.ok) {
-            sendData({
-              to: "*",
-              payload: JSON.stringify({
-                message: `${url}${fields.key}`,
-                fileName: file.name,
-                name: metadata?.displayName,
-              }),
-              label: "file",
-            });
-          }
-        }
-      }
-    };
-    input.click();
-    setIsFileUploading(false);
   };
 
   return (

@@ -42,6 +42,7 @@ import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { uploadFile } from "@/actions/uploadFile";
 import { fetchApi } from "@/utils/api";
 import MobileMenuDropdown from "./MobileMenuDropdown";
+import { updateOfficeHoursData } from "@/utils/LobbyApiActions";
 
 const BottomBar = ({
   daoName,
@@ -55,7 +56,7 @@ const BottomBar = ({
   hostAddress: string;
   // meetingStatus: boolean | undefined;
   // currentRecordingStatus: boolean | undefined;
-  meetingData?: SessionInterface;
+  meetingData?: any;
   meetingCategory: string;
 }) => {
   const { isAudioOn, enableAudio, disableAudio } = useLocalAudio();
@@ -64,6 +65,7 @@ const BottomBar = ({
   const { leaveRoom, closeRoom, room } = useRoom();
   const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
+  const { peerId } = useLocalPeer();
 
   const roomId = params.roomId as string | undefined;
   const [s3URL, setS3URL] = useState<string>("");
@@ -78,7 +80,9 @@ const BottomBar = ({
     updateMetadata,
     peerId: localPeerId,
   } = useLocalPeer<PeerMetadata>();
-  const { peerIds } = usePeerIds({ roles: ["host", "guest"] });
+  const { peerIds } = usePeerIds({
+    roles: ["host", "guest", "speaker", "listener", "coHost"],
+  });
 
   const {
     isChatOpen,
@@ -92,7 +96,11 @@ const BottomBar = ({
     setIsScreenShared,
     meetingRecordingStatus,
     setMeetingRecordingStatus,
+    setPromptView,
+    hasUnreadMessages,
+    setHasUnreadMessages,
   } = useStudioState();
+
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare({
       onProduceStart(data) {
@@ -144,11 +152,44 @@ const BottomBar = ({
           body: raw,
         };
 
+        if (meetingCategory === "session") {
+          try {
+            const response = await fetchApi(
+              "/update-video-uri",
+              requestOptions
+            );
+            const result = await response.json();
+          } catch (error) {
+            console.error(error);
+          }
+        } else if (meetingCategory === "officehours") {
+          const requestBody = {
+            host_address: hostAddress,
+            dao_name: daoName,
+            reference_id: meetingData.reference_id,
+            video_uri: videoUri,
+          };
+
+          walletAddress &&
+            (await updateOfficeHoursData(walletAddress, token, requestBody));
+        }
+      }
+    },
+  });
+
+  useDataMessage({
+    onMessage(payload: string, from: string, label?: string) {
+      if (label === "chat") {
         try {
-          const response = await fetchApi("/update-video-uri", requestOptions);
-          const result = await response.json();
+          const parsedPayload = JSON.parse(payload);
+
+          const isDifferentUser = from !== peerId;
+
+          if (isDifferentUser) {
+            setHasUnreadMessages(true);
+          }
         } catch (error) {
-          console.error(error);
+          console.error("Error parsing message:", error);
         }
       }
     },
@@ -232,10 +273,25 @@ const BottomBar = ({
             }),
           };
 
-          const response = await fetchApi(
-            `/update-recording-status`,
-            requestOptions
-          );
+          if (meetingCategory === "session") {
+            const response = await fetchApi(
+              `/update-recording-status`,
+              requestOptions
+            );
+          } else if (meetingCategory === "officehours") {
+            const requestBody = {
+              host_address: hostAddress,
+              dao_name: daoName,
+              reference_id: meetingData.reference_id,
+              meeting_status: isRecording === true ? "Recorded" : "Finished",
+              nft_image: nft_image,
+              isMeetingRecorded: isRecording,
+            };
+
+            walletAddress &&
+              (await updateOfficeHoursData(walletAddress, token, requestBody));
+          }
+
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(
@@ -303,67 +359,73 @@ const BottomBar = ({
         </div>
 
         <div className={clsx("flex space-x-2 sm:space-x-3")}>
-          <ButtonWithIcon
-            content={isVideoOn ? "Turn off camera" : "Turn on camera"}
-            onClick={() => {
-              if (isVideoOn) {
-                disableVideo();
-              } else {
-                enableVideo();
-              }
-            }}
-            className={clsx(
-              isVideoOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
-            )}
-          >
-            {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
-          </ButtonWithIcon>
-          <ButtonWithIcon
-            content={isAudioOn ? "Turn off microphone" : "Turn on microphone"}
-            onClick={() => {
-              if (isAudioOn) {
-                disableAudio();
-              } else {
-                enableAudio();
-              }
-            }}
-            className={clsx(
-              isAudioOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
-            )}
-          >
-            {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
-          </ButtonWithIcon>
-          <ButtonWithIcon
-            content={
-              isScreenShared && shareStream !== null
-                ? "Stop Sharing"
-                : shareStream !== null
-                ? "Stop Sharing"
-                : isScreenShared
-                ? "Only one screen share is allowed at a time"
-                : "Share Screen"
-            }
-            onClick={() => {
-              if (isScreenShared && shareStream !== null) {
-                stopScreenShare();
-              } else if (isScreenShared) {
-                toast.error("Only one screen share is allowed at a time");
-                return;
-              }
-              if (shareStream !== null) {
-                stopScreenShare();
-              } else {
-                startScreenShare();
-              }
-            }}
-            className={clsx(
-              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
-                (shareStream !== null || isScreenShared) && "bg-gray-500/80"
-              }`
-            )}
-          >
-            {BasicIcons.screenShare}
-          </ButtonWithIcon>
+          {role !== "listener" && (
+            <>
+              <ButtonWithIcon
+                content={isVideoOn ? "Turn off camera" : "Turn on camera"}
+                onClick={() => {
+                  if (isVideoOn) {
+                    disableVideo();
+                  } else {
+                    enableVideo();
+                  }
+                }}
+                className={clsx(
+                  isVideoOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
+                )}
+              >
+                {isVideoOn ? BasicIcons.on.cam : BasicIcons.off.cam}
+              </ButtonWithIcon>
+              <ButtonWithIcon
+                content={
+                  isAudioOn ? "Turn off microphone" : "Turn on microphone"
+                }
+                onClick={() => {
+                  if (isAudioOn) {
+                    disableAudio();
+                  } else {
+                    enableAudio();
+                  }
+                }}
+                className={clsx(
+                  isAudioOn ? "bg-gray-500" : "bg-red-500 hover:bg-red-400"
+                )}
+              >
+                {isAudioOn ? BasicIcons.on.mic : BasicIcons.off.mic}
+              </ButtonWithIcon>
+              <ButtonWithIcon
+                content={
+                  isScreenShared && shareStream !== null
+                    ? "Stop Sharing"
+                    : shareStream !== null
+                    ? "Stop Sharing"
+                    : isScreenShared
+                    ? "Only one screen share is allowed at a time"
+                    : "Share Screen"
+                }
+                onClick={() => {
+                  if (isScreenShared && shareStream !== null) {
+                    stopScreenShare();
+                  } else if (isScreenShared) {
+                    toast.error("Only one screen share is allowed at a time");
+                    return;
+                  }
+                  if (shareStream !== null) {
+                    stopScreenShare();
+                  } else {
+                    startScreenShare();
+                  }
+                }}
+                className={clsx(
+                  `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
+                    (shareStream !== null || isScreenShared) && "bg-gray-500/80"
+                  }`
+                )}
+              >
+                {BasicIcons.screenShare}
+              </ButtonWithIcon>
+            </>
+          )}
           <ButtonWithIcon
             content={metadata?.isHandRaised ? "Lower Hand" : "Raise Hand"}
             onClick={() => {
@@ -505,6 +567,16 @@ const BottomBar = ({
               </span>
             </Button>
           )}
+
+          {role === "listener" && (
+            <OutlineButton
+              className="mr-auto flex items-center justify-between gap-3"
+              onClick={() => setPromptView("request-to-speak")}
+            >
+              {BasicIcons.requestToSpeak}
+              <div className="text-white">Request to speak</div>
+            </OutlineButton>
+          )}
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
@@ -517,13 +589,23 @@ const BottomBar = ({
               </span>
             </div>
           </ButtonWithIcon>
-          <ButtonWithIcon
-            content="Chat"
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className={clsx("bg-[#202020] hover:bg-gray-500/50")}
-          >
-            {BasicIcons.chat}
-          </ButtonWithIcon>
+          <div className="relative">
+            <ButtonWithIcon
+              content="Chat"
+              onClick={() => {
+                setIsChatOpen(!isChatOpen);
+                if (hasUnreadMessages) {
+                  setHasUnreadMessages(false);
+                }
+              }}
+              className={clsx("bg-[#202020] hover:bg-gray-500/50")}
+            >
+              {BasicIcons.chat}
+            </ButtonWithIcon>
+            {hasUnreadMessages && !isChatOpen && (
+              <div className="absolute -top-1 -right-1 bg-red-600 rounded-full w-3 h-3 animate-pulse" />
+            )}
+          </div>
         </div>
       </footer>
     </>
@@ -531,3 +613,23 @@ const BottomBar = ({
 };
 
 export default BottomBar;
+
+interface OutlineButtonProps {
+  onClick?: () => void;
+  className?: string;
+  children: React.ReactNode;
+}
+
+const OutlineButton: React.FC<OutlineButtonProps> = ({
+  className,
+  onClick,
+  children,
+}) => (
+  <button
+    onClick={onClick}
+    type="button"
+    className={clsx("border border-custom-4 rounded-lg py-2 px-3", className)}
+  >
+    {children}
+  </button>
+);

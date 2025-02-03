@@ -1,16 +1,14 @@
-import { useLocalPeer, usePeerIds } from '@huddle01/react/hooks';
-import { Role } from '@huddle01/server-sdk/auth';
-import { FC, memo } from 'react';
-import RemotePeerMetaData from '../PeerMetaData/RemotePeerMetaData';
-import LocalPeerMetaData from '../PeerMetaData/LocalPeerMetaData';
+import { useLocalPeer, usePeerIds } from "@huddle01/react/hooks";
+import { Role } from "@huddle01/server-sdk/auth";
+import { FC, memo } from "react";
+import RemotePeerMetaData from "../PeerMetaData/RemotePeerMetaData";
+import LocalPeerMetaData from "../PeerMetaData/LocalPeerMetaData";
 
 interface SpeakersListProps {
   className?: string;
 }
 
-const SpeakersList: FC<SpeakersListProps> = ({
-  className,
-}) => {
+const SpeakersList: FC<SpeakersListProps> = ({ className }) => {
   const { peerIds } = usePeerIds({ roles: [Role.SPEAKER] });
   const { peerId: localPeerId, role: localPeerRole } = useLocalPeer();
 

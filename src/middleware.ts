@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   console.log("origin: ", origin);
 
   // CORS check
-  if (!origin) {
+  if (!origin || !allowedOrigins.includes(origin)) {
     return new NextResponse(
       JSON.stringify({ error: "Unknown origin request. Forbidden" }),
       {
@@ -162,6 +162,7 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 export const config = {
   matcher: [
     "/api/proxy/:path*",
+    "/api/edit-office-hours/:path*",
     "/api/end-call/:path*",
     "/api/update-meeting-status/:path*",
     "/api/update-recorded-session/:path*",

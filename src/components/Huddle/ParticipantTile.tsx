@@ -10,7 +10,7 @@ interface participantTileProps {
 
 function ParticipantTile({ className }: participantTileProps) {
   const { peerIds } = usePeerIds({
-    roles: [Role.HOST, Role.GUEST, Role.CO_HOST],
+    roles: [Role.HOST, Role.GUEST, Role.CO_HOST, Role.LISTENER, Role.SPEAKER],
   });
   const { isScreenShared } = useStudioState();
 

@@ -18,6 +18,8 @@ import { Role } from "@huddle01/server-sdk/auth";
 import { NestedPeerListIcons } from "@/utils/PeerListIcons";
 import { useState } from "react";
 import Image from "next/image";
+import { IoCopy } from "react-icons/io5";
+import { Tooltip } from "@nextui-org/react";
 
 interface RemotePeerProps {
   peerId: string;
@@ -33,6 +35,10 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
     roles: [Role.HOST, Role.GUEST, Role.CO_HOST],
   });
   const [reaction, setReaction] = useState("");
+  const [tooltipContent, setTooltipContent] = useState("Copy");
+  const [animatingButtons, setAnimatingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useDataMessage({
     onMessage(payload, from, label) {
@@ -46,6 +52,24 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
       }
     },
   });
+
+  const handleAddrCopy = (addr: string) => {
+    navigator.clipboard.writeText(addr);
+    setTooltipContent("Copied");
+
+    setAnimatingButtons((prev) => ({
+      ...prev,
+      [addr]: true,
+    }));
+
+    setTimeout(() => {
+      setTooltipContent("Copy");
+      setAnimatingButtons((prev) => ({
+        ...prev,
+        [addr]: false,
+      }));
+    }, 4000);
+  };
 
   return (
     <div
@@ -89,7 +113,27 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
           </div>
         )}
         <span className="absolute bottom-4 left-4 text-white font-medium">
-          {metadata?.displayName}
+          <div className="flex">
+            {metadata?.displayName}{" "}
+            <Tooltip
+              content={tooltipContent}
+              placement="right"
+              closeDelay={1}
+              showArrow
+            >
+              <div
+                className={`pl-2 pt-[2px] cursor-pointer  ${
+                  animatingButtons[metadata?.walletAddress || ""]
+                    ? "text-blue-500"
+                    : "text-[#3E3D3D]"
+                }`}
+              >
+                <IoCopy
+                  onClick={() => handleAddrCopy(`${metadata?.walletAddress}`)}
+                />
+              </div>
+            </Tooltip>
+          </div>
         </span>
         <span className="absolute bottom-4 right-4">
           {isAudioOn

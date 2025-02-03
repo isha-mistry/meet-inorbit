@@ -4,7 +4,10 @@ import React from "react";
 function page({ params }: { params: { roomId: string } }) {
   return (
     <div>
-      <UpdateSessionDetails roomId={params.roomId} meetingType={"session"} />
+      <UpdateSessionDetails
+        roomId={params.roomId}
+        meetingType={"officehours"}
+      />
     </div>
   );
 }

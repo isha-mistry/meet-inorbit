@@ -25,8 +25,8 @@ const config: Config = {
         "2md": "950px",
         "2sm": "670px",
         "0.5md": "700px",
-        "1.5md":"830px",
-        "1.7md":"900px",
+        "1.5md": "830px",
+        "1.7md": "900px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -100,6 +100,20 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        blink: {
+          "0%": {
+            transform: "scale(0.8)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "scale(1.3)",
+            opacity: "0.4",
+          },
+          "100%": {
+            transform: "scale(0.8)",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         fadeIn: "fadeIn 1s ease-out",
@@ -110,6 +124,7 @@ const config: Config = {
         "gradient-x": "gradient-x 5s ease infinite",
         float: "float 3s ease-in-out infinite",
         "bounce-slow": "bounce 2s infinite",
+        "animate-pulse": "blink 1s linear infinite",
       },
     },
   },

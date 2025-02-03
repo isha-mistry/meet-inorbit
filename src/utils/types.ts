@@ -54,3 +54,9 @@ export interface RoomMetadata {
   questions: Question[];
   polls: Poll[];
 }
+
+export type SpeakerRequestAction = {
+  type: "SPEAKER_REQUEST_ACTION";
+  action: "ACCEPT" | "REJECT";
+  peerId: string;
+};

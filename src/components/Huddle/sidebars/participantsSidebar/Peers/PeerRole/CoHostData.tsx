@@ -24,12 +24,35 @@ const CoHostData: React.FC<CoHostDataProps> = ({ peerId }) => {
       {me.role === "host" && (
         <div>
           <Strip
+            type="personSpeaker"
+            title="Invite as Speaker"
+            variant="normal"
+            onClick={() => {
+              updateRole(Role.SPEAKER, {
+                custom: {
+                  admin: true,
+                  canConsume: true,
+                  canProduce: true,
+                  canProduceSources: {
+                    cam: true,
+                    mic: true,
+                    screen: true,
+                  },
+                  canRecvData: true,
+                  canSendData: true,
+                  canUpdateMetadata: true,
+                },
+              });
+            }}
+          />
+
+          <Strip
             type="remove"
             title="Remove as Co-Host"
             variant="danger"
             onClick={() => {
               if (me.role === "host" || me.role === "coHost") {
-                updateRole(Role.GUEST);
+                updateRole(Role.LISTENER);
               }
             }}
           />
@@ -49,17 +72,17 @@ const CoHostData: React.FC<CoHostDataProps> = ({ peerId }) => {
         <div>
           <Strip
             type="leave"
-            title="Leave the spaces"
-            variant="danger"
-            onClick={leaveRoom}
-          />
-          <Strip
-            type="leave"
             title="Leave co-host role"
             variant="danger"
             onClick={() => {
-              me.updateRole({ role: "guest" });
+              me.updateRole({ role: "listener" });
             }}
+          />
+          <Strip
+            type="leave"
+            title="Leave the spaces"
+            variant="danger"
+            onClick={leaveRoom}
           />
         </div>
       )}

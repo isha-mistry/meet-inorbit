@@ -44,6 +44,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [hostJoinedStatus, setHostJoinedStatus] = useState<string>();
   const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<string>();
   const [isApiCalling, setIsApiCalling] = useState<boolean>();
+  const [isHost, setIsHost] = useState<boolean>();
 
   // Hooks
   const { push } = useRouter();
@@ -102,6 +103,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (result.success) {
           const { data } = result;
+          if (walletAddress === data.host_address) {
+            setIsHost(true);
+          }
           setMeetingData(data);
           setHostAddress(data.host_address);
           setDaoName(data.dao_name);
@@ -163,7 +167,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           },
           body: JSON.stringify({ walletAddress }),
         });
-
 
         const { data } = await response.json();
 
@@ -229,7 +232,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           roomId: params.roomId,
           role,
           displayName: name,
-          walletAddress,
+          address: walletAddress,
+          meetingType: "session",
         }),
       });
 
@@ -410,7 +414,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     disabled={isLoadingProfile || isJoining}
                   >
                     <span className="mr-2">
-                      {isJoining ? "Joining Spaces..." : "Start Meeting"}
+                      {isJoining
+                        ? "Joining Spaces..."
+                        : isHost
+                        ? "Start Meeting"
+                        : "Join Meeting"}
                     </span>
                     {!isJoining && (
                       <Image

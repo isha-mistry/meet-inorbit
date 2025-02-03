@@ -59,10 +59,15 @@ import {
 } from "@/components/Huddle/HuddleUtils";
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
 import { fetchApi } from "@/utils/api";
-import { Fullscreen, Maximize2, Minimize2 } from "lucide-react";
+import { Fullscreen, Maximize2, Minimize2, ScreenShare } from "lucide-react";
 import Audio from "@/components/Huddle/Media/Audio";
 import AudioController from "@/components/Huddle/Media/AudioController";
 import interact from "interactjs";
+import { IoCopy } from "react-icons/io5";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
 
 const GlobalScrollbarStyles = `
   /* Webkit (Chrome, Safari, newer versions of Opera) */
@@ -156,6 +161,26 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const draggableRef = useRef(null);
   const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
+  const [tooltipContent, setTooltipContent] = useState("Copy");
+  const [animatingButtons, setAnimatingButtons] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const firstSlideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isScreenShared) {
@@ -164,14 +189,11 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }
   });
   useEffect(() => {
-    console.log("Draggable ref:", draggableRef.current);
     if (draggableRef.current) {
       const position = { x: 0, y: 0 };
       const interactable = interact(draggableRef.current).draggable({
         listeners: {
-          start(event) {
-            console.log(event.type, event.target);
-          },
+          start(event) {},
           move(event) {
             position.x += event.dx;
             position.y += event.dy;
@@ -194,7 +216,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         interactable.unset();
       };
     }
-  }, [shareStream, !isFullScreen]);
+  }, [shareStream, !isFullScreen, isSmallScreen]);
 
   const [remoteVideoTracks, setRemoteVideoTracks] = useState<
     Record<string, MediaStreamTrack | null>
@@ -360,11 +382,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
   useDataMessage({
     async onMessage(payload, from, label) {
       if (label === "chat") {
-        const { message, name } = JSON.parse(payload);
+        const { message, name, timestamp } = JSON.parse(payload);
         addChatMessage({
           name: name,
           text: message,
           isUser: from === peerId,
+          timestamp: new Date(timestamp),
         });
       }
       if (from === peerId) {
@@ -599,6 +622,24 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //   }
   // }, [isRecording]);
 
+  const handleAddrCopy = (addr: string) => {
+    navigator.clipboard.writeText(addr);
+    setTooltipContent("Copied");
+
+    setAnimatingButtons((prev) => ({
+      ...prev,
+      [addr]: true,
+    }));
+
+    setTimeout(() => {
+      setTooltipContent("Copy");
+      setAnimatingButtons((prev) => ({
+        ...prev,
+        [addr]: false,
+      }));
+    }, 4000);
+  };
+
   return (
     <>
       {isAllowToEnter ? (
@@ -669,270 +710,498 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </div>
               </div>
             </header>
-            <main
-              className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-[80%] p-2`}
-            >
-              {shareStream && isFullScreen && (
-                <div
-                  ref={draggableRef}
-                  className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
-                  style={{
-                    transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
-                  }}
-                >
-                  {metadata?.avatarUrl && (
-                    <div className=" rounded-full w-20 h-20">
-                      <Image
-                        alt="image"
-                        src={metadata?.avatarUrl}
-                        className="maskAvatar object-cover object-center"
-                        width={100}
-                        height={100}
-                      />
-                    </div>
-                  )}
-                  <span className="absolute bottom-2 left-2 text-white">
-                    You
-                  </span>
-                </div>
-              )}
-              <div
-                className={`relative flex flex-col lg:flex-row w-full h-full ${
-                  isRemoteFullScreen && isScreenShared && isFullScreen
-                    ? "bg-[#202020] rounded-lg justify-center"
-                    : ""
-                } `}
+
+            <div className="relative flex-1 w-full h-[80%] p-2">
+              <Swiper
+                pagination={{
+                  clickable: true,
+                  renderBullet: (index, className) => {
+                    return `<span 
+                    class="${className}" 
+                    style="
+                         background-color: white;
+                         opacity: 0.8;
+                         border-radius:50%;
+                         width: 10px;
+                         height: 10px;
+                         display:inline-block;
+                        "
+                     ></span>`;
+                  },
+                  bulletClass: "swiper-pagination-bullet",
+                  bulletActiveClass: "swiper-pagination-bullet-active",
+                }}
+                modules={[Pagination]}
               >
-                {shareStream && (
-                  <div className={`w-full `}>
-                    <GridContainer className="w-full h-full relative">
-                      <>
-                        <Tooltip
-                          content={
-                            isFullScreen ? "Exit Full Screen" : "Full Screen"
-                          }
-                        >
-                          <Button
-                            className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
-                            onClick={toggleFullScreen}
-                          >
-                            {isFullScreen ? <Minimize2 /> : <Maximize2 />}
-                          </Button>
-                        </Tooltip>
-                        <Video
-                          stream={videoStreamTrack}
-                          name={metadata?.displayName ?? "guest"}
-                        />
-                      </>
-                    </GridContainer>
-                  </div>
-                )}
-                {peerIds.map((peerId) => (
-                  <RemoteScreenShare
-                    key={peerId}
-                    peerId={peerId}
-                    isRemoteFullScreen={isRemoteFullScreen}
-                    setIsRemoteFullScreen={setIsRemoteFullScreen}
-                    onVideoTrackUpdate={handleVideoTrackUpdate}
-                  />
-                ))}
-                <section
-                  className={`${
-                    !isScreenShared
-                      ? "grid"
-                      : `${
-                          isRemoteFullScreen && isScreenShared
-                            ? "hidden"
-                            : `${
-                                isFullScreen && isScreenShared
-                                  ? "hidden"
-                                  : "grid"
-                              }`
-                        }`
-                  } py-4 lg:py-0 lg:px-4 gap-2 w-full h-full m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 ${
-                    isScreenShared
-                      ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
-                      : peerIds.length === 0
-                      ? "grid-cols-1"
-                      : peerIds.length === 1
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
-                      : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
-                  }
-                   `}
-                >
-                  {role !== Role.BOT && (
-                    <>
+                <SwiperSlide>
+                  <main
+                    className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
+                  >
+                    {((shareStream && isFullScreen) ||
+                      (shareStream && isSmallScreen)) && (
                       <div
-                        className={`relative 
-                        ${
-                          isAudioOn
-                            ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-                            : "bg-[#202020] bg-opacity-80"
-                        }
-                      rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
+                        ref={draggableRef}
+                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
+                        style={{
+                          transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
+                        }}
                       >
-                        <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
-                          <div className="absolute left-4 top-4 text-3xl z-10">
-                            {reaction}
+                        {metadata?.avatarUrl && (
+                          <div className=" rounded-full w-20 h-20">
+                            <Image
+                              alt="image"
+                              src={metadata?.avatarUrl}
+                              className="maskAvatar object-cover object-center"
+                              width={100}
+                              height={100}
+                            />
                           </div>
-                          {metadata?.isHandRaised && (
-                            <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
-                              ✋
-                            </span>
-                          )}
-                          {stream && (
-                            <span className="absolute top-0 bottom-0 right-0 left-0">
-                              <Camera
-                                stream={stream}
+                        )}
+                        <span className="absolute bottom-2 left-2 text-white">
+                          You
+                        </span>
+                      </div>
+                    )}
+                    <div
+                      className={`relative flex flex-col lg:flex-row w-full h-full ${
+                        isRemoteFullScreen && isScreenShared && isFullScreen
+                          ? "bg-[#202020] rounded-lg justify-center"
+                          : ""
+                      } `}
+                    >
+                      {shareStream && (
+                        <div className={`w-full `}>
+                          <GridContainer className="w-full h-full relative">
+                            <>
+                              <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg ">
+                                <span className="text-sm flex items-center">
+                                  <Tooltip
+                                    content={tooltipContent}
+                                    placement="bottom"
+                                    closeDelay={1}
+                                    showArrow
+                                  >
+                                    <div
+                                      className="pl-2 pt-[2px] cursor-pointer hover:text-blue-500 hover:underline"
+                                      onClick={() =>
+                                        handleAddrCopy(
+                                          `${metadata?.walletAddress}`
+                                        )
+                                      }
+                                    >
+                                      {name}
+                                    </div>
+                                  </Tooltip>{" "}
+                                  &nbsp; is presenting
+                                </span>
+                              </div>
+                              {!isSmallScreen && (
+                                <Tooltip
+                                  content={
+                                    isFullScreen
+                                      ? "Exit Full Screen"
+                                      : "Full Screen"
+                                  }
+                                >
+                                  <Button
+                                    className="absolute bottom-4 right-4 z-10 bg-[#0a0a0a] hover:bg-[#131212] rounded-full"
+                                    onClick={toggleFullScreen}
+                                  >
+                                    {isFullScreen ? (
+                                      <Minimize2 />
+                                    ) : (
+                                      <Maximize2 />
+                                    )}
+                                  </Button>
+                                </Tooltip>
+                              )}
+                              <Video
+                                stream={videoStreamTrack}
                                 name={metadata?.displayName ?? "guest"}
                               />
-                            </span>
-                          )}
-
-                          {!stream && (
-                            <div className="flex w-24 h-24 rounded-full">
-                              {metadata?.avatarUrl && (
-                                <div className=" rounded-full w-24 h-24">
-                                  <Image
-                                    alt="image"
-                                    src={metadata?.avatarUrl}
-                                    className="maskAvatar object-cover object-center"
-                                    width={100}
-                                    height={100}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          <span className="absolute bottom-4 left-4 text-white font-medium">
-                            {`${metadata?.displayName} (You)`}
-                          </span>
-                          <span className="absolute bottom-4 right-4">
-                            {isAudioOn
-                              ? NestedPeerListIcons.active.mic
-                              : NestedPeerListIcons.inactive.mic}
-                          </span>
+                            </>
+                          </GridContainer>
                         </div>
-                      </div>
-                    </>
-                  )}
-
-                  {isScreenShared ? (
-                    <>
-                      {peerIds.length > 2 ? (
-                        <>
-                          {peerIds.slice(0, 1).map((peerId) => (
-                            <RemotePeer
-                              key={peerId}
-                              peerId={peerId}
-                              className={clsx("sm:hidden")}
-                            />
-                          ))}
-                          <ParticipantTile className={clsx("sm:hidden")} />
-                        </>
-                      ) : (
-                        peerIds.map((peerId) => (
-                          <RemotePeer
-                            key={peerId}
-                            peerId={peerId}
-                            className={clsx("sm:hidden")}
-                          />
-                        ))
                       )}
-                      {peerIds.length > 3 ? (
-                        <>
-                          {peerIds.slice(0, 2).map((peerId) => (
-                            <RemotePeer
-                              key={peerId}
-                              peerId={peerId}
-                              className={clsx("hidden sm:flex md:hidden")}
-                            />
-                          ))}
-
-                          <ParticipantTile
-                            className={clsx("hidden sm:flex md:hidden")}
-                          />
-                        </>
-                      ) : (
-                        peerIds.map((peerId) => (
-                          <RemotePeer
-                            key={peerId}
-                            peerId={peerId}
-                            className={clsx("hidden sm:flex md:hidden")}
-                          />
-                        ))
-                      )}
-                      {peerIds.length > 2 ? (
-                        <>
-                          {peerIds.slice(0, 1).map((peerId) => (
-                            <RemotePeer
-                              key={peerId}
-                              peerId={peerId}
-                              className={clsx("hidden md:flex lg:hidden")}
-                            />
-                          ))}
-                          <ParticipantTile
-                            className={clsx("hidden md:flex lg:hidden")}
-                          />
-                        </>
-                      ) : (
-                        peerIds.map((peerId) => (
-                          <RemotePeer
-                            key={peerId}
-                            peerId={peerId}
-                            className={clsx("hidden md:flex lg:hidden")}
-                          />
-                        ))
-                      )}
-                      {peerIds.length > 3 ? (
-                        <>
-                          {peerIds.slice(0, 2).map((peerId) => (
-                            <RemotePeer
-                              key={peerId}
-                              peerId={peerId}
-                              className={clsx("hidden lg:flex ")}
-                            />
-                          ))}
-                          <ParticipantTile
-                            className={clsx("hidden lg:flex ")}
-                          />
-                        </>
-                      ) : (
-                        peerIds.map((peerId) => (
-                          <RemotePeer
-                            key={peerId}
-                            peerId={peerId}
-                            className={clsx("hidden lg:flex ")}
-                          />
-                        ))
-                      )}
-                    </>
-                  ) : peerIds.length > 3 ? (
-                    <>
-                      {peerIds.slice(0, 2).map((peerId) => (
-                        <RemotePeer key={peerId} peerId={peerId} />
+                      {peerIds.map((peerId) => (
+                        <RemoteScreenShare
+                          key={peerId}
+                          peerId={peerId}
+                          isRemoteFullScreen={isRemoteFullScreen}
+                          setIsRemoteFullScreen={setIsRemoteFullScreen}
+                          onVideoTrackUpdate={handleVideoTrackUpdate}
+                        />
                       ))}
 
-                      <GridContainer
-                        className={clsx(
-                          "bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] border-none"
-                        )}
+                      <section
+                        ref={firstSlideRef}
+                        className={`${
+                          !isScreenShared
+                            ? "grid "
+                            : `${
+                                isRemoteFullScreen && isScreenShared
+                                  ? "hidden"
+                                  : `${
+                                      isFullScreen && isScreenShared
+                                        ? "hidden"
+                                        : "hidden lg:grid"
+                                    }`
+                              }`
+                        } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${
+                          isScreenShared
+                            ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
+                            : peerIds.length === 0
+                            ? "grid-cols-1"
+                            : peerIds.length === 1
+                            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
+                            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
+                        }
+                      `}
                       >
-                        <div className="flex items-center justify-center w-24 h-24 rounded-full bg-[#232631] text-[#717682] text-3xl font-semibold ">
-                          +{peerIds.length - 2}
-                        </div>
-                      </GridContainer>
+                        {role !== Role.BOT && (
+                          <>
+                            <div
+                              className={`relative 
+                            ${
+                              isAudioOn
+                                ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                                : "bg-[#202020] bg-opacity-80"
+                            }
+                          rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
+                            >
+                              <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
+                                <div className="absolute left-4 top-4 text-3xl z-10">
+                                  {reaction}
+                                </div>
+                                {metadata?.isHandRaised && (
+                                  <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
+                                    ✋
+                                  </span>
+                                )}
+                                {stream && (
+                                  <span className="absolute top-0 bottom-0 right-0 left-0">
+                                    <Camera
+                                      stream={stream}
+                                      name={metadata?.displayName ?? "guest"}
+                                    />
+                                  </span>
+                                )}
+
+                                {!stream && (
+                                  <div className="flex w-24 h-24 rounded-full">
+                                    {metadata?.avatarUrl && (
+                                      <div className=" rounded-full w-24 h-24">
+                                        <Image
+                                          alt="image"
+                                          src={metadata?.avatarUrl}
+                                          className="maskAvatar object-cover object-center"
+                                          width={100}
+                                          height={100}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                <span className="absolute bottom-4 left-4 text-white font-medium">
+                                  <div className="flex">
+                                    {`${metadata?.displayName} (You)`}
+                                    <Tooltip
+                                      content={tooltipContent}
+                                      placement="right"
+                                      closeDelay={1}
+                                      showArrow
+                                    >
+                                      <div
+                                        className={`pl-2 pt-[2px] cursor-pointer  ${
+                                          animatingButtons[
+                                            metadata?.walletAddress || ""
+                                          ]
+                                            ? "text-blue-500"
+                                            : "text-[#3E3D3D]"
+                                        }`}
+                                      >
+                                        <IoCopy
+                                          onClick={() =>
+                                            handleAddrCopy(
+                                              `${metadata?.walletAddress}`
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                    </Tooltip>
+                                  </div>
+                                </span>
+                                <span className="absolute bottom-4 right-4">
+                                  {isAudioOn
+                                    ? NestedPeerListIcons.active.mic
+                                    : NestedPeerListIcons.inactive.mic}
+                                </span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {isScreenShared ? (
+                          <>
+                            {peerIds.length > 2 ? (
+                              <>
+                                {peerIds.slice(0, 2).map((peerId) => (
+                                  <RemotePeer
+                                    key={peerId}
+                                    peerId={peerId}
+                                    className={clsx("sm:hidden")}
+                                  />
+                                ))}
+                              </>
+                            ) : (
+                              peerIds.map((peerId) => (
+                                <RemotePeer
+                                  key={peerId}
+                                  peerId={peerId}
+                                  className={clsx("sm:hidden")}
+                                />
+                              ))
+                            )}
+                            {peerIds.length > 3 ? (
+                              <>
+                                {peerIds.slice(0, 3).map((peerId) => (
+                                  <RemotePeer
+                                    key={peerId}
+                                    peerId={peerId}
+                                    className={clsx("hidden sm:flex md:hidden")}
+                                  />
+                                ))}
+                              </>
+                            ) : (
+                              peerIds.map((peerId) => (
+                                <RemotePeer
+                                  key={peerId}
+                                  peerId={peerId}
+                                  className={clsx("hidden sm:flex md:hidden")}
+                                />
+                              ))
+                            )}
+                            {peerIds.length > 2 ? (
+                              <>
+                                {peerIds.slice(0, 2).map((peerId) => (
+                                  <RemotePeer
+                                    key={peerId}
+                                    peerId={peerId}
+                                    className={clsx("hidden md:flex lg:hidden")}
+                                  />
+                                ))}
+                              </>
+                            ) : (
+                              peerIds.map((peerId) => (
+                                <RemotePeer
+                                  key={peerId}
+                                  peerId={peerId}
+                                  className={clsx("hidden md:flex lg:hidden")}
+                                />
+                              ))
+                            )}
+                            {peerIds.length > 3 ? (
+                              <>
+                                {peerIds.slice(0, 3).map((peerId) => (
+                                  <RemotePeer
+                                    key={peerId}
+                                    peerId={peerId}
+                                    className={clsx("hidden lg:flex ")}
+                                  />
+                                ))}
+                              </>
+                            ) : (
+                              peerIds.map((peerId) => (
+                                <RemotePeer
+                                  key={peerId}
+                                  peerId={peerId}
+                                  className={clsx("hidden lg:flex ")}
+                                />
+                              ))
+                            )}
+                          </>
+                        ) : peerIds.length > 3 ? (
+                          <>
+                            {peerIds.slice(0, 3).map((peerId) => (
+                              <RemotePeer key={peerId} peerId={peerId} />
+                            ))}
+                          </>
+                        ) : (
+                          peerIds.map((peerId) => (
+                            <RemotePeer key={peerId} peerId={peerId} />
+                          ))
+                        )}
+                      </section>
+                    </div>
+                  </main>
+                </SwiperSlide>
+
+                {isScreenShared && isSmallScreen && (
+                  <>
+                    {Array.from({
+                      length: Math.ceil((peerIds.length - 3) / 4) + 1,
+                    }).map((_, i) => (
+                      <SwiperSlide key={i}>
+                        <main
+                          className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
+                        >
+                          <div
+                            className={`relative flex flex-col lg:flex-row w-full h-full`}
+                          >
+                            <section
+                              className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2 `}
+                            >
+                              {i === 0 && role !== Role.BOT && (
+                                <>
+                                  <div
+                                    className={`relative 
+                            ${
+                              isAudioOn
+                                ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                                : "bg-[#202020] bg-opacity-80"
+                            }
+                          rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
+                                  >
+                                    <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
+                                      <div className="absolute left-4 top-4 text-3xl z-10">
+                                        {reaction}
+                                      </div>
+                                      {metadata?.isHandRaised && (
+                                        <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
+                                          ✋
+                                        </span>
+                                      )}
+                                      {stream && (
+                                        <span className="absolute top-0 bottom-0 right-0 left-0">
+                                          <Camera
+                                            stream={stream}
+                                            name={
+                                              metadata?.displayName ?? "guest"
+                                            }
+                                          />
+                                        </span>
+                                      )}
+
+                                      {!stream && (
+                                        <div className="flex w-24 h-24 rounded-full">
+                                          {metadata?.avatarUrl && (
+                                            <div className=" rounded-full w-24 h-24">
+                                              <Image
+                                                alt="image"
+                                                src={metadata?.avatarUrl}
+                                                className="maskAvatar object-cover object-center"
+                                                width={100}
+                                                height={100}
+                                              />
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                      <span className="absolute bottom-4 left-4 text-white font-medium">
+                                        <div className="flex">
+                                          {`${metadata?.displayName} (You)`}
+                                          <Tooltip
+                                            content={tooltipContent}
+                                            placement="right"
+                                            closeDelay={1}
+                                            showArrow
+                                          >
+                                            <div
+                                              className={`pl-2 pt-[2px] cursor-pointer  ${
+                                                animatingButtons[
+                                                  metadata?.walletAddress || ""
+                                                ]
+                                                  ? "text-blue-500"
+                                                  : "text-[#3E3D3D]"
+                                              }`}
+                                            >
+                                              <IoCopy
+                                                onClick={() =>
+                                                  handleAddrCopy(
+                                                    `${metadata?.walletAddress}`
+                                                  )
+                                                }
+                                              />
+                                            </div>
+                                          </Tooltip>
+                                        </div>
+                                      </span>
+                                      <span className="absolute bottom-4 right-4">
+                                        {isAudioOn
+                                          ? NestedPeerListIcons.active.mic
+                                          : NestedPeerListIcons.inactive.mic}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                              {i === 0
+                                ? peerIds
+                                    .slice(0, 3)
+                                    .map((peerId) => (
+                                      <RemotePeer
+                                        key={peerId}
+                                        peerId={peerId}
+                                      />
+                                    ))
+                                : peerIds
+                                    .slice(3 + (i - 1) * 4, 3 + (i - 1) * 4 + 4)
+                                    .map((peerId) => (
+                                      <RemotePeer
+                                        key={peerId}
+                                        peerId={peerId}
+                                      />
+                                    ))}
+                            </section>
+                          </div>
+                        </main>
+                      </SwiperSlide>
+                    ))}
+                  </>
+                )}
+                {!(isFullScreen || isRemoteFullScreen) &&
+                  peerIds.length > 2 &&
+                  ((isSmallScreen && !isScreenShared) || !isSmallScreen) && (
+                    <>
+                      {Array.from({
+                        length: Math.ceil((peerIds.length - 2) / 4),
+                      }).map((_, i) => {
+                        // Calculate the peers for this slide
+                        const slidePeers = peerIds.slice(
+                          3 + i * 4,
+                          3 + i * 4 + 4
+                        );
+
+                        // Only render the slide if there are peers to show
+                        return slidePeers.length > 0 ? (
+                          <SwiperSlide key={i}>
+                            <main
+                              className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
+                            >
+                              <div
+                                className={`relative flex flex-col lg:flex-row w-full h-full`}
+                              >
+                                <section
+                                  className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2`}
+                                >
+                                  {slidePeers.map((peerId) => (
+                                    <RemotePeer key={peerId} peerId={peerId} />
+                                  ))}
+                                </section>
+                              </div>
+                            </main>
+                          </SwiperSlide>
+                        ) : null;
+                      })}
                     </>
-                  ) : (
-                    peerIds.map((peerId) => (
-                      <RemotePeer key={peerId} peerId={peerId} />
-                    ))
                   )}
-                </section>
-              </div>
+              </Swiper>
               {isChatOpen && <ChatBar />}
-              {isParticipantsOpen && <ParticipantsBar />}
-            </main>
+              {isParticipantsOpen && (
+                <ParticipantsBar meetingCategory={meetingCategory} />
+              )}
+            </div>
+
             <BottomBar
               daoName={daoName}
               hostAddress={hostAddress}
