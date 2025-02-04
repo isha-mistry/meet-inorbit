@@ -35,6 +35,7 @@
     "ethers": "^6.12.1",
     "framer-motion": "^11.2.10",
     "interactjs": "^1.10.27",
+    "ioredis": "^5.4.2",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.383.0",
     "luxon": "^3.4.4",
