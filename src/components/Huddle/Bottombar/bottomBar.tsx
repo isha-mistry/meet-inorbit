@@ -354,11 +354,11 @@ const BottomBar = ({
   return (
     <>
       <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-[#0a0a0a] lg:bg-transparent z-10">
-        <div className="">
+        <div className="lg:flex-1">
           <QuickLinks daoName={daoName} />
         </div>
 
-        <div className={clsx("flex space-x-2 sm:space-x-3")}>
+        <div className={clsx("lg:flex-1 flex justify-center space-x-2 sm:space-x-3")}>
           {role !== "listener" && (
             <>
               <ButtonWithIcon
@@ -545,7 +545,7 @@ const BottomBar = ({
           </ButtonWithIcon>
         </div>
 
-        <div className="hidden lg:flex space-x-3">
+        <div className="hidden lg:flex lg:flex-1 justify-end space-x-3">
           {role === "host" && (
             <Button
               className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
@@ -570,7 +570,7 @@ const BottomBar = ({
 
           {role === "listener" && (
             <OutlineButton
-              className="mr-auto flex items-center justify-between gap-3"
+              className="flex items-center justify-between gap-3"
               onClick={() => setPromptView("request-to-speak")}
             >
               {BasicIcons.requestToSpeak}
