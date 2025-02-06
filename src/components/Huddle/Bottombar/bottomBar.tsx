@@ -210,8 +210,32 @@ const BottomBar = ({
     };
   }, [role]);
 
+  const [endCallDisabled, setEndCallDisabled] = useState(false);
+  const [dropdownDisabled, setDropdownDisabled] = useState(false);
+  useEffect(() => {
+    if (endCallDisabled) {
+      const timer = setTimeout(() => {
+        setEndCallDisabled(false);
+      }, 600000); // 10 minutes in milliseconds
+      return () => clearTimeout(timer);
+    }
+  }, [endCallDisabled]);
+
+  useEffect(() => {
+    if (dropdownDisabled) {
+      const timer = setTimeout(() => {
+        setDropdownDisabled(false);
+      }, 300000); // 5 minutes in milliseconds
+      return () => clearTimeout(timer);
+    }
+  }, [dropdownDisabled]);
+
+
   const handleEndCall = async (endMeet: string) => {
+
+    setEndCallDisabled(true);
     setIsLoading(true);
+    setDropdownDisabled(true); 
 
     if (role === "host" && meetingRecordingStatus === true) {
       await handleStopRecording(
@@ -310,7 +334,7 @@ const BottomBar = ({
           console.log("Error: ", e);
         }
       }
-      closeRoom();
+      await closeRoom();
       setIsLoading(false);
       setShowLeaveDropDown(false);
     } else {
@@ -341,6 +365,7 @@ const BottomBar = ({
         // }
       } catch (e) {
         console.log("error: ", e);
+        setEndCallDisabled(false);
       }
     }
   };
@@ -502,10 +527,11 @@ const BottomBar = ({
           />
 
           <div className="flex cursor-pointer items-center">
-            <Dropdown
+          <Dropdown
               triggerChild={BasicIcons.leave}
               open={showLeaveDropDown}
-              onOpenChange={() => setShowLeaveDropDown((prev) => !prev)}
+              onOpenChange={() => !dropdownDisabled && setShowLeaveDropDown((prev) => !prev)}
+              disabled={dropdownDisabled}
             >
               {role === "host" && (
                 <Strip
@@ -513,6 +539,8 @@ const BottomBar = ({
                   title={isLoading ? "Leaving..." : "End spaces for all"}
                   variant="danger"
                   onClick={() => handleEndCall("close")}
+                  disabled={endCallDisabled}
+                  className={isLoading ? "cursor-not-allowed" : ""}
                 />
               )}
               {role !== "host" && (
@@ -521,6 +549,8 @@ const BottomBar = ({
                   title={isLoading ? "Leaving..." : "Leave the spaces"}
                   variant="danger"
                   onClick={() => handleEndCall("leave")}
+                  disabled={endCallDisabled}
+                  className={isLoading ? "cursor-not-allowed" : ""}
                 />
               )}
             </Dropdown>
