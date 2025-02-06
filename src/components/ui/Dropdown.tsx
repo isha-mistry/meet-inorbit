@@ -9,6 +9,7 @@ type DropdownProps = {
   onOpenChange?(open: boolean): void;
   triggerChild: JSX.Element;
   children: React.ReactNode;
+  disabled?: boolean; 
 };
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -17,10 +18,11 @@ const Dropdown: React.FC<DropdownProps> = ({
   onOpenChange,
   open,
   align,
+  disabled=false, 
 }) => {
   return (
     <DropdownMenu.Root open={open} onOpenChange={onOpenChange}>
-      <DropdownMenu.Trigger asChild>
+      <DropdownMenu.Trigger asChild disabled={disabled}>
         <span>{triggerChild}</span>
       </DropdownMenu.Trigger>
 
