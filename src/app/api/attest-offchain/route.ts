@@ -19,6 +19,7 @@ import {
   SOCKET_BASE_URL,
 } from "@/config/constants";
 import { io } from "socket.io-client";
+import { cacheWrapper } from "@/utils/cacheWrapper";
 
 interface AttestOffchainRequestBody {
   recipient: string;
@@ -150,6 +151,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
+        if(cacheWrapper.isAvailable){
+          const cacheKey = `profile:${requestData.recipient}`;
+          await cacheWrapper.delete(cacheKey);
+        }
+
         client.close();
       } else if (requestData.meetingType === 2) {
         const client = await connectDB();
@@ -180,6 +186,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
+        if(cacheWrapper.isAvailable){
+          const cacheKey = `profile:${requestData.recipient}`;
+          await cacheWrapper.delete(cacheKey);
+        }
+
         client.close();
       } else if (requestData.meetingType === 3) {
         const client = await connectDB();
@@ -205,6 +216,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
             },
           }
         );
+        if(cacheWrapper.isAvailable){
+          const cacheKey = `profile:${requestData.recipient}`;
+          await cacheWrapper.delete(cacheKey);
+        }
 
         client.close();
       } else if (requestData.meetingType === 4) {
@@ -234,6 +249,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
             },
           }
         );
+
+        if(cacheWrapper.isAvailable){
+          const cacheKey = `profile:${requestData.recipient}`;
+          await cacheWrapper.delete(cacheKey);
+        }
 
         client.close();
       }
