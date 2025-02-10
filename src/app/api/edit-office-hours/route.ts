@@ -1,5 +1,6 @@
 import { connectDB } from "@/config/connectDB";
 import { SOCKET_BASE_URL } from "@/config/constants";
+import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 import { Attendee, OfficeHoursProps } from "@/types/OfficeHoursTypes";
 import { cacheWrapper } from "@/utils/cacheWrapper";
 import {
@@ -29,11 +30,16 @@ async function sendMeetingStartNotification({
     const usersCollection = db.collection("delegates");
     const notificationCollection = db.collection("notifications");
 
-    // Get all user addresses from the database
-    const allUsers = await usersCollection.find({}, { address: 1 }).toArray();
-    // const allUsers = [
-    //   { address: "0x92DDc00c2C2BC130d62026cB5e8171cC4337b08e" },
-    // ];
+    const allUsers = await usersCollection
+      .find(
+        {
+          address: {
+            $ne: host_address.toLowerCase(),
+          },
+        },
+        { address: 1 }
+      )
+      .toArray();
 
     // Format the time
     const localSlotTime = await formatSlotDateAndTime({
@@ -43,14 +49,14 @@ async function sendMeetingStartNotification({
 
     // Create base notification object
     const baseNotification = {
-      content: `Office hours titled "${title}" on ${dao_name} with ${hostENSNameOrAddress} has started. The office hours is scheduled for ${localSlotTime} UTC.`,
+      content: `Office hours "${title}" for ${dao_name}, hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
       createdAt: Date.now(),
       read_status: false,
       notification_name: "officeHoursStarted",
       notification_title: "Office Hours Started",
       notification_type: "officeHours",
       additionalData: {
-        additionalData,
+        ...additionalData,
         host_address,
         dao_name,
       },
@@ -66,6 +72,8 @@ async function sendMeetingStartNotification({
     const notificationResults = await notificationCollection.insertMany(
       notifications
     );
+
+    console.log("Inserted notifications:", notificationResults);
 
     if (notificationResults.acknowledged === true) {
       // Get all inserted notifications
@@ -101,6 +109,25 @@ async function sendMeetingStartNotification({
       socket.on("error", (err) => {
         console.error("WebSocket error:", err);
       });
+
+      for (const document of allUsers) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Office Hours Have Started",
+              body: compileBookedSessionTemplate(
+                "Office Hours Have Started - Join Now",
+                baseNotification.content
+              ),
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        }
+      }
     }
 
     return notificationResults;

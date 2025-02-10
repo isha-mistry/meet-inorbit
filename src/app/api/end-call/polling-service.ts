@@ -27,7 +27,7 @@ export async function pollMeetingTimes(
 
       // Fetch meeting data
       const response = await fetch(
-        `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
+        `https://api.huddle01.com/api/v2/sdk/rooms/session-details?roomId=${roomId}`,
         requestOptionsForMeeting
       );
 
