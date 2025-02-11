@@ -44,6 +44,14 @@ export const bookedSessionTemplate = `
 		}
 
 		@media (max-width:785px) {
+			body {
+				padding: 12px !important;
+			}
+			
+			.nl-container {
+				background-color: transparent !important;
+			}
+
 			.desktop_hide table.icons-outer {
 				display: inline-table !important;
 			}
@@ -166,7 +174,10 @@ export const bookedSessionTemplate = `
 															<td class="pad">
 																<div style="font-family: Tahoma, Verdana, sans-serif">
 																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2;">
-																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>Exciting update!,{{title}}</strong></p>
+																		<p style="margin: 0; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>🎉Exciting update! 🎉</strong></p>
+																	</div>
+																	<div class style="font-size: 12px; font-family: Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2;">
+																		<p style="margin-top: 10px; font-size: 16px; text-align: center; mso-line-height-alt: 19.2px;"><strong>{{title}}</strong></p>
 																	</div>
 																</div>
 															</td>
@@ -197,6 +208,19 @@ export const bookedSessionTemplate = `
 															</td>
 														</tr>
 													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="column column-1" width="100%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 20px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
+														<table class="paragraph_block block-1" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+																<tr>
+																		<td class="pad" style="padding-bottom:5px;padding-left:60px;padding-right:60px;padding-top:5px; text-align: center;">
+																				<a href="{{url}}" style="background-color:#1a30eb; color: #ffffff; font-family: Tahoma, Verdana, Segoe, sans-serif; font-size: 16px; font-weight: bold; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block; text-align: center; mso-padding-alt: 0;">
+																						<span style="mso-text-raise: 6pt;">Join Now</span>
+																				</a>
+																		</td>
+																</tr>
+														</table>
 												</td>
 											</tr>
 										</tbody>

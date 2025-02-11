@@ -1,5 +1,5 @@
 import { connectDB } from "@/config/connectDB";
-import { SOCKET_BASE_URL } from "@/config/constants";
+import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
 import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 import { Attendee, OfficeHoursProps } from "@/types/OfficeHoursTypes";
 import { cacheWrapper } from "@/utils/cacheWrapper";
@@ -30,15 +30,15 @@ async function sendMeetingStartNotification({
     const usersCollection = db.collection("delegates");
     const notificationCollection = db.collection("notifications");
 
+    const normalizedHostAddress = host_address.toLowerCase();
+
+    // Get all users except the host using MongoDB query
     const allUsers = await usersCollection
-      .find(
-        {
-          address: {
-            $ne: host_address.toLowerCase(),
-          },
+      .find({
+        $expr: {
+          $ne: [{ $toLower: "$address" }, normalizedHostAddress],
         },
-        { address: 1 }
-      )
+      })
       .toArray();
 
     // Format the time
@@ -120,7 +120,8 @@ async function sendMeetingStartNotification({
               subject: "Office Hours Have Started",
               body: compileBookedSessionTemplate(
                 "Office Hours Have Started - Join Now",
-                baseNotification.content
+                baseNotification.content,
+                `${BASE_URL}/meeting/officehours/${additionalData.meetingId}/lobby`,
               ),
             });
           } catch (error) {

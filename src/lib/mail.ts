@@ -65,11 +65,12 @@ export async function sendMail({
   }
 }
 
-export function compileBookedSessionTemplate(title: string, content: string) {
+export function compileBookedSessionTemplate(title: string, content: string, url: string) {
   const template = handlebars.compile(bookedSessionTemplate);
   const htmlBody = template({
     title: title,
     content: content,
+    url: url,
   });
   return htmlBody;
 }
