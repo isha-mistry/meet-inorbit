@@ -316,6 +316,8 @@ const BottomBar = ({
               (await updateOfficeHoursData(walletAddress, token, requestBody));
           }
 
+          console.log("role: ", role);
+
           if (role === "host") {
             setTimeout(async () => {
               await handleCloseMeeting(

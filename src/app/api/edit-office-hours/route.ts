@@ -1,7 +1,142 @@
 import { connectDB } from "@/config/connectDB";
+import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
+import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 import { Attendee, OfficeHoursProps } from "@/types/OfficeHoursTypes";
 import { cacheWrapper } from "@/utils/cacheWrapper";
+import {
+  formatSlotDateAndTime,
+  getDisplayNameOrAddr,
+} from "@/utils/NotificationUtils";
 import { NextResponse } from "next/server";
+import { io } from "socket.io-client";
+
+async function sendMeetingStartNotification({
+  db,
+  title,
+  dao_name,
+  startTime,
+  host_address,
+  additionalData,
+}: {
+  db: any;
+  title: string;
+  dao_name: string;
+  startTime: string;
+  host_address: string;
+  additionalData: any;
+}) {
+  try {
+    // Get users collection
+    const usersCollection = db.collection("delegates");
+    const notificationCollection = db.collection("notifications");
+
+    const normalizedHostAddress = host_address.toLowerCase();
+
+    // Get all users except the host using MongoDB query
+    const allUsers = await usersCollection
+      .find({
+        $expr: {
+          $ne: [{ $toLower: "$address" }, normalizedHostAddress],
+        },
+      })
+      .toArray();
+
+    // Format the time
+    const localSlotTime = await formatSlotDateAndTime({
+      dateInput: startTime,
+    });
+    const hostENSNameOrAddress = await getDisplayNameOrAddr(host_address);
+
+    // Create base notification object
+    const baseNotification = {
+      content: `Office hours "${title}" for ${dao_name}, hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
+      createdAt: Date.now(),
+      read_status: false,
+      notification_name: "officeHoursStarted",
+      notification_title: "Office Hours Started",
+      notification_type: "officeHours",
+      additionalData: {
+        ...additionalData,
+        host_address,
+        dao_name,
+      },
+    };
+
+    // Create notifications for all users
+    const notifications = allUsers.map((user: any) => ({
+      ...baseNotification,
+      receiver_address: user.address,
+    }));
+
+    // Insert all notifications at once
+    const notificationResults = await notificationCollection.insertMany(
+      notifications
+    );
+
+    console.log("Inserted notifications:", notificationResults);
+
+    if (notificationResults.acknowledged === true) {
+      // Get all inserted notifications
+      const insertedNotifications = await notificationCollection
+        .find({
+          _id: { $in: Object.values(notificationResults.insertedIds) },
+        })
+        .toArray();
+
+      // Connect to socket server and send notifications
+      const socket = io(`${SOCKET_BASE_URL}`, {
+        withCredentials: true,
+      });
+
+      socket.on("connect", () => {
+        console.log("Connected to WebSocket server from API");
+
+        socket.emit("officehours_started", {
+          notifications: insertedNotifications.map((notification: any) => ({
+            ...notification,
+            _id: notification._id.toString(),
+          })),
+        });
+
+        console.log("Bulk notifications sent from API to socket server");
+        socket.disconnect();
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("WebSocket connection error:", err);
+      });
+
+      socket.on("error", (err) => {
+        console.error("WebSocket error:", err);
+      });
+
+      for (const document of allUsers) {
+        const emailId = document.emailId;
+        if (emailId && emailId !== "" && emailId !== undefined) {
+          try {
+            await sendMail({
+              to: emailId,
+              name: "Chora Club",
+              subject: "Office Hours Have Started",
+              body: compileBookedSessionTemplate(
+                "Office Hours Have Started - Join Now",
+                baseNotification.content,
+                `${BASE_URL}/meeting/officehours/${additionalData.meetingId}/lobby`,
+              ),
+            });
+          } catch (error) {
+            console.error("Error sending mail:", error);
+          }
+        }
+      }
+    }
+
+    return notificationResults;
+  } catch (error) {
+    console.error("Error sending meeting start notifications:", error);
+    throw error;
+  }
+}
 
 export async function PUT(req: Request) {
   try {
@@ -110,11 +245,10 @@ export async function PUT(req: Request) {
         }
       );
 
-      if(cacheWrapper.isAvailable){
+      if (cacheWrapper.isAvailable) {
         const cacheKey = `profile:${host_address}`;
         await cacheWrapper.delete(cacheKey);
       }
-
     }
 
     // Handle meeting status update and counts
@@ -123,6 +257,22 @@ export async function PUT(req: Request) {
       updateFields.meeting_status !== existingMeeting.meeting_status
     ) {
       addFieldIfChanged("meeting_status", updateFields.meeting_status);
+
+      if (updateFields.meeting_status === "Ongoing") {
+        try {
+          await sendMeetingStartNotification({
+            db,
+            title: existingMeeting.title,
+            dao_name,
+            startTime: existingMeeting.startTime,
+            host_address,
+            additionalData: existingMeeting,
+          });
+        } catch (error) {
+          console.error("Error sending start notifications:", error);
+          // Continue with the update even if notification fails
+        }
+      }
 
       const isCompletedStatus = ["Recorded", "Finished"].includes(
         updateFields.meeting_status
@@ -144,11 +294,10 @@ export async function PUT(req: Request) {
           { upsert: true }
         );
 
-        if(cacheWrapper.isAvailable){
+        if (cacheWrapper.isAvailable) {
           const cacheKey = `profile:${host_address}`;
           await cacheWrapper.delete(cacheKey);
         }
-  
 
         // Update attendees' counts
         if (existingMeeting.attendees && existingMeeting.attendees.length > 0) {
@@ -167,11 +316,13 @@ export async function PUT(req: Request) {
 
           if (cacheWrapper.isAvailable) {
             const cacheKeys = existingMeeting.attendees.map(
-              (attendee:Attendee) => `profile:${attendee.attendee_address}`
+              (attendee: Attendee) => `profile:${attendee.attendee_address}`
             );
-            
-            await Promise.all(cacheKeys.map((key:string) => cacheWrapper.delete(key)));
-          } 
+
+            await Promise.all(
+              cacheKeys.map((key: string) => cacheWrapper.delete(key))
+            );
+          }
 
           await Promise.all(updatePromises);
         }

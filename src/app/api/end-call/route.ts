@@ -3,7 +3,7 @@ import { connectDB } from "@/config/connectDB";
 import { pollMeetingTimes } from "./polling-service";
 
 interface Meeting {
-  meetingId: string;
+  sessionId: string;
   startTime: number;
   endTime: number;
 }
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     };
 
     const response = await fetch(
-      `https://api.huddle01.com/api/v1/rooms/meetings?roomId=${roomId}`,
+      `https://api.huddle01.com/api/v2/sdk/rooms/session-details?roomId=${roomId}`,
       requestOptionsForMeeting
     );
 
@@ -92,8 +92,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       throw new Error("Failed to fetch data");
     }
 
-    const meetingsData: { meetings: Meeting[] } = await response.json();
-    const meetings: Meeting[] = meetingsData.meetings;
+    const meetingsData: { sessions: Meeting[] } = await response.json();
+    console.log("Meetings data:", meetingsData);
+    const meetings: Meeting[] = meetingsData.sessions;
 
     const hasValidTimes = meetings.some(
       (meeting) => meeting.startTime && meeting.endTime
@@ -148,8 +149,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const meetingTimePerEOA: MeetingTimePerEOA = {};
 
     for (const meeting of meetings) {
+      console.log(`Fetching participant list for session: ${meeting.sessionId}`);
       const response = await fetch(
-        `https://api.huddle01.com/api/v1/rooms/participant-list?meetingId=${meeting.meetingId}`,
+        `https://api.huddle01.com/api/v2/sdk/rooms/participant-list?sessionId=${meeting.sessionId}`,
         requestOptionsForMeeting
       );
       if (!response.ok) {
