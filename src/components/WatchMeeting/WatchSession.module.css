@@ -184,3 +184,24 @@
 .transition-max-height {
   transition: max-height 0.5s ease-in-out;
 }
+
+
+.customScrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.customScrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.customScrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
