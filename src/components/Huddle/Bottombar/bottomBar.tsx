@@ -230,12 +230,10 @@ const BottomBar = ({
     }
   }, [dropdownDisabled]);
 
-
   const handleEndCall = async (endMeet: string) => {
-
     setEndCallDisabled(true);
     setIsLoading(true);
-    setDropdownDisabled(true); 
+    setDropdownDisabled(true);
 
     if (role === "host" && meetingRecordingStatus === true) {
       await handleStopRecording(
@@ -319,24 +317,22 @@ const BottomBar = ({
           console.log("role: ", role);
 
           if (role === "host") {
-            setTimeout(async () => {
-              await handleCloseMeeting(
-                walletAddress ?? "",
-                token,
-                meetingCategory,
-                roomId,
-                daoName,
-                hostAddress,
-                meetingData,
-                isRecording
-              );
-            }, 4000);
+            await handleCloseMeeting(
+              walletAddress ?? "",
+              token,
+              meetingCategory,
+              roomId,
+              daoName,
+              hostAddress,
+              meetingData,
+              isRecording
+            );
           }
         } catch (e) {
           console.log("Error: ", e);
         }
       }
-      await closeRoom();
+      closeRoom();
       setIsLoading(false);
       setShowLeaveDropDown(false);
     } else {
@@ -385,7 +381,11 @@ const BottomBar = ({
           <QuickLinks daoName={daoName} />
         </div>
 
-        <div className={clsx("lg:flex-1 flex justify-center space-x-2 sm:space-x-3")}>
+        <div
+          className={clsx(
+            "lg:flex-1 flex justify-center space-x-2 sm:space-x-3"
+          )}
+        >
           {role !== "listener" && (
             <>
               <ButtonWithIcon
@@ -529,10 +529,12 @@ const BottomBar = ({
           />
 
           <div className="flex cursor-pointer items-center">
-          <Dropdown
+            <Dropdown
               triggerChild={BasicIcons.leave}
               open={showLeaveDropDown}
-              onOpenChange={() => !dropdownDisabled && setShowLeaveDropDown((prev) => !prev)}
+              onOpenChange={() =>
+                !dropdownDisabled && setShowLeaveDropDown((prev) => !prev)
+              }
               disabled={dropdownDisabled}
             >
               {role === "host" && (
