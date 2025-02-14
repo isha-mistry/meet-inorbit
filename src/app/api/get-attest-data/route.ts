@@ -1,5 +1,6 @@
 import { connectDB } from "@/config/connectDB";
 import { BASE_URL } from "@/config/constants";
+import { daoConfigs } from "@/config/daos";
 import { fetchApi } from "@/utils/api";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -46,13 +47,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 404 }
       );
     }
-
     let token = "";
-    if (data.dao_name === "optimism") {
-      token = "OP";
-    } else if (data.dao_name === "arbitrum") {
-      token = "ARB";
+    
+    if(data){
+      token=daoConfigs[data.dao_name].tokenSymbol;
     }
+
+    // if (data.dao_name === "optimism") {
+    //   token = "OP";
+    // } else if (data.dao_name === "arbitrum") {
+    //   token = "ARB";
+    // }
 
     const attestationPromises: any = [];
     const processedAddresses = new Set<string>();
