@@ -690,6 +690,45 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }, 4000);
   };
 
+  const getPeerWidthClass = () => {
+    if(peerIds.length === 0){
+      return 'translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]';
+    }
+    else if (window.innerWidth < 880 && peerIds.length < 3 ) {
+      return 'min-w-[100%] max-h-[50%]';
+    } else if (window.innerWidth < 1200 && peerIds.length < 4) {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]'; // Modified for smaller screens to avoid pushing off the side
+    } else if (window.innerWidth < 1690 && peerIds.length < 5) {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]'; // Keep relative to the medium screen
+    } else if (window.innerWidth >= 1690 && peerIds.length < 6) {
+      return 'min-w-[350px] lg:max-w-[380px] max-h-[50%]';
+    } else if(peerIds.length === 0){
+      return 'translate-y-1/2';
+    }
+    else {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]'; // Default if none of the conditions match
+    }
+  };
+  const getPeerWidthClassslide = () => {
+    if(peerIds.length === 0){
+      return 'translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]';
+    }
+    else if (window.innerWidth < 880 && peerIds.length >7 ) {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] max-h-[50%]';
+    } else if (window.innerWidth < 1200 && peerIds.length > 8) {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]'; // Modified for smaller screens to avoid pushing off the side
+    } else if (window.innerWidth < 1690 && peerIds.length > 11) {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]'; // Keep relative to the medium screen
+    } else if (window.innerWidth >= 1690 && peerIds.length > 14) {
+      return 'min-w-[350px] lg:max-w-[380px] max-h-[50%]';
+    } else if(peerIds.length === 0){
+      return 'translate-y-1/2';
+    }
+    else {
+      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]'; // Default if none of the conditions match
+    }
+  };
+
   return (
     <>
       {isAllowToEnter ? (
@@ -783,8 +822,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 }}
                 modules={[Pagination]}
               >
-                {isScreenShared && (
-                <SwiperSlide>
+                <SwiperSlide style={{ display: isScreenShared ? 'block' : 'none' }}>
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
@@ -1086,7 +1124,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     </div>
                   </main>
                 </SwiperSlide>
-                )}
 
                 {/* {isScreenShared && isSmallScreen && (
                   <>
@@ -1253,7 +1290,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
                     <div className="relative flex w-full h-full">
-                      <section className="py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center">
+                      <section className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center
+                        `}>
                         {/* Local Peer */}
                         {role !== Role.BOT && (
                           <div
@@ -1263,7 +1301,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                 ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
                                 : "bg-[#202020] bg-opacity-80"
                             }
-                          rounded-lg flex min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[320px] min-h-[150px] max-h-[100%] overflow-hidden`}
+                          rounded-lg flex ${getPeerWidthClass()}   min-h-[150px]  max-h-[100%] overflow-hidden`}
                           >
                             <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
                               <div className="absolute left-4 top-4 text-3xl z-10">
@@ -1339,7 +1377,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         {/* First 15 Remote Peers */}
                         {remotePeerGroups.length > 0 &&
                           remotePeerGroups[0].map((peerId) => (
-                            <RemotePeer key={peerId} peerId={peerId} />
+                            <RemotePeer key={peerId} peerId={peerId} className={`${getPeerWidthClass()}`} />
                           ))}
                       </section>
                     </div>
@@ -1355,7 +1393,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       <div className="relative flex w-full h-full">
                       <section className="py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center">
                           {group.map((peerId) => (
-                            <RemotePeer key={peerId} peerId={peerId} />
+                            <RemotePeer key={peerId} peerId={peerId} className={`${getPeerWidthClassslide()}`} />
                           ))}
                         </section>
                       </div>

@@ -74,7 +74,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   return (
     <div
       className={clsx(
-        `bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[320px] min-h-[150px] max-h-[100%] w-full flex-1 ${
+        `bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-h-[150px] max-h-[100%] w-full flex-1 ${
           isAudioOn
             ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
             : "bg-[#202020] bg-opacity-80"
