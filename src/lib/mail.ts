@@ -25,7 +25,7 @@ export async function sendMail({
   // console.log("body", body);
 
   const transport = nodemailer.createTransport({
-    host: "smtpout.secureserver.net",
+    host: "smtp.gmail.com",
     secure: true,
     secureConnection: false,
     tls: {
