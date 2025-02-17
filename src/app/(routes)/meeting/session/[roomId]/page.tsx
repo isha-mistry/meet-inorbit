@@ -264,7 +264,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     return address.slice(0, maxLength) + "...";
   };
 
-   const [remotePeersPerScreen, setRemotePeersPerScreen] = useState(14);
+  const [remotePeersPerScreen, setRemotePeersPerScreen] = useState(14);
 
   useEffect(() => {
     const handleResize = () => {
@@ -691,43 +691,74 @@ export default function Component({ params }: { params: { roomId: string } }) {
   };
 
   const getPeerWidthClass = () => {
-    if(peerIds.length === 0){
-      return 'translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]';
-    }
-    else if (window.innerWidth < 880 && peerIds.length < 3 ) {
-      return 'min-w-[100%] max-h-[50%]';
+    if (peerIds.length === 0) {
+      return "translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]";
+    } else if (window.innerWidth < 880 && peerIds.length < 3) {
+      return "min-w-[100%] max-h-[50%]";
     } else if (window.innerWidth < 1200 && peerIds.length < 4) {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]'; // Modified for smaller screens to avoid pushing off the side
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]"; // Modified for smaller screens to avoid pushing off the side
     } else if (window.innerWidth < 1690 && peerIds.length < 5) {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]'; // Keep relative to the medium screen
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]"; // Keep relative to the medium screen
     } else if (window.innerWidth >= 1690 && peerIds.length < 6) {
-      return 'min-w-[350px] lg:max-w-[380px] max-h-[50%]';
-    } else if(peerIds.length === 0){
-      return 'translate-y-1/2';
-    }
-    else {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]'; // Default if none of the conditions match
+      return "min-w-[350px] lg:max-w-[380px] max-h-[50%]";
+    } else if (peerIds.length === 0) {
+      return "translate-y-1/2";
+    } else {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]"; // Default if none of the conditions match
     }
   };
   const getPeerWidthClassslide = () => {
-    if(peerIds.length === 0){
-      return 'translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]';
-    }
-    else if (window.innerWidth < 880 && peerIds.length >7 ) {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] max-h-[50%]';
+    if (peerIds.length === 8) {
+      return "translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]";
+    } else if (
+      window.innerWidth < 880 &&
+      peerIds.length > 8 &&
+      peerIds.length <= 10
+    ) {
+      return "min-w-[100%] max-h-[50%]";
+    } else if (window.innerWidth < 880 && peerIds.length > 10) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]";
     } else if (window.innerWidth < 1200 && peerIds.length > 8) {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]'; // Modified for smaller screens to avoid pushing off the side
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]"; // Modified for smaller screens to avoid pushing off the side
     } else if (window.innerWidth < 1690 && peerIds.length > 11) {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]'; // Keep relative to the medium screen
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]"; // Keep relative to the medium screen
     } else if (window.innerWidth >= 1690 && peerIds.length > 14) {
-      return 'min-w-[350px] lg:max-w-[380px] max-h-[50%]';
-    } else if(peerIds.length === 0){
-      return 'translate-y-1/2';
-    }
-    else {
-      return 'min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]'; // Default if none of the conditions match
+      return "min-w-[350px] lg:max-w-[380px] max-h-[50%]";
+    } else {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]"; // Default if none of the conditions match
     }
   };
+
+  const groupRemotePeersIncreased = (
+    peerIds: string[],
+    initialPeersPerScreen: number
+  ): string[][] => {
+    const groups: string[][] = [];
+    let currentGroup: string[] = [];
+    let peersPerScreen = initialPeersPerScreen; // Start with initial value
+
+    // Add local peer on the first screen.
+
+    for (let i = 0; i < peerIds.length; i++) {
+      currentGroup.push(peerIds[i]);
+      if (currentGroup.length === peersPerScreen) {
+        groups.push([...currentGroup]);
+        currentGroup = [];
+        peersPerScreen = initialPeersPerScreen + 1; // Increment for next slide
+      }
+    }
+
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+
+    return groups;
+  };
+
+  const remotePeerGroupsIncreased = groupRemotePeersIncreased(
+    peerIds,
+    remotePeersPerScreen
+  );
 
   return (
     <>
@@ -822,7 +853,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 }}
                 modules={[Pagination]}
               >
-                <SwiperSlide style={{ display: isScreenShared ? 'block' : 'none' }}>
+                <SwiperSlide
+                  style={{ display: isScreenShared ? "block" : "none" }}
+                >
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
@@ -1120,7 +1153,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                             <RemotePeer key={peerId} peerId={peerId} />
                           ))
                         )}
-                      </section> 
+                      </section>
                     </div>
                   </main>
                 </SwiperSlide>
@@ -1285,13 +1318,15 @@ export default function Component({ params }: { params: { roomId: string } }) {
                     </>
                   )} */}
 
-<SwiperSlide>
+                <SwiperSlide>
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
                     <div className="relative flex w-full h-full">
-                      <section className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center
-                        `}>
+                      <section
+                        className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center
+                        `}
+                      >
                         {/* Local Peer */}
                         {role !== Role.BOT && (
                           <div
@@ -1375,9 +1410,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         )}
 
                         {/* First 15 Remote Peers */}
-                        {remotePeerGroups.length > 0 &&
-                          remotePeerGroups[0].map((peerId) => (
-                            <RemotePeer key={peerId} peerId={peerId} className={`${getPeerWidthClass()}`} />
+                        {remotePeerGroupsIncreased.length > 0 &&
+                          remotePeerGroupsIncreased[0].map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={`${getPeerWidthClass()}`}
+                            />
                           ))}
                       </section>
                     </div>
@@ -1385,22 +1424,25 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </SwiperSlide>
 
                 {/* Remaining remote peer slides */}
-                {remotePeerGroups.slice(1).map((group, index) => (
+                {remotePeerGroupsIncreased.slice(1).map((group, index) => (
                   <SwiperSlide key={`slide-${index + 1}`}>
                     <main
                       className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                     >
                       <div className="relative flex w-full h-full">
-                      <section className="py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center">
+                        <section className="py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center">
                           {group.map((peerId) => (
-                            <RemotePeer key={peerId} peerId={peerId} className={`${getPeerWidthClassslide()}`} />
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={`${getPeerWidthClassslide()}`}
+                            />
                           ))}
                         </section>
                       </div>
                     </main>
                   </SwiperSlide>
                 ))}
-
               </Swiper>
               {isChatOpen && <ChatBar />}
               {isParticipantsOpen && (
