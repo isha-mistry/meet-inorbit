@@ -869,7 +869,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 }}
                 modules={[Pagination]}
               >
-                <SwiperSlide>
+                <SwiperSlide style={{ display: isScreenShared ? "block" : "none" }}>
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
