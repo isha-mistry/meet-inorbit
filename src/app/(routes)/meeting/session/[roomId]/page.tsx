@@ -1010,9 +1010,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                 )}
 
                                 {!stream && (
-                                  <div className="flex w-24 h-24 rounded-full">
+                                  <div className="flex size-20 0.5xs:w-24 0.5xs:h-24 rounded-full">
                                     {metadata?.avatarUrl && (
-                                      <div className=" rounded-full w-24 h-24">
+                                      <div className=" rounded-full size-20 0.5xs:w-24 0.5xs:h-24">
                                         <Image
                                           alt="image"
                                           src={metadata?.avatarUrl}
@@ -1025,7 +1025,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   </div>
                                 )}
                                 <span className="absolute bottom-4 left-4 text-white font-medium">
-                                  <div className="flex">
+                                  <div className="flex items-center text-sm 0.5xs:text-base">
                                     {`${metadata?.displayName} (You)`}
                                     <Tooltip
                                       content={tooltipContent}
@@ -1357,9 +1357,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
                               )}
 
                               {!stream && (
-                                <div className="flex w-24 h-24 rounded-full">
+                                <div className="flex size-20 0.5xs:w-24 0.5xs:h-24 rounded-full">
                                   {metadata?.avatarUrl && (
-                                    <div className=" rounded-full w-24 h-24">
+                                    <div className=" rounded-full size-20 0.5xs:w-24 0.5xs:h-24">
                                       <Image
                                         alt="image"
                                         src={metadata?.avatarUrl}
@@ -1372,7 +1372,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                 </div>
                               )}
                               <span className="absolute bottom-4 left-4 text-white font-medium">
-                                <div className="flex">
+                                <div className="flex items-center text-sm 0.5xs:text-base">
                                   {`${metadata?.displayName} (You)`}
                                   <Tooltip
                                     content={tooltipContent}
