@@ -9,12 +9,36 @@ import Confetti from "react-confetti";
 function SessionHostedModal({ data, collection }: any) {
   const router = useRouter();
   const [copySuccess, setCopySuccess] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+    height: 0,
+  });
 
+  // useEffect(() => {
+  //   document.body.style.overflow = "hidden";
+
+  //   return () => {
+  //     document.body.style.overflow = "auto";
+  //   };
+  // }, []);
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Set initial window size
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       document.body.style.overflow = "auto";
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -65,11 +89,22 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
 
   return (
     <>
+      <Confetti
+        width={windowSize.width}
+        height={windowSize.height}
+        recycle={true} 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 51, 
+        }}
+      />
       <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
         <div className="absolute inset-0 backdrop-blur-md"></div>
 
         <div className="px-8 pb-14 pt-20 border z-50 rounded-[30px] bg-white flex flex-col items-center text-center gap-3 relative w-[56%]">
-          <Confetti recycle={true} className="size-[100%]" />
+          {/* <Confetti recycle={true} className="size-[100%]" /> */}
           <IoClose
             className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"
             onClick={() => handleRedirection()}

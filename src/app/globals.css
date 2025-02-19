@@ -34,8 +34,8 @@ body::-webkit-scrollbar-thumb {
 .swiper-pagination {
   position: absolute;
   bottom: 3px !important;
-  left: 48% !important;
-  transform: translateX(-50%);
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   width: fit-content !important;
   display: flex;
   align-items: center;
