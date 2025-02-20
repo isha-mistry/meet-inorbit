@@ -93,39 +93,39 @@ export const daoConfigs: { [key: string]: DAOConfig } = {
   
   },
   // Easy to add new DAOs
-  mantle: {
-    name: "Mantle",
-    logo: "/images/Mantledaologo.png",
-    chainId: 5000,
-    chainName: "Mantle",
-    chainAddress: "0xEd459209796D741F5B609131aBd927586fcCACC5", // Replace with actual address
-    viemchain: mantle,
-    tokenSymbol: "MNT",
-    alchemyAttestationUrl: process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL || "",
-    offchainAttestationUrl: "https://arbitrum.easscan.org",
-    attestationUrl: "https://optimism.easscan.org/offchain/attestation/view",
-    eascontracAddress: "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458",
-    blocks: [
-      {
-        title: "Forum",
-        link: "https://gov.mantle.io/",
-      },
-      {
-        title: "Website",
-        link: "https://mantle.io/",
-      },
-      {
-        title: "Block Explorer",
-        link: "https://mantle.io/",
-      },
-      {
-        title: "Mantle Twitter Profile",
-        link: "https://twitter.com/mantle",
-      },
-      {
-        title: "Mantle DAO Twitter Profile",
-        link: "https://twitter.com/MantleGov",
-      },
-    ],
-  },
+  // mantle: {
+  //   name: "Mantle",
+  //   logo: "/images/Mantledaologo.png",
+  //   chainId: 5000,
+  //   chainName: "Mantle",
+  //   chainAddress: "0xEd459209796D741F5B609131aBd927586fcCACC5", // Replace with actual address
+  //   viemchain: mantle,
+  //   tokenSymbol: "MNT",
+  //   alchemyAttestationUrl: process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL || "",
+  //   offchainAttestationUrl: "https://arbitrum.easscan.org",
+  //   attestationUrl: "https://optimism.easscan.org/offchain/attestation/view",
+  //   eascontracAddress: "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458",
+  //   blocks: [
+  //     {
+  //       title: "Forum",
+  //       link: "https://gov.mantle.io/",
+  //     },
+  //     {
+  //       title: "Website",
+  //       link: "https://mantle.io/",
+  //     },
+  //     {
+  //       title: "Block Explorer",
+  //       link: "https://mantle.io/",
+  //     },
+  //     {
+  //       title: "Mantle Twitter Profile",
+  //       link: "https://twitter.com/mantle",
+  //     },
+  //     {
+  //       title: "Mantle DAO Twitter Profile",
+  //       link: "https://twitter.com/MantleGov",
+  //     },
+  //   ],
+  // },
 };
