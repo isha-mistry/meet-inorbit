@@ -494,7 +494,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "cam",
         });
         if (stream) {
-          await enableVideo(stream);
+          await enableVideo({customVideoStream:stream});
         }
       };
       changeVideo();
@@ -510,7 +510,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "mic",
         });
         if (stream) {
-          enableAudio(stream);
+          enableAudio({customAudioStream:stream});
         }
       };
       changeAudio();
