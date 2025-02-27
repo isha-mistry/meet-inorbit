@@ -144,10 +144,10 @@ export async function PUT(req: Request) {
     const { host_address, dao_name, reference_id, attendees, ...updateFields } =
       updateData;
 
-    if (cacheWrapper.isAvailable) {
-      const cacheKey = `office-hours-all`;
-      await cacheWrapper.delete(cacheKey);
-    }
+    // if (cacheWrapper.isAvailable) {
+    //   const cacheKey = `office-hours-all`;
+    //   await cacheWrapper.delete(cacheKey);
+    // }
 
     if (!host_address || !dao_name || !reference_id) {
       return NextResponse.json(
@@ -259,10 +259,10 @@ export async function PUT(req: Request) {
       addFieldIfChanged("meeting_status", updateFields.meeting_status);
 
       if (updateFields.meeting_status === "Ongoing") {
-        if (cacheWrapper.isAvailable) {
-          const cacheKey = `office-hours-all`;
-          await cacheWrapper.delete(cacheKey);
-        }
+        // if (cacheWrapper.isAvailable) {
+        //   const cacheKey = `office-hours-all`;
+        //   await cacheWrapper.delete(cacheKey);
+        // }
         try {
           await sendMeetingStartNotification({
             db,
