@@ -48,32 +48,50 @@ class RedisCacheWrapper implements CacheWrapper {
     if (!this.isAvailable || !this.redis) {
       return null;
     }
-
+  
+    // Add environment prefix to key
+    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const prefixedKey = `${redisPrefix}:${key}`;
+  
     try {
-      return await this.redis.get(key);
+      return await this.redis.get(prefixedKey);
     } catch (err) {
       this.handleConnectionError(err);
       return null;
     }
   }
-
+  
   async set(key: string, value: string, expireSeconds?: number): Promise<void> {
     if (!this.isAvailable || !this.redis) {
       return;
     }
-
+  
+    // Add environment prefix to key
+    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const prefixedKey = `${redisPrefix}:${key}`;
+  
     try {
-      await this.redis.set(key, value);
+      await this.redis.set(prefixedKey, value);
       if (expireSeconds) {
-        await this.redis.expire(key, expireSeconds);
+        await this.redis.expire(prefixedKey, expireSeconds);
       }
     } catch (err) {
       this.handleConnectionError(err);
     }
   }
+
+
   async delete(key: string) {
+    if (!this.isAvailable || !this.redis) {
+      return;
+    }
+    
+    // Add environment prefix to key
+    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const prefixedKey = `${redisPrefix}:${key}`;
+    
     try {
-      await this.redis?.del(key);
+      await this.redis.del(prefixedKey);
     } catch (err) {
       console.error("Redis delete error:", err);
       this.handleConnectionError(err);
