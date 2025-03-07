@@ -448,6 +448,14 @@ export async function PUT(req: Request) {
       }
     );
 
+    if(result.acknowledged)
+    {
+      if (cacheWrapper.isAvailable) {
+        const cacheKey = `office-hours-all`;
+        await cacheWrapper.delete(cacheKey);
+      }
+    }
+
     const updatedDocument = await collection.findOne({
       host_address,
       "dao.name": dao_name,
