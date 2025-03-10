@@ -180,6 +180,23 @@ export default function Component({ params }: { params: { roomId: string } }) {
     };
   }, []);
 
+  useEffect(() => {
+    // Only run this once when the component mounts
+    const handleRouting = async () => {
+      if (!authenticated) {
+        login();
+      } else if (authenticated && walletAddress != null && !window.location.pathname.includes('/lobby')) {
+        // Only redirect if we're not already in the lobby path
+        const url = `${BASE_URL}${path}/lobby`;
+        router.push(url);
+      }
+    };
+    
+    handleRouting();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]); // Empty dependency array to run only once
+
+
   const firstSlideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -671,6 +688,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
   //     }
   //   }
   // }, [isRecording]);
+
 
   const handleAddrCopy = (addr: string) => {
     navigator.clipboard.writeText(addr);
