@@ -1,17 +1,20 @@
-import { connectDB } from "@/config/connectDB";
+import { BASE_URL } from "@/config/constants";
 
 interface Meeting {
-  meetingId: string;
+  sessionId: string;
   startTime: number;
   endTime: number;
 }
 
-const MAX_RETRIES = 30; // Maximum number of polling attempts
+const MAX_RETRIES = 20; // Maximum number of polling attempts
 const POLLING_INTERVAL = 60000; // Poll every minute
 
 export async function pollMeetingTimes(
   roomId: string,
-  apiKey: string
+  apiKey: string,
+  dao_name: string,
+  hostAddress: string,
+  token: string
 ): Promise<void> {
   let retries = 0;
 
@@ -35,8 +38,8 @@ export async function pollMeetingTimes(
         throw new Error("Failed to fetch meeting data");
       }
 
-      const meetingsData: { meetings: Meeting[] } = await response.json();
-      const meetings: Meeting[] = meetingsData.meetings;
+      const meetingsData: { sessions: Meeting[] } = await response.json();
+      const meetings: Meeting[] = meetingsData.sessions;
 
       const hasValidTimes = meetings.some(
         (meeting) => meeting.startTime && meeting.endTime
@@ -44,18 +47,24 @@ export async function pollMeetingTimes(
 
       if (hasValidTimes) {
         // When valid times are found, trigger the main endpoint again
-        const mainEndpointResponse = await fetch("/api/end-call", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            roomId,
-            meetingType: 2, // office hours
-            dao_name: "", // This will be handled by the main endpoint
-            hostAddress: "", // This will be handled by the main endpoint
-          }),
-        });
+
+        const mainEndpointResponse = await fetch(
+          `${BASE_URL}/api/proxy/end-call`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-wallet-address": hostAddress,
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              roomId,
+              meetingType: 2,
+              dao_name: dao_name,
+              hostAddress: hostAddress,
+            }),
+          }
+        );
 
         if (!mainEndpointResponse.ok) {
           throw new Error("Failed to process meeting data");
