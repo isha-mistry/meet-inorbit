@@ -74,7 +74,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
   return (
     <div
       className={clsx(
-        `bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-w-[150px] min-h-[150px] w-full ${
+        `bg-[#202020] bg-opacity-80 relative rounded-lg flex flex-col items-center justify-center min-h-[150px] max-h-[100%] w-full flex-1 ${
           isAudioOn
             ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
             : "bg-[#202020] bg-opacity-80"
@@ -98,9 +98,9 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
           </span>
         )}
         {!videoStream && (
-          <div className="flex w-24 h-24 rounded-full">
+          <div className="flex size-20 0.5xs:w-24 0.5xs:h-24 rounded-full">
             {metadata?.avatarUrl && (
-              <div className=" rounded-full w-24 h-24">
+              <div className=" rounded-full size-20 0.5xs:w-24 0.5xs:h-24">
                 <Image
                   src={metadata?.avatarUrl}
                   alt="image"
@@ -113,7 +113,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
           </div>
         )}
         <span className="absolute bottom-4 left-4 text-white font-medium">
-          <div className="flex">
+          <div className="flex items-center text-sm 0.5xs:text-base">
             {metadata?.displayName}{" "}
             <Tooltip
               content={tooltipContent}

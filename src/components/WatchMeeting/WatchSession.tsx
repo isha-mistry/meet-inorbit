@@ -39,7 +39,8 @@ import { UserProfileInterface } from "@/types/UserProfileTypes";
 import { usePathname } from "next/navigation";
 import { formatTimeAgo } from "@/utils/getRelativeTime";
 import ShareMediaModal from "./ShareMediaModal";
-import styles from "./WatchSession.module.css"
+import styles from "./WatchSession.module.css";
+import { daoConfigs } from "@/config/daos";
 
 interface Attendee extends DynamicAttendeeInterface {
   profileInfo: UserProfileInterface;
@@ -73,15 +74,15 @@ function WatchSession({
   const path = usePathname();
 
   const userImages = [
-    user1, 
-    user2, 
-    user3, 
-    user4, 
-    user5, 
-    user6, 
-    user7, 
-    user8, 
-    user9
+    user1,
+    user2,
+    user3,
+    user4,
+    user5,
+    user6,
+    user7,
+    user8,
+    user9,
   ];
 
   const getRandomUserImage = () => {
@@ -186,49 +187,53 @@ function WatchSession({
                   </div>
                 </div>
                 <>
-                {data.uid_host ? (
-                  <Tooltip
-                    showArrow
-                    content={
-                      <div className="font-poppins">Offchain Attestation</div>
-                    }
-                    placement="top"
-                    className="rounded-md bg-opacity-90 max-w-96"
-                    closeDelay={1}
-                  >
-                    <Link
-                      href={
-                        data.uid_host
-                          ? data.dao_name.toLowerCase() === "optimism"
-                            ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
-                            : data.dao_name.toLowerCase() === "arbitrum"
-                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
-                            : ""
-                          : "#"
+                  {data.uid_host ? (
+                    <Tooltip
+                      showArrow
+                      content={
+                        <div className="font-poppins">Offchain Attestation</div>
                       }
-                      onClick={(e) => {
-                        if (!data.uid_host) {
-                          e.preventDefault();
-                          toast.error("Offchain attestation not available");
-                        }
-                      }}
-                      target="_blank"
+                      placement="top"
+                      className="rounded-md bg-opacity-90 max-w-96"
+                      closeDelay={1}
                     >
-                      <Image
-                        src={offChain_link}
-                        alt="image"
-                        height={100}
-                        width={100}
-                        className="size-4 xs:size-6"
-                        priority
-                        quality={100}
-                      />
-                    </Link>
-                  </Tooltip>
-                ): (
-                  <></>
-                )}
-                  
+                      <Link
+                        href={
+                          data.uid_host
+                            ? `${
+                                daoConfigs[data.dao_name.toLowerCase()]
+                                  .attestationUrl
+                              }/${data.uid_host}`
+                            : "#"
+                          // ? data.dao_name.toLowerCase() === "optimism"
+                          //   ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
+                          //   : data.dao_name.toLowerCase() === "arbitrum"
+                          //   ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
+                          //   : ""
+                          // : "#"
+                        }
+                        onClick={(e) => {
+                          if (!data.uid_host) {
+                            e.preventDefault();
+                            toast.error("Offchain attestation not available");
+                          }
+                        }}
+                        target="_blank"
+                      >
+                        <Image
+                          src={offChain_link}
+                          alt="image"
+                          height={100}
+                          width={100}
+                          className="size-4 xs:size-6"
+                          priority
+                          quality={100}
+                        />
+                      </Link>
+                    </Tooltip>
+                  ) : (
+                    <></>
+                  )}
                 </>
                 {data.onchain_host_uid ? (
                   <Tooltip
@@ -243,12 +248,17 @@ function WatchSession({
                     <Link
                       href={
                         data.onchain_host_uid
-                          ? data.dao_name.toLowerCase() === "optimism"
-                            ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
-                            : data.dao_name.toLowerCase() === "arbitrum"
-                            ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
-                            : ""
+                          ? `${
+                              daoConfigs[data.dao_name.toLowerCase()]
+                                .attestationView
+                            }`
                           : "#"
+                        // ? data.dao_name.toLowerCase() === "optimism"
+                        //   ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
+                        //   : data.dao_name.toLowerCase() === "arbitrum"
+                        //   ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
+                        //   : ""
+                        // : "#"
                       }
                       onClick={(e) => {
                         if (!data.onchain_host_uid) {
@@ -274,17 +284,9 @@ function WatchSession({
               </div>
 
               <div className="flex items-center gap-1">
-                {data.dao_name === "optimism" ? (
+                {daoConfigs ? (
                   <Image
-                    src={oplogo}
-                    alt="image"
-                    width={100}
-                    height={100}
-                    className="rounded-full w-5 h-5"
-                  />
-                ) : data.dao_name === "arbitrum" ? (
-                  <Image
-                    src={arblogo}
+                    src={daoConfigs[data.dao_name.toLowerCase()].logo}
                     alt="image"
                     width={100}
                     height={100}
@@ -357,7 +359,11 @@ function WatchSession({
             {showPopup && (
               <div
                 className={`absolute bg-white rounded-xl mt-1 py-2 duration-200 ease-in-out z-30 ${styles.customScrollbar}`}
-                style={{ boxShadow: "0px 4px 9.1px 0px rgba(0,0,0,0.04)" ,maxHeight: "300px", overflowY: "auto"}}
+                style={{
+                  boxShadow: "0px 4px 9.1px 0px rgba(0,0,0,0.04)",
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                }}
               >
                 {data.attendees.map((attendee, index) => (
                   <div key={index}>
@@ -396,12 +402,12 @@ function WatchSession({
                           closeDelay={1}
                         >
                           <Link
-                            href={
-                              data.dao_name.toLowerCase() === "optimism"
-                                ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                                : data.dao_name.toLowerCase() === "arbitrum"
-                                ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
-                                : ""
+                            href={daoConfigs?`${daoConfigs[data.dao_name.toLowerCase()].attestationUrl}/${attendee.attendee_uid}`:""
+                              // data.dao_name.toLowerCase() === "optimism"
+                              //   ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                              //   : data.dao_name.toLowerCase() === "arbitrum"
+                              //   ? `https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
+                              //   : ""
                             }
                             target="_blank"
                           >
@@ -433,12 +439,12 @@ function WatchSession({
                           closeDelay={1}
                         >
                           <Link
-                            href={
-                              data.dao_name.toLowerCase() === "optimism"
-                                ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
-                                : data.dao_name.toLowerCase() === "arbitrum"
-                                ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
-                                : ""
+                            href={daoConfigs?`${daoConfigs[data.dao_name.toLowerCase()].attestationView}/${attendee.onchain_attendee_uid}`:""
+                              // data.dao_name.toLowerCase() === "optimism"
+                              //   ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                              //   : data.dao_name.toLowerCase() === "arbitrum"
+                              //   ? `https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
+                              //   : ""
                             }
                             target="_blank"
                           >

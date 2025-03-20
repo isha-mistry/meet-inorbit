@@ -8,13 +8,16 @@ import { arbBlock, opBlock } from "@/config/staticDataUtils";
 import React from "react";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import clsx from "clsx";
+import { daoConfigs } from "@/config/daos";
 
 function QuickLinks({ daoName }: { daoName: string }) {
   return (
     <div className="flex items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className={clsx("bg-[#0a0a0a] hover:bg-[#0a0a0a] border-none")}>
+          <Button
+            className={clsx("bg-[#0a0a0a] hover:bg-[#0a0a0a] border-none")}
+          >
             <div className="flex gap-2 items-center">
               <div className="bg-[#202020] hover:bg-gray-500/50 p-2 rounded-lg">
                 <PiLinkSimpleBold
@@ -22,7 +25,9 @@ function QuickLinks({ daoName }: { daoName: string }) {
                   size={24}
                 ></PiLinkSimpleBold>
               </div>
-              <div className="hidden lg:block text-white text-base">Quick Links</div>
+              <div className="hidden lg:block text-white text-base">
+                Quick Links
+              </div>
             </div>
           </Button>
         </DropdownMenuTrigger>
@@ -31,22 +36,21 @@ function QuickLinks({ daoName }: { daoName: string }) {
           sideOffset={8}
         >
           <div className="space-y-2">
-            {/* <div className="arrow-up"></div> */}
-            {(daoName === "arbitrum"
-              ? arbBlock
-              : daoName === "optimism"
-              ? opBlock
-              : []
-            ).map((block, index) => (
-              <a
-                href={block.link}
-                target="_blank"
-                className="block px-4 py-2 bg-[#2f2f2f] hover:bg-gray-600/50 hover:rounded-md"
-                key={index}
-              >
-                {block.title}
-              </a>
-            ))}
+            {daoName && daoConfigs[daoName]?.blocks?.length ? (
+              daoConfigs[daoName].blocks.map((block, index) => (
+                <a
+                  href={block.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2 bg-[#2f2f2f] hover:bg-gray-600/50 hover:rounded-md"
+                  key={index}
+                >
+                  {block.title}
+                </a>
+              ))
+            ) : (
+              <p className="text-gray-400">No links available</p>
+            )}
           </div>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -186,6 +186,23 @@ export default function Component({ params }: { params: { roomId: string } }) {
     };
   }, []);
 
+  useEffect(() => {
+    // Only run this once when the component mounts
+    const handleRouting = async () => {
+      if (!authenticated) {
+        login();
+      } else if (authenticated && walletAddress != null && !window.location.pathname.includes('/lobby')) {
+        // Only redirect if we're not already in the lobby path
+        const url = `${BASE_URL}${path}/lobby`;
+        router.push(url);
+      }
+    };
+    
+    handleRouting();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]); // Empty dependency array to run only once
+
+
   const firstSlideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -270,6 +287,57 @@ export default function Component({ params }: { params: { roomId: string } }) {
     if (address.length <= maxLength) return address;
     return address.slice(0, maxLength) + "...";
   };
+
+  const [remotePeersPerScreen, setRemotePeersPerScreen] = useState(14);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width > 1690) {
+        setRemotePeersPerScreen(14);
+      } else if (width > 1200) {
+        setRemotePeersPerScreen(11);
+      } else if (width > 880) {
+        setRemotePeersPerScreen(8);
+      } else {
+        setRemotePeersPerScreen(7);
+      }
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Grouping function for remote peers
+  const groupRemotePeers = (
+    peerIds: string[],
+    peersPerScreen: number
+  ): string[][] => {
+    const groups: string[][] = [];
+    let currentGroup: string[] = [];
+
+    // Always add local peer to the first screen.
+
+    for (let i = 0; i < peerIds.length; i++) {
+      currentGroup.push(peerIds[i]);
+      if (currentGroup.length === peersPerScreen) {
+        groups.push([...currentGroup]);
+        currentGroup = [];
+      }
+    }
+
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+
+    return groups;
+  };
+
+  const remotePeerGroups = groupRemotePeers(peerIds, remotePeersPerScreen);
 
   // let meetingType;
 
@@ -443,7 +511,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "cam",
         });
         if (stream) {
-          await enableVideo(stream);
+          await enableVideo({customVideoStream:stream});
         }
       };
       changeVideo();
@@ -459,7 +527,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "mic",
         });
         if (stream) {
-          enableAudio(stream);
+          enableAudio({customAudioStream:stream});
         }
       };
       changeAudio();
@@ -656,6 +724,76 @@ export default function Component({ params }: { params: { roomId: string } }) {
     }, 4000);
   };
 
+  const getPeerWidthClass = () => {
+    if (peerIds.length === 0) {
+      return "translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]";
+    } else if (window.innerWidth < 880 && peerIds.length < 3) {
+      return "min-w-[100%] max-h-[50%]";
+    } else if (window.innerWidth < 1200 && peerIds.length < 4) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]"; // Modified for smaller screens to avoid pushing off the side
+    } else if (window.innerWidth < 1690 && peerIds.length < 5) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]"; // Keep relative to the medium screen
+    } else if (window.innerWidth >= 1690 && peerIds.length < 6) {
+      return "min-w-[350px] lg:max-w-[380px] max-h-[50%]";
+    } else if (peerIds.length === 0) {
+      return "translate-y-1/2";
+    } else {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]"; // Default if none of the conditions match
+    }
+  };
+  const getPeerWidthClassslide = () => {
+    if (peerIds.length === 8) {
+      return "translate-y-1/2 max-h-[50%] min-w-[250px] max-w-[500px]";
+    } else if (
+      window.innerWidth < 880 &&
+      peerIds.length > 8 &&
+      peerIds.length <= 10
+    ) {
+      return "min-w-[100%] max-h-[50%]";
+    } else if (window.innerWidth < 880 && peerIds.length > 10) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]";
+    } else if (window.innerWidth < 1200 && peerIds.length > 8) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] sm:max-w-[350px] max-h-[50%]"; // Modified for smaller screens to avoid pushing off the side
+    } else if (window.innerWidth < 1690 && peerIds.length > 11) {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[300px] md:max-w-[350px] max-h-[50%]"; // Keep relative to the medium screen
+    } else if (window.innerWidth >= 1690 && peerIds.length > 14) {
+      return "min-w-[350px] lg:max-w-[380px] max-h-[50%]";
+    } else {
+      return "min-w-[150px] xs:min-w-[200px] sm:min-w-[280px] 1.7xl:min-w-[350px] sm:max-w-[320px] 1.7xl:max-w-[360px] max-h-[50%]"; // Default if none of the conditions match
+    }
+  };
+
+  const groupRemotePeersIncreased = (
+    peerIds: string[],
+    initialPeersPerScreen: number
+  ): string[][] => {
+    const groups: string[][] = [];
+    let currentGroup: string[] = [];
+    let peersPerScreen = initialPeersPerScreen; // Start with initial value
+
+    // Add local peer on the first screen.
+
+    for (let i = 0; i < peerIds.length; i++) {
+      currentGroup.push(peerIds[i]);
+      if (currentGroup.length === peersPerScreen) {
+        groups.push([...currentGroup]);
+        currentGroup = [];
+        peersPerScreen = initialPeersPerScreen + 1; // Increment for next slide
+      }
+    }
+
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+
+    return groups;
+  };
+
+  const remotePeerGroupsIncreased = groupRemotePeersIncreased(
+    peerIds,
+    remotePeersPerScreen
+  );
+
   return (
     <>
       {isAllowToEnter ? (
@@ -748,7 +886,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 }}
                 modules={[Pagination]}
               >
-                <SwiperSlide>
+                <SwiperSlide style={{ display: isScreenShared ? "block" : "none" }}>
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
                   >
@@ -903,9 +1041,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                 )}
 
                                 {!stream && (
-                                  <div className="flex w-24 h-24 rounded-full">
+                                  <div className="flex size-20 0.5xs:w-24 0.5xs:h-24 rounded-full">
                                     {metadata?.avatarUrl && (
-                                      <div className=" rounded-full w-24 h-24">
+                                      <div className=" rounded-full size-20 0.5xs:w-24 0.5xs:h-24">
                                         <Image
                                           alt="image"
                                           src={metadata?.avatarUrl}
@@ -918,7 +1056,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   </div>
                                 )}
                                 <span className="absolute bottom-4 left-4 text-white font-medium">
-                                  <div className="flex">
+                                  <div className="flex items-center text-sm 0.5xs:text-base">
                                     {`${metadata?.displayName} (You)`}
                                     <Tooltip
                                       content={tooltipContent}
@@ -1051,7 +1189,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   </main>
                 </SwiperSlide>
 
-                {isScreenShared && isSmallScreen && (
+                {/* {isScreenShared && isSmallScreen && (
                   <>
                     {Array.from({
                       length: Math.ceil((peerIds.length - 3) / 4) + 1,
@@ -1173,8 +1311,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       </SwiperSlide>
                     ))}
                   </>
-                )}
-                {!(isFullScreen || isRemoteFullScreen) &&
+                )} */}
+                {/* {!(isFullScreen || isRemoteFullScreen) &&
                   peerIds.length > 2 &&
                   ((isSmallScreen && !isScreenShared) || !isSmallScreen) && (
                     <>
@@ -1209,7 +1347,133 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         ) : null;
                       })}
                     </>
-                  )}
+                  )} */}
+
+                <SwiperSlide>
+                  <main
+                    className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
+                  >
+                    <div className="relative flex w-full h-full">
+                      <section
+                        className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center
+                        `}
+                      >
+                        {/* Local Peer */}
+                        {role !== Role.BOT && (
+                          <div
+                            className={`relative w-full flex-1
+                            ${
+                              isAudioOn
+                                ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                                : "bg-[#202020] bg-opacity-80"
+                            }
+                          rounded-lg flex ${getPeerWidthClass()}   min-h-[150px]  max-h-[100%] overflow-hidden`}
+                          >
+                            <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
+                              <div className="absolute left-4 top-4 text-3xl z-10">
+                                {reaction}
+                              </div>
+                              {metadata?.isHandRaised && (
+                                <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
+                                  ✋
+                                </span>
+                              )}
+                              {stream && (
+                                <span className="absolute top-0 bottom-0 right-0 left-0">
+                                  <Camera
+                                    stream={stream}
+                                    name={metadata?.displayName ?? "guest"}
+                                  />
+                                </span>
+                              )}
+
+                              {!stream && (
+                                <div className="flex size-20 0.5xs:w-24 0.5xs:h-24 rounded-full">
+                                  {metadata?.avatarUrl && (
+                                    <div className=" rounded-full size-20 0.5xs:w-24 0.5xs:h-24">
+                                      <Image
+                                        alt="image"
+                                        src={metadata?.avatarUrl}
+                                        className="maskAvatar object-cover object-center"
+                                        width={100}
+                                        height={100}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              <span className="absolute bottom-4 left-4 text-white font-medium">
+                                <div className="flex items-center text-sm 0.5xs:text-base">
+                                  {`${metadata?.displayName} (You)`}
+                                  <Tooltip
+                                    content={tooltipContent}
+                                    placement="right"
+                                    closeDelay={1}
+                                    showArrow
+                                  >
+                                    <div
+                                      className={`pl-2 pt-[2px] cursor-pointer  ${
+                                        animatingButtons[
+                                          metadata?.walletAddress || ""
+                                        ]
+                                          ? "text-blue-500"
+                                          : "text-[#3E3D3D]"
+                                      }`}
+                                    >
+                                      <IoCopy
+                                        onClick={() =>
+                                          handleAddrCopy(
+                                            `${metadata?.walletAddress}`
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </Tooltip>
+                                </div>
+                              </span>
+                              <span className="absolute bottom-4 right-4">
+                                {isAudioOn
+                                  ? NestedPeerListIcons.active.mic
+                                  : NestedPeerListIcons.inactive.mic}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* First 15 Remote Peers */}
+                        {remotePeerGroupsIncreased.length > 0 &&
+                          remotePeerGroupsIncreased[0].map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={`${getPeerWidthClass()}`}
+                            />
+                          ))}
+                      </section>
+                    </div>
+                  </main>
+                </SwiperSlide>
+
+                {/* Remaining remote peer slides */}
+                {remotePeerGroupsIncreased.slice(1).map((group, index) => (
+                  <SwiperSlide key={`slide-${index + 1}`}>
+                    <main
+                      className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
+                    >
+                      <div className="relative flex w-full h-full">
+                        <section className="py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide flex flex-wrap justify-center">
+                          {group.map((peerId) => (
+                            <RemotePeer
+                              key={peerId}
+                              peerId={peerId}
+                              className={`${getPeerWidthClassslide()}`}
+                            />
+                          ))}
+                        </section>
+                      </div>
+                    </main>
+                  </SwiperSlide>
+                ))}
               </Swiper>
               {isChatOpen && <ChatBar />}
               {isParticipantsOpen && (

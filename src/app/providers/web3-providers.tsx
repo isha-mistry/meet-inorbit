@@ -134,6 +134,14 @@ const privyConfig: PrivyClientConfig = {
   loginMethods: ['wallet', 'google', 'farcaster'],
   appearance: {
     showWalletLoginFirst: true,
+    walletList: [
+      "metamask",
+      "rainbow",
+      "wallet_connect",
+      "coinbase_wallet",
+      "uniswap",
+      "rabby_wallet",
+    ],
   },
   defaultChain:optimism,
 };
