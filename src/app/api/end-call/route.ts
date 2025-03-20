@@ -39,11 +39,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
       meetingType,
       dao_name,
       hostAddress,
+      token,
     }: {
       roomId: string;
       meetingType: number;
       dao_name: string;
       hostAddress: string;
+      token: string;
     } = await req.json();
 
     if (!roomId) {
@@ -103,9 +105,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (!hasValidTimes && meetingType === 2) {
       console.log(`Starting polling for office hours meeting: ${roomId}`);
       // Start polling and return early
-      pollMeetingTimes(roomId, process.env.NEXT_PUBLIC_API_KEY ?? "").catch(
-        (error) => console.error("Error initiating polling:", error)
-      );
+      pollMeetingTimes(
+        roomId,
+        process.env.NEXT_PUBLIC_API_KEY ?? "",
+        dao_name,
+        hostAddress,
+        token
+      ).catch((error) => console.error("Error initiating polling:", error));
 
       return NextResponse.json(
         {
@@ -149,7 +155,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const meetingTimePerEOA: MeetingTimePerEOA = {};
 
     for (const meeting of meetings) {
-      console.log(`Fetching participant list for session: ${meeting.sessionId}`);
+      console.log(
+        `Fetching participant list for session: ${meeting.sessionId}`
+      );
       const response = await fetch(
         `https://api.huddle01.com/api/v2/sdk/rooms/participant-list?sessionId=${meeting.sessionId}`,
         requestOptionsForMeeting

@@ -119,6 +119,7 @@ export const handleCloseMeeting = async (
         meetingType: meetingType,
         dao_name: daoName,
         hostAddress: hostAddress,
+        token: token,
       }),
     };
 
