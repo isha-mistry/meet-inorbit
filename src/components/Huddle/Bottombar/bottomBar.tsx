@@ -235,136 +235,157 @@ const BottomBar = ({
     setIsLoading(true);
     setDropdownDisabled(true);
 
+    // Only wait for recording to stop if necessary
     if (role === "host" && meetingRecordingStatus === true) {
-      await handleStopRecording(
-        roomId,
-        walletAddress ?? "",
-        privypass,
-        setIsRecording
-      );
+      try {
+        await Promise.race([
+          handleStopRecording(
+            roomId,
+            walletAddress ?? "",
+            privypass,
+            setIsRecording
+          ),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Recording stop timeout")), 5000)
+          ),
+        ]);
+      } catch (error) {
+        console.error("Failed to stop recording, proceeding anyway:", error);
+      }
     }
 
     toast("Meeting Ended");
+
+    // Handle "leave" option - let user exit immediately
     if (endMeet === "leave") {
       leaveRoom();
       setIsLoading(false);
       setShowLeaveDropDown(false);
-    } else if (endMeet === "close") {
+    }
+
+    // Handle "close" option
+    if (endMeet === "close") {
       if (role === "host") {
-        let nft_image;
-        try {
-          const myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/json");
-          const requestOptions = {
-            method: "GET",
-            headers: myHeaders,
-          };
-          const imageResponse = await fetch(
-            `${BASE_URL}/api/images/og/nft?daoName=${daoName}&meetingId=${roomId}`,
-            requestOptions
-          );
+        // First close the room and update UI so user isn't waiting
+        closeRoom();
+        setIsLoading(false);
+        setShowLeaveDropDown(false);
 
-          try {
-            const arrayBuffer = await imageResponse.arrayBuffer();
-            const result = await uploadFile(arrayBuffer, daoName, roomId);
-            nft_image = `ipfs://` + result.Hash;
-          } catch (error) {
-            console.error("Error in uploading file:", error);
-          }
-        } catch (error) {
-          console.log("Error in generating OG image:::", error);
-        }
-        try {
-          const myHeaders = new Headers();
-          const token = await getAccessToken();
-          myHeaders.append("Content-Type", "application/json");
-          if (walletAddress) {
-            myHeaders.append("x-wallet-address", walletAddress);
-            myHeaders.append("Authorization", `Bearer ${token}`);
-          }
-          const requestOptions = {
-            method: "PUT",
-            headers: myHeaders,
-            body: JSON.stringify({
-              meetingId: roomId,
-              meetingType: meetingCategory,
-              recordedStatus: isRecording,
-              meetingStatus: isRecording === true ? "Recorded" : "Finished",
-              nft_image: nft_image,
-              daoName: daoName,
-            }),
-          };
-
-          if (meetingCategory === "session") {
-            const response = await fetchApi(
-              `/update-recording-status`,
-              requestOptions
-            );
-          } else if (meetingCategory === "officehours") {
-            const requestBody = {
-              host_address: hostAddress,
-              dao_name: daoName,
-              reference_id: meetingData.reference_id,
-              meeting_status: isRecording === true ? "Recorded" : "Finished",
-              nft_image: nft_image,
-              isMeetingRecorded: isRecording,
-            };
-
-            walletAddress &&
-              (await updateOfficeHoursData(walletAddress, token, requestBody));
-          }
-
-          console.log("role: ", role);
-
-          if (role === "host") {
-            await handleCloseMeeting(
-              walletAddress ?? "",
-              token,
-              meetingCategory,
-              roomId,
-              daoName,
-              hostAddress,
-              meetingData,
-              isRecording
-            );
-          }
-        } catch (e) {
-          console.log("Error: ", e);
-        }
+        // Run all non-critical operations in background
+        backgroundHostOperations();
+      } else {
+        // Non-host just needs to close the room
+        closeRoom();
+        setIsLoading(false);
+        setShowLeaveDropDown(false);
       }
-      closeRoom();
-      setIsLoading(false);
-      setShowLeaveDropDown(false);
-    } else {
       return;
     }
 
-    if (meetingCategory === "officehours") {
+    // If we get here, reset UI state
+    setIsLoading(false);
+    setShowLeaveDropDown(false);
+  };
+
+  // Background functions that run after user UI is updated
+  const backgroundHostOperations = async () => {
+    try {
+      const token = await getAccessToken();
+
+      // First handle critical closing operations
+      await handleCloseMeeting(
+        walletAddress ?? "",
+        token,
+        meetingCategory,
+        roomId,
+        daoName,
+        hostAddress,
+        meetingData,
+        isRecording
+      );
+
+      // Then generate NFT image and update meeting status with the result
+      // Using the IPFS hash in the update
+      const nft_image = await generateAndUploadNFTImage();
+      await updateMeetingStatus(nft_image);
+    } catch (error) {
+      console.error("Background host operations failed:", error);
+    }
+  };
+
+  // Generate and upload NFT image in background
+  const generateAndUploadNFTImage = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+      };
+
+      // Set a timeout for image generation
+      const imageResponse = (await Promise.race([
+        fetch(
+          `${BASE_URL}/api/images/og/nft?daoName=${daoName}&meetingId=${roomId}`,
+          requestOptions
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Image generation timeout")), 10000)
+        ),
+      ])) as Response;
+
+      const arrayBuffer = await imageResponse.arrayBuffer();
+      const result = await uploadFile(arrayBuffer, daoName, roomId);
+      return `ipfs://` + result.Hash;
+    } catch (error) {
+      console.error("Error in generating/uploading NFT image:", error);
+      return null;
+    }
+  };
+
+  // Update meeting status in background
+  const updateMeetingStatus = async (nft_image: string | null) => {
+    try {
       const myHeaders = new Headers();
       const token = await getAccessToken();
       myHeaders.append("Content-Type", "application/json");
+
       if (walletAddress) {
         myHeaders.append("x-wallet-address", walletAddress);
         myHeaders.append("Authorization", `Bearer ${token}`);
       }
-      try {
-        const res = await fetch(
-          `${APP_BASE_URL}/api/update-office-hours/${hostAddress}`,
-          {
-            method: "PUT",
-            headers: myHeaders,
-          }
-        );
-        const res_data = await res.json();
 
-        // if (res_data.success) {
-        toast.success("Next Office hour is scheduled!");
+      const requestOptions = {
+        method: "PUT",
+        headers: myHeaders,
+        body: JSON.stringify({
+          meetingId: roomId,
+          meetingType: meetingCategory,
+          recordedStatus: isRecording,
+          meetingStatus: isRecording === true ? "Recorded" : "Finished",
+          nft_image: nft_image,
+          daoName: daoName,
+        }),
+      };
 
-        // }
-      } catch (e) {
-        console.log("error: ", e);
-        setEndCallDisabled(false);
+      if (meetingCategory === "session") {
+        await fetchApi("/update-recording-status", requestOptions);
+      } else if (meetingCategory === "officehours") {
+        const requestBody = {
+          host_address: hostAddress,
+          dao_name: daoName,
+          reference_id: meetingData.reference_id,
+          meeting_status: isRecording === true ? "Recorded" : "Finished",
+          nft_image: nft_image,
+          isMeetingRecorded: isRecording,
+        };
+
+        if (walletAddress) {
+          await updateOfficeHoursData(walletAddress, token, requestBody);
+        }
       }
+    } catch (error) {
+      console.error("Error updating meeting status:", error);
     }
   };
 

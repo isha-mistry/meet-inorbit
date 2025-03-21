@@ -1,7 +1,5 @@
 import { APP_BASE_URL, BASE_URL } from "@/config/constants";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import useAuthentication from "@/app/hooks/useAuthentication";
 // export const revalidate = 0;
 
@@ -20,7 +18,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       privyToken
     );
 
-    console.log(isAuthorized, token, origin);
+    // console.log(isAuthorized, token, origin);
 
     if (isAuthorized === false) {
       return NextResponse.json(
