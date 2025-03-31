@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react"; // Import useRef
 import { useRouter } from "next-nprogress-bar";
 import { Toaster, toast } from "react-hot-toast";
 import { useHuddle01, useRoom, useLocalPeer } from "@huddle01/react/hooks";
@@ -25,6 +25,7 @@ import {
   updateMeetingStatus,
 } from "@/utils/LobbyApiActions";
 import { APP_BASE_URL } from "@/config/constants";
+import { XMarkIcon } from "@heroicons/react/24/outline"; // Import close icon
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // State Management
@@ -35,6 +36,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [profileDetails, setProfileDetails] = useState<any>();
   const [meetingData, setMeetingData] = useState<any>();
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [showConfirmWallet, setShowConfirmWallet] = useState(true); // New state
 
   // Meeting Details State
   const [hostAddress, setHostAddress] = useState<string>();
@@ -45,6 +47,21 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<string>();
   const [isApiCalling, setIsApiCalling] = useState<boolean>();
   const [isHost, setIsHost] = useState<boolean>();
+  const [buttonText, setButtonText] = useState<string>("Join Meeting");
+  const { walletAddress } = useWalletAddress();
+
+  // Update ButtonText when walletAddress Changes
+  useEffect(() => {
+    if (walletAddress && meetingData) {
+      if (walletAddress === meetingData.host_address) {
+        setIsHost(true);
+        setButtonText("Start Meeting");
+      } else {
+        setIsHost(false);
+        setButtonText("Join Meeting");
+      }
+    }
+  }, [walletAddress, meetingData]);
 
   // Hooks
   const { push } = useRouter();
@@ -56,7 +73,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     useConnection();
   const { state, joinRoom } = useRoom();
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
-  const { walletAddress } = useWalletAddress();
+
+  const popupRef = useRef<HTMLDivElement>(null); // Ref for the popup
 
   // Connection Management
   // useEffect(() => {
@@ -105,6 +123,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const { data } = result;
           if (walletAddress === data.host_address) {
             setIsHost(true);
+            setButtonText("Start Meeting");
+          } else {
+            setIsHost(false);
+            setButtonText("Join Meeting");
           }
           setMeetingData(data);
           setHostAddress(data.host_address);
@@ -282,6 +304,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     }
   };
 
+  const handleCloseConfirmWallet = () => {
+    setShowConfirmWallet(false);
+  };
+
+  const handleContinue = () => {
+    setShowConfirmWallet(false);
+  };
+
   // Render loading state
   if (isPageLoading || isSessionLoading || isApiCalling) {
     return (
@@ -317,87 +347,128 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     );
   }
 
-  // Render main lobby
+  // Render the component
   return (
-    <>
-      {isAllowToEnter === true && (
-        <div className="min-h-screen bg-[#0a0a0a] ">
-          <main className="flex min-h-screen flex-col text-white font-poppins">
-            <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
-              <div className="text-4xl font-semibold font-quanty tracking-wide">
-                <span className="text-white">Chora</span>
-                <span className="text-blue-shade-100">Club</span>
+    <div className="min-h-screen bg-[#0a0a0a] relative">
+      {showConfirmWallet && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-40">
+          {" "}
+          {/* Semi-transparent overlay */}
+          <div className="relative bg-[#1a1a1a] border border-[#333] p-8 rounded-xl shadow-lg w-full max-w-md text-white flex items-center flex-col">
+            {" "}
+            {/* Darker background, subtle border */}
+            <button
+              onClick={handleCloseConfirmWallet}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+            <h2 className="text-2xl font-semibold mb-4 text-center text-blue-300">
+              Confirm Your Wallet
+            </h2>{" "}
+            {/* More prominent title */}
+            <p className="mb-4 text-gray-400 text-center">
+              You're currently connected with:
+            </p>{" "}
+            {/* Subdued description */}
+            <ConnectWalletWithENS showPopup={true} />
+            <p className="text-red-500 text-center mt-4 font-semibold">
+              If this is not the wallet address you used to host or wish to join
+              with, please switch to a different wallet.
+            </p>{" "}
+            {/* Improved warning text */}
+            <button
+              onClick={handleContinue}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-full mt-6 hover:from-blue-500 hover:to-blue-300 transition duration-300"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      <main
+        className="flex min-h-screen flex-col text-white font-poppins"
+        style={{
+          filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
+          pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
+        }}
+      >
+        <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
+          <div className="text-4xl font-semibold font-quanty tracking-wide">
+            <span className="text-white">Chora</span>
+            <span className="text-blue-shade-100">Club</span>
+          </div>
+          <ConnectWalletWithENS />
+        </div>
+
+        <div className="flex w-full items-center justify-center my-auto px-4">
+          <div className="flex flex-col items-center justify-center gap-4 w-full xs:w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 mt-8 lg:mt-14">
+            {/* Avatar Section */}
+            <div className="relative w-full rounded-2xl py-16 sm:py-20 lg:py-28 overflow-hidden">
+              {/* Background blur layer */}
+              <div className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"></div>
+
+              {/* Avatar container */}
+              <div className="relative z-10 flex items-center justify-center ">
+                <div className="relative rounded-full p-1">
+                  <Image
+                    src={avatarUrl}
+                    alt="profile-avatar"
+                    width={100}
+                    height={100}
+                    className="maskAvatar shadow-md w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full"
+                    quality={100}
+                    priority
+                  />
+                </div>
               </div>
-              <ConnectWalletWithENS />
             </div>
 
-            <div className="flex w-full items-center justify-center my-auto px-4">
-              <div className="flex flex-col items-center justify-center gap-4 w-full xs:w-11/12 sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 mt-8 lg:mt-14">
-                {/* Avatar Section */}
-                <div className="relative w-full rounded-2xl py-16 sm:py-20 lg:py-28 overflow-hidden">
-                  {/* Background blur layer */}
-                  <div className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"></div>
-
-                  {/* Avatar container */}
-                  <div className="relative z-10 flex items-center justify-center ">
-                    <div className="relative rounded-full p-1">
-                      <Image
-                        src={avatarUrl}
-                        alt="profile-avatar"
-                        width={100}
-                        height={100}
-                        className="maskAvatar shadow-md w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full"
-                        quality={100}
-                        priority
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name/Address Section */}
-                <div className="flex items-center w-full flex-col">
-                  <div
-                    className={`flex flex-col justify-center w-full gap-1 text-white font-semibold`}
-                  >
-                    ENS Name / Address
-                    <div
-                      className={`flex w-full items-center rounded-[10px]  border border-[#2f2f2f] bg-[#202020] px-3 text-gray-300 outline-none backdrop-blur-[400px]`}
-                    >
-                      {/* <div 
+            {/* Name/Address Section */}
+            <div className="flex items-center w-full flex-col">
+              <div
+                className={`flex flex-col justify-center w-full gap-1 text-white font-semibold`}
+              >
+                ENS Name / Address
+                <div
+                  className={`flex w-full items-center rounded-[10px]  border border-[#2f2f2f] bg-[#202020] px-3 text-gray-300 outline-none backdrop-blur-[400px]`}
+                >
+                  {/* <div
                     className="absolute inset-0 bg-[#202020] opacity-50 blur-lg z-0"
                   ></div> */}
-                      <div className="mr-2">
-                        <Image
-                          alt="user-icon"
-                          src="/images/user-icon.svg"
-                          className="size-4 sm:size-5"
-                          width={30}
-                          height={30}
+                  <div className="mr-2">
+                    <Image
+                      alt="user-icon"
+                      src="/images/user-icon.svg"
+                      className="size-4 sm:size-5"
+                      width={30}
+                      height={30}
+                    />
+                  </div>
+                  <div className="flex-1 bg-transparent py-2 sm:py-3 outline-none text-gray-500 text-sm sm:text-base">
+                    {isLoadingProfile ? (
+                      <div className="flex items-center justify-center">
+                        <Oval
+                          visible={true}
+                          height="20"
+                          width="20"
+                          color="#4f4f4f"
+                          secondaryColor="#2f2f2f"
                         />
                       </div>
-                      <div className="flex-1 bg-transparent py-2 sm:py-3 outline-none text-gray-500 text-sm sm:text-base">
-                        {isLoadingProfile ? (
-                          <div className="flex items-center justify-center">
-                            <Oval
-                              visible={true}
-                              height="20"
-                              width="20"
-                              color="#4f4f4f"
-                              secondaryColor="#2f2f2f"
-                            />
-                          </div>
-                        ) : (
-                          name
-                        )}
-                      </div>
-                    </div>
+                    ) : (
+                      name
+                    )}
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Start Button */}
-                <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
-                  <button
-                    className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
+            {/* Start Button */}
+            <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
+              <button
+                className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
                   ${
                     isLoadingProfile
                       ? "bg-gray-700"
@@ -410,33 +481,27 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                   }
                   transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
-                    onClick={handleStartSpaces}
-                    disabled={isLoadingProfile || isJoining}
-                  >
-                    <span className="mr-2">
-                      {isJoining
-                        ? "Joining Spaces..."
-                        : isHost
-                        ? "Start Meeting"
-                        : "Join Meeting"}
-                    </span>
-                    {!isJoining && (
-                      <Image
-                        alt="arrow-right"
-                        width={24}
-                        height={24}
-                        src={arrow}
-                        className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-1"
-                      />
-                    )}
-                  </button>
-                </div>
-              </div>
+                onClick={handleStartSpaces}
+                disabled={isLoadingProfile || isJoining}
+              >
+                <span className="mr-2">
+                  {isJoining ? "Joining Spaces..." : buttonText}
+                </span>
+                {!isJoining && (
+                  <Image
+                    alt="arrow-right"
+                    width={24}
+                    height={24}
+                    src={arrow}
+                    className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                )}
+              </button>
             </div>
-          </main>
+          </div>
         </div>
-      )}
-    </>
+      </main>
+    </div>
   );
 };
 
