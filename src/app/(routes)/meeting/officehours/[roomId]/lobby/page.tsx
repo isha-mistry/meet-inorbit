@@ -27,6 +27,7 @@ import {
 } from "@/utils/LobbyApiActions";
 import { APP_BASE_URL } from "@/config/constants";
 import { m } from "framer-motion";
+import { XMarkIcon } from "@heroicons/react/24/outline"; 
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // State Management
@@ -47,6 +48,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [attendeeJoinedStatus, setAttendeeJoinedStatus] = useState<string>();
   const [isApiCalling, setIsApiCalling] = useState<boolean>();
   const [isHost, setIsHost] = useState<boolean>();
+  const [showConfirmWallet, setShowConfirmWallet] = useState(true);
+   const [buttonText, setButtonText] = useState<string>("Join Meeting");
 
   // Hooks
   const { push } = useRouter();
@@ -71,6 +74,19 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   //     openConnectModal();
   //   }
   // }, [isConnected, isPageLoading, isSessionLoading]);
+
+    // Update ButtonText when walletAddress Changes
+    useEffect(() => {
+      if (walletAddress && meetingData) {
+        if (walletAddress === meetingData.host_address) {
+          setIsHost(true);
+          setButtonText("Start Meeting");
+        } else {
+          setIsHost(false);
+          setButtonText("Join Meeting");
+        }
+      }
+    }, [walletAddress, meetingData]);
 
   useEffect(() => {
     if (!walletAddress) {
@@ -107,6 +123,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const { data } = result;
           if (walletAddress === data.host_address) {
             setIsHost(true);
+            setButtonText("Start Meeting");
+          } else {
+            setIsHost(false);
+            setButtonText("Join Meeting");
           }
           setMeetingData(data);
           setHostAddress(data.host_address);
@@ -288,6 +308,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     }
   };
 
+  const handleCloseConfirmWallet = () => {
+    setShowConfirmWallet(false);
+  };
+
+  const handleContinue = () => {
+    setShowConfirmWallet(false);
+  };
+
   // Render loading state
   if (isPageLoading || isSessionLoading || isApiCalling) {
     return (
@@ -327,8 +355,48 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   return (
     <>
       {isAllowToEnter === true && (
-        <div className="min-h-screen bg-[#0a0a0a] ">
-          <main className="flex min-h-screen flex-col text-white font-poppins">
+        <div className="min-h-screen bg-[#0a0a0a] relative">
+              {showConfirmWallet && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-40">
+          {" "}
+          {/* Semi-transparent overlay */}
+          <div className="relative bg-[#1a1a1a] border border-[#333] p-8 rounded-xl shadow-lg w-full max-w-md text-white flex items-center flex-col">
+            {" "}
+            {/* Darker background, subtle border */}
+            <button
+              onClick={handleCloseConfirmWallet}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+            <h2 className="text-2xl font-semibold mb-4 text-center text-blue-300">
+              Confirm Your Wallet
+            </h2>{" "}
+            {/* More prominent title */}
+            <p className="mb-4 text-gray-400 text-center">
+              You're currently connected with:
+            </p>{" "}
+            {/* Subdued description */}
+            <ConnectWalletWithENS showPopup={true} />
+            <p className="text-red-500 text-center mt-4 font-semibold">
+              If this is not the wallet address you used to host or wish to join
+              with, please switch to a different wallet.
+            </p>{" "}
+            {/* Improved warning text */}
+            <button
+              onClick={handleContinue}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-full mt-6 hover:from-blue-500 hover:to-blue-300 transition duration-300"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+          <main className="flex min-h-screen flex-col text-white font-poppins"
+           style={{
+            filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
+            pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
+          }}>
             <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
               <div className="text-4xl font-semibold font-quanty tracking-wide">
                 <span className="text-white">Chora</span>
@@ -422,9 +490,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                     <span className="mr-2">
                       {isJoining
                         ? "Joining Spaces..."
-                        : isHost
-                        ? "Start Meeting"
-                        : "Join Meeting"}
+                        : buttonText}
                     </span>
                     {!isJoining && (
                       <Image
