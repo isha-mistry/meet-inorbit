@@ -60,6 +60,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (meetingType === 1) {
       meetingTypeName = "session";
+      initialDelay = 4 * 1000;
     } else if (meetingType === 2) {
       meetingTypeName = "officehours";
       initialDelay = 2 * 60 * 1000;

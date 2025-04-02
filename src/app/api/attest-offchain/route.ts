@@ -76,6 +76,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
 
+
     const encodedData = schemaEncoder.encodeData([
       {
         name: "MeetingId",
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "StartTime", value: requestData.startTime, type: "uint32" },
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
+
 
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
@@ -104,6 +106,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer
     );
 
+
     const pkg = {
       sig: offchainAttestation,
       signer: await signer.getAddress(),
@@ -121,15 +124,36 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const url = baseUrl + createOffchainURL(pkg);
 
+    // const data = {
+    //   filename: `eas.txt`,
+    //   textJson: JSON.stringify(pkg),
+    // };
+
     const data = {
       filename: `eas.txt`,
-      textJson: JSON.stringify(pkg),
+      textJson: JSON.stringify(pkg, (key, value) =>
+        typeof value === "bigint" ? value.toString() : value
+      ),
     };
+
+
 
     let uploadstatus = false;
     try {
-      const response = await axios.post(`${baseUrl}/offchain/store`, data);
-      if (response.data) {
+      const response = await fetch(`${baseUrl}/offchain/store`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      // if (!response.ok) {
+      //   throw new Error(`Failed to upload data: ${response.statusText}`);
+      // }
+
+      const responseData = await response.json();
+      if (responseData.offchainAttestationId) {
         uploadstatus = true;
       }
 
@@ -142,7 +166,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
-              uid_host: response.data.offchainAttestationId,
+              uid_host: responseData.offchainAttestationId,
             },
           }
         );
@@ -177,7 +201,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           },
           {
             $set: {
-              "attendees.$.attendee_uid": response.data.offchainAttestationId,
+              "attendees.$.attendee_uid": responseData.offchainAttestationId,
             },
           }
         );
@@ -208,7 +232,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           { meetingId: requestData.meetingId.split("/")[0] },
           {
             $set: {
-              uid_host: response.data.offchainAttestationId,
+              uid_host: responseData.offchainAttestationId,
             },
           }
         );
@@ -241,7 +265,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           },
           {
             $set: {
-              "attendees.$.attendee_uid": response.data.offchainAttestationId,
+              "attendees.$.attendee_uid": responseData.offchainAttestationId,
             },
           }
         );

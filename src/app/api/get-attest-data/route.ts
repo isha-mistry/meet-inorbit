@@ -18,6 +18,7 @@ async function delegateAttestationOffchain(data: any) {
     body: JSON.stringify(data),
   };
 
+
   // const response = await fetchApi(`/attest-offchain`, requestOptions);
   const response = await fetch(
     `${BASE_URL}/api/attest-offchain/`,
