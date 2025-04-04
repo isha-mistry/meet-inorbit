@@ -141,6 +141,7 @@ const privyConfig: PrivyClientConfig = {
       "coinbase_wallet",
       "uniswap",
       "rabby_wallet",
+      "detected_wallets"
     ],
   },
   defaultChain:optimism,
