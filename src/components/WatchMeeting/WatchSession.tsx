@@ -8,14 +8,10 @@ import user6 from "@/assets/images/user/user6.svg";
 import user7 from "@/assets/images/user/user7.svg";
 import user8 from "@/assets/images/user/user8.svg";
 import user9 from "@/assets/images/user/user9.svg";
-import view from "@/assets/images/daos/view.png";
 import Image from "next/image";
-import oplogo from "@/assets/images/daos/op.png";
-import arblogo from "@/assets/images/daos/arbitrum.jpg";
 import time from "@/assets/images/daos/time.png";
 import onChain_link from "@/assets/images/watchmeeting/onChain_link.png";
 import offChain_link from "@/assets/images/watchmeeting/offChain_link.png";
-import { PiFlagFill } from "react-icons/pi";
 import { BiSolidShare } from "react-icons/bi";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Link from "next/link";
@@ -152,9 +148,8 @@ function WatchSession({
     <div className="">
       <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
         <div
-          className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 ${
-            data.description.length > 0 ? "border-b" : ""
-          }  border-[#CCCCCC]`}
+          className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 ${data.description.length > 0 ? "border-b" : ""
+            }  border-[#CCCCCC]`}
         >
           <div className="text-lg font-semibold pb-3">
             {sessionDetails.title || data.title}
@@ -166,7 +161,7 @@ function WatchSession({
                   className="flex gap-2 cursor-pointer items-center"
                   onClick={() =>
                     router.push(
-                      `/${data.dao_name}/${data.host_address}?active=info`
+                      `/arbitrum/${data.host_address}?active=info`
                     )
                   }
                 >
@@ -200,10 +195,7 @@ function WatchSession({
                       <Link
                         href={
                           data.uid_host
-                            ? `${
-                                daoConfigs[data.dao_name.toLowerCase()]
-                                  .attestationUrl
-                              }/${data.uid_host}`
+                            ? `https://arbitrum.easscan.org/offchain/attestation/view/${data.uid_host}`
                             : "#"
                           // ? data.dao_name.toLowerCase() === "optimism"
                           //   ? `https://optimism.easscan.org/offchain/attestation/view/${data.uid_host}`
@@ -248,10 +240,7 @@ function WatchSession({
                     <Link
                       href={
                         data.onchain_host_uid
-                          ? `${
-                              daoConfigs[data.dao_name.toLowerCase()]
-                                .attestationView
-                            }`
+                          ? `https://arbitrum.easscan.org/attestation/view/${data.onchain_host_uid}`
                           : "#"
                         // ? data.dao_name.toLowerCase() === "optimism"
                         //   ? `https://optimism.easscan.org/attestation/view/${data.onchain_host_uid}`
@@ -283,7 +272,7 @@ function WatchSession({
                 )}
               </div>
 
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 {daoConfigs ? (
                   <Image
                     src={daoConfigs[data.dao_name.toLowerCase()].logo}
@@ -298,7 +287,7 @@ function WatchSession({
                 <div className="text-[#292929] font-semibold capitalize">
                   {data.dao_name}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="flex gap-6">
@@ -321,8 +310,8 @@ function WatchSession({
                   {collection === "meetings"
                     ? formatTimeAgo(data.slot_time)
                     : collection === "office_hours"
-                    ? formatTimeAgo(data.startTime ?? "")
-                    : ""}
+                      ? formatTimeAgo(data.startTime ?? "")
+                      : ""}
                 </div>
               </div>
               {path.includes("/watch") && (
@@ -402,7 +391,7 @@ function WatchSession({
                           closeDelay={1}
                         >
                           <Link
-                            href={daoConfigs?`${daoConfigs[data.dao_name.toLowerCase()].attestationUrl}/${attendee.attendee_uid}`:""
+                            href={`https://arbitrum.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                               // data.dao_name.toLowerCase() === "optimism"
                               //   ? `https://optimism.easscan.org/offchain/attestation/view/${attendee.attendee_uid}`
                               //   : data.dao_name.toLowerCase() === "arbitrum"
@@ -439,7 +428,7 @@ function WatchSession({
                           closeDelay={1}
                         >
                           <Link
-                            href={daoConfigs?`${daoConfigs[data.dao_name.toLowerCase()].attestationView}/${attendee.onchain_attendee_uid}`:""
+                            href={`https://arbitrum.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                               // data.dao_name.toLowerCase() === "optimism"
                               //   ? `https://optimism.easscan.org/attestation/view/${attendee.onchain_attendee_uid}`
                               //   : data.dao_name.toLowerCase() === "arbitrum"
@@ -487,9 +476,8 @@ function WatchSession({
               <>
                 <div
                   ref={contentRef}
-                  className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${
-                    isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
-                  }`}
+                  className={`max-h-full transition-max-height duration-500 ease-in-out overflow-hidden ${isExpanded ? "max-h-full" : "max-h-24 line-clamp-3"
+                    }`}
                   style={{
                     maxHeight: isExpanded ? `${contentHeight}px` : "6rem",
                   }}
@@ -527,7 +515,7 @@ function WatchSession({
           data={data}
         />
       )}
-    </div>
+    </div >
   );
 }
 

@@ -9,7 +9,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     recordedStatus,
     meetingStatus,
     nft_image,
-    daoName,
   } = await req.json();
 
   try {
@@ -19,7 +18,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     // const collectionName =
     //   meetingType === "session" ? "meetings" : "office_hours";
     const db = client.db();
-    const collection = db.collection("meetings");
+    const collection = db.collection("sessions");
 
     if (cacheWrapper.isAvailable) {
       await cacheWrapper.delete("meetings");
@@ -57,19 +56,19 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       const { host_address, attendees } = updatedDocument;
 
       // Update the delegate collection to increase sessionRecords.hostedRecords.totalMeetings count
-      const delegateCollection = db.collection("delegates");
+      const delegateCollection = db.collection("users");
       const delegateUpdateResult = await delegateCollection.findOneAndUpdate(
         { address: host_address },
         {
           $inc: {
-            [`meetingRecords.${daoName}.sessionHosted.totalHostedMeetings`]: 1,
+            [`meetingRecords.sessionHosted.totalHostedMeetings`]: 1,
           },
         },
         { returnDocument: "after", upsert: true } // Ensures the document is created if it doesn't exist
       );
 
-      if(cacheWrapper.isAvailable){
-        const cacheKey=`profile:${host_address}`;
+      if (cacheWrapper.isAvailable) {
+        const cacheKey = `profile:${host_address}`;
         await cacheWrapper.delete(cacheKey);
       }
 
@@ -79,7 +78,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
           { address: attendee_address },
           {
             $inc: {
-              [`meetingRecords.${daoName}.sessionAttended.totalAttendedMeetings`]: 1,
+              [`meetingRecords.sessionAttended.totalAttendedMeetings`]: 1,
             },
             // $setOnInsert: {
             //   "meetingRecords.sessionAttended.offchainCount": 0,

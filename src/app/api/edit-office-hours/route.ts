@@ -27,7 +27,7 @@ async function sendMeetingStartNotification({
 }) {
   try {
     // Get users collection
-    const usersCollection = db.collection("delegates");
+    const usersCollection = db.collection("users");
     const notificationCollection = db.collection("notifications");
 
     const normalizedHostAddress = host_address.toLowerCase();
@@ -121,7 +121,7 @@ async function sendMeetingStartNotification({
               body: compileBookedSessionTemplate(
                 "Office Hours Have Started - Join Now",
                 baseNotification.content,
-                `${BASE_URL}/meeting/officehours/${additionalData.meetingId}/lobby`,
+                `${BASE_URL}/meeting/officehours/${additionalData.meetingId}/lobby`
               ),
             });
           } catch (error) {
@@ -163,7 +163,7 @@ export async function PUT(req: Request) {
     const client = await connectDB();
     const db = client.db();
     const collection = db.collection("office_hours");
-    const delegatesCollection = db.collection("delegates");
+    const delegatesCollection = db.collection("users");
 
     const existingDoc = await collection.findOne({
       host_address,
@@ -448,8 +448,7 @@ export async function PUT(req: Request) {
       }
     );
 
-    if(result.acknowledged)
-    {
+    if (result.acknowledged) {
       if (cacheWrapper.isAvailable) {
         const cacheKey = `office-hours-all`;
         await cacheWrapper.delete(cacheKey);

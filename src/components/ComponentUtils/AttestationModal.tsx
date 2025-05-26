@@ -45,9 +45,9 @@ function AttestationModal({
   }, []);
 
   const toggleModal = () => {
-    if (rating !== null && !feedbackStored) {
-      storeUserFeedback();
-    }
+    // if (rating !== null && !feedbackStored) {
+    //   storeUserFeedback();
+    // }
     onClose();
   };
 
@@ -65,57 +65,57 @@ function AttestationModal({
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
 
-    if (rating !== null && !feedbackStored) {
-      storeUserFeedback();
-    }
+    // if (rating !== null && !feedbackStored) {
+    //   storeUserFeedback();
+    // }
   };
 
   const handleRatingClick = (value: number) => {
     setRating(value);
   };
 
-  const storeUserFeedback = async () => {
-    try {
-      const myHeaders = new Headers();
-      const token=await getAccessToken();
-      myHeaders.append("Content-Type", "application/json");
+  // const storeUserFeedback = async () => {
+  //   try {
+  //     const myHeaders = new Headers();
+  //     const token=await getAccessToken();
+  //     myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        address: hostAddress,
-        role: role,
-        feedbackType: "feedbackReceived",
-        data: {
-          guestAddress: walletAddress,
-          meetingId: meetingId,
-          ratings: rating,
-        },
-      });
+  //     const raw = JSON.stringify({
+  //       address: hostAddress,
+  //       role: role,
+  //       feedbackType: "feedbackReceived",
+  //       data: {
+  //         guestAddress: walletAddress,
+  //         meetingId: meetingId,
+  //         ratings: rating,
+  //       },
+  //     });
 
-      if (walletAddress) {
-        myHeaders.append("x-wallet-address", walletAddress);
-        myHeaders.append("Authorization",`Bearer ${token}`);
-      }
+  //     if (walletAddress) {
+  //       myHeaders.append("x-wallet-address", walletAddress);
+  //       myHeaders.append("Authorization",`Bearer ${token}`);
+  //     }
 
-      const requestOptions: any = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
+  //     const requestOptions: any = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: raw,
+  //       redirect: "follow",
+  //     };
 
-      const response = await fetchApi(
-        "/feedback/store-feedback",
-        requestOptions
-      );
+  //     const response = await fetchApi(
+  //       "/feedback/store-feedback",
+  //       requestOptions
+  //     );
 
-      const result = await response.json();
-      if (result.success) {
-        setFeedbackStored(true);
-      }
-    } catch (e) {
-      console.log("Error: ", e);
-    }
-  };
+  //     const result = await response.json();
+  //     if (result.success) {
+  //       setFeedbackStored(true);
+  //     }
+  //   } catch (e) {
+  //     console.log("Error: ", e);
+  //   }
+  // };
 
   return (
     <div>
@@ -177,7 +177,7 @@ function AttestationModal({
                   </div>
                 )}
                 <div className="flex-col md:flex-row flex items-center text-blue-shade-100 mb-6 sm:mb-0 sm:mt-6 gap-2 sm:gap-0">
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <FaArrowRight size={10} className="mt-1 mr-1" />
                     <div className="mr-8">
                       <Link
@@ -195,7 +195,7 @@ function AttestationModal({
                         Share Your Feedback!
                       </Link>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div>
                     {/* <div className="flex justify-center"> */}

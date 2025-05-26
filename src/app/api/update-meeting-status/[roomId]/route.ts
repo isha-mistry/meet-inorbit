@@ -8,7 +8,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
   const { meetingId, meetingType, additionalData } = await req.json();
 
   const {
-    daoName,
     sessionType,
     callerAddress,
     hostAddress,

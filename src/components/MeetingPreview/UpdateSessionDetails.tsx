@@ -195,7 +195,7 @@ function UpdateSessionDetails({
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">
-                <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "office hours"} on Chora Club</span>
+                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "office hours"} on Chora Club</span>
                   <button
                     className="ml-auto rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}
@@ -209,21 +209,19 @@ function UpdateSessionDetails({
               <div className="flex">
                 <Button
                   onClick={() => setViewMode("edit")}
-                  className={`rounded-l-full ${
-                    viewMode === "edit"
-                      ? "bg-black text-white"
-                      : "bg-white border border-black text-black"
-                  }`}
+                  className={`rounded-l-full ${viewMode === "edit"
+                    ? "bg-black text-white"
+                    : "bg-white border border-black text-black"
+                    }`}
                 >
                   Edit
                 </Button>
                 <Button
                   onClick={() => setViewMode("preview")}
-                  className={`rounded-r-full ${
-                    viewMode === "preview"
-                      ? "bg-black text-white"
-                      : "bg-white border border-black text-black"
-                  }`}
+                  className={`rounded-r-full ${viewMode === "preview"
+                    ? "bg-black text-white"
+                    : "bg-white border border-black text-black"
+                    }`}
                 >
                   Preview
                 </Button>

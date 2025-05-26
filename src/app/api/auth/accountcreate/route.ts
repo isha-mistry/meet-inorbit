@@ -78,7 +78,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       // Connect to database
       client = await connectDB();
       const db = client.db();
-      const collection = db.collection("delegates");
+      const collection = db.collection("users");
 
       // Check if delegate already exists
       const existingDocument = await collection.findOne({

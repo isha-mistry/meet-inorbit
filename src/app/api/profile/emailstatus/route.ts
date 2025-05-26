@@ -12,11 +12,14 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    console.log("Received update request:", { address, isEmailVisible });
 
+    console.log("Connecting to MongoDB...");
     const client = await connectDB();
+    console.log("Connected to MongoDB");
 
     const db = client.db();
-    const collection = db.collection("delegates");
+    const collection = db.collection("users");
 
     // Find documents matching the address (case-insensitive)
     const documents = await collection

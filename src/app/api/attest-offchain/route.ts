@@ -45,15 +45,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
-  const currentDAO=daoConfigs[requestData.daoName];
+  const currentDAO = daoConfigs[requestData.daoName];
 
   try {
-    const atstUrl =currentDAO?currentDAO.alchemyAttestationUrl:"";
-      // requestData.daoName === "optimism"
-      //   ? ATTESTATION_OP_URL
-      //   : requestData.daoName === "arbitrum"
-      //   ? ATTESTATION_ARB_URL
-      //   : "";
+    const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
+    // requestData.daoName === "optimism"
+    //   ? ATTESTATION_OP_URL
+    //   : requestData.daoName === "arbitrum"
+    //   ? ATTESTATION_ARB_URL
+    //   : "";
     // Set up your ethers provider and signer
     const provider = new ethers.JsonRpcProvider(atstUrl, undefined, {
       staticNetwork: true,
@@ -61,12 +61,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const privateKey = process.env.PVT_KEY ?? "";
     const signer = new ethers.Wallet(privateKey, provider);
 
-    const EASContractAddress = currentDAO?currentDAO.eascontracAddress:"";
-      // requestData.daoName === "optimism"
-      //   ? "0x4200000000000000000000000000000000000021"
-      //   : requestData.daoName === "arbitrum"
-      //   ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
-      //   : "";
+    const EASContractAddress = currentDAO ? currentDAO.eascontracAddress : "";
+    // requestData.daoName === "optimism"
+    //   ? "0x4200000000000000000000000000000000000021"
+    //   : requestData.daoName === "arbitrum"
+    //   ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
+    //   : "";
     const eas = new EAS(EASContractAddress);
 
     eas.connect(signer);
@@ -75,7 +75,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const schemaEncoder = new SchemaEncoder(
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
-
 
     const encodedData = schemaEncoder.encodeData([
       {
@@ -87,7 +86,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "StartTime", value: requestData.startTime, type: "uint32" },
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
-
 
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
@@ -106,7 +104,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       signer
     );
 
-
     const pkg = {
       sig: offchainAttestation,
       signer: await signer.getAddress(),
@@ -114,7 +111,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     let baseUrl = "";
 
-    baseUrl=currentDAO.offchainAttestationUrl;
+    baseUrl = currentDAO.offchainAttestationUrl;
 
     // if (requestData.daoName === "optimism") {
     //   baseUrl = OFFCHAIN_OP_ATTESTATION_BASE_URL;
@@ -135,8 +132,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         typeof value === "bigint" ? value.toString() : value
       ),
     };
-
-
 
     let uploadstatus = false;
     try {
@@ -161,7 +156,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const client = await connectDB();
 
         const db = client.db();
-        const collection = db.collection("meetings");
+        const collection = db.collection("sessions");
         await collection.findOneAndUpdate(
           { meetingId: requestData.meetingId.split("/")[0] },
           {
@@ -171,7 +166,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        const usersCollection = db.collection("delegates");
+        const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
@@ -181,7 +176,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        if(cacheWrapper.isAvailable){
+        if (cacheWrapper.isAvailable) {
           const cacheKey = `profile:${requestData.recipient}`;
           await cacheWrapper.delete(cacheKey);
         }
@@ -191,7 +186,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const client = await connectDB();
 
         const db = client.db();
-        const collection = db.collection("meetings");
+        const collection = db.collection("sessions");
         await collection.findOneAndUpdate(
           {
             meetingId: requestData.meetingId.split("/")[0],
@@ -206,7 +201,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        const usersCollection = db.collection("delegates");
+        const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
@@ -216,7 +211,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        if(cacheWrapper.isAvailable){
+        if (cacheWrapper.isAvailable) {
           const cacheKey = `profile:${requestData.recipient}`;
           await cacheWrapper.delete(cacheKey);
         }
@@ -237,7 +232,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        const usersCollection = db.collection("delegates");
+        const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
@@ -246,7 +241,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             },
           }
         );
-        if(cacheWrapper.isAvailable){
+        if (cacheWrapper.isAvailable) {
           const cacheKey = `profile:${requestData.recipient}`;
           await cacheWrapper.delete(cacheKey);
         }
@@ -270,7 +265,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        const usersCollection = db.collection("delegates");
+        const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
           { address: requestData.recipient },
           {
@@ -280,7 +275,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           }
         );
 
-        if(cacheWrapper.isAvailable){
+        if (cacheWrapper.isAvailable) {
           const cacheKey = `profile:${requestData.recipient}`;
           await cacheWrapper.delete(cacheKey);
         }
@@ -299,10 +294,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // Rest of your code remains the same
 
     let offchainAttestationLink = "";
-    if(currentDAO){
-      offchainAttestationLink=`${currentDAO.attestationUrl}/${offchainAttestation.uid}`;
+    if (currentDAO) {
+      offchainAttestationLink = `${currentDAO.attestationUrl}/${offchainAttestation.uid}`;
     }
-    
+
     // if (requestData.daoName === "optimism") {
     //   offchainAttestationLink = `https://optimism.easscan.org/offchain/attestation/view/${offchainAttestation.uid}`;
     // } else if (requestData.daoName === "arbitrum") {

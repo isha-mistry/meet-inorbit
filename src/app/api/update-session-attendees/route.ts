@@ -21,7 +21,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     const client = await connectDB();
 
     const db = client.db();
-    const collection = db.collection("meetings");
+    const collection = db.collection("sessions");
 
     const existingDocument = await collection.findOne({
       meetingId: meetingId,

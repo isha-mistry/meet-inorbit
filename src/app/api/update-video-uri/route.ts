@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       { $set: { video_uri, meeting_status: "inactive" } }
     );
 
-    const meetingsCollection = db.collection("meetings");
+    const meetingsCollection = db.collection("sessions");
     const sessionMeeting = await meetingsCollection.findOneAndUpdate(
       { meetingId },
       {

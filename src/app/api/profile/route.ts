@@ -1,59 +1,13 @@
 import { connectDB } from "@/config/connectDB";
-import { Item } from "@radix-ui/react-dropdown-menu";
+import { cacheWrapper } from "@/utils/cacheWrapper";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse, NextRequest } from "next/server";
 
-// // Define the request body type
-// interface DelegateRequestBody {
-//   address: string;
-//   image: string;
-//   description: string;
-//   daoName: string;
-//   isDelegate: boolean;
-//   displayName: string;
-//   emailId: string;
-//   socialHandles: {
-//     twitter: string;
-//     discord: string;
-//     discourse: string;
-//     github: string;
-//   };
-// }
-
-type follow_activity = {
-  action: string;
-  timestamp: Date;
-};
-type follower_details = {
-  address: string;
-  isNotification: boolean;
-  isFollowing: boolean;
-  activity: follow_activity[];
-};
-type dao_following = {
-  isFollowing: boolean;
-  isNotification: boolean;
-  follower_address: string;
-  timestamp: Date;
-};
-type followings = {
-  dao: string;
-  following: dao_following[];
-};
-
-type network_details = {
-  dao_name: string;
-  network: string;
-  discourse: string;
-  description: string;
-};
-
-interface DelegateRequestBody {
+interface ProfileRequestBody {
   address: string;
   image: string;
-  // description: string;
-  isDelegate: boolean;
   displayName: string;
+  description: string;
   emailId: string;
   isEmailVisible: boolean;
   socialHandles: {
@@ -61,42 +15,16 @@ interface DelegateRequestBody {
     discord: string;
     github: string;
   };
-  networks: network_details[];
-  followers: follower_details[];
-  followings: followings[];
 }
 
-// Define the response body type
-// interface DelegateResponseBody {
-//   success: boolean;
-//   data?: {
-//     id: string;
-//     address: string;
-//     image: string;
-//     daoName: string;
-//     description: string;
-//     isDelegate: boolean;
-//     displayName: string;
-//     emailId: string;
-//     socialHandles: {
-//       twitter: string;
-//       discord: string;
-//       discourse: string;
-//       github: string;
-//     };
-//   } | null;
-//   error?: string;
-// }
-
-interface DelegateResponseBody {
+interface ProfileResponseBody {
   success: boolean;
   data?: {
     id: string;
     address: string;
     image: string;
-    // description: string;
-    isDelegate: boolean;
     displayName: string;
+    description: string;
     emailId: string;
     isEmailVisible: boolean;
     socialHandles: {
@@ -104,52 +32,49 @@ interface DelegateResponseBody {
       discord: string;
       github: string;
     };
-    networks: network_details[];
-    followers: follower_details[];
-    followings: followings[];
   } | null;
   error?: string;
 }
 
 export async function POST(
   req: NextRequest,
-  res: NextApiResponse<DelegateResponseBody>
+  res: NextApiResponse<ProfileResponseBody>
 ) {
   const {
     address,
     image,
-    isDelegate,
     displayName,
+    description,
     emailId,
     isEmailVisible,
     socialHandles,
-    networks,
-  }: DelegateRequestBody = await req.json();
+  }: ProfileRequestBody = await req.json();
 
   try {
     // Connect to your MongoDB database
+    // console.log("Connecting to MongoDB...");
     const client = await connectDB();
+    // console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
-    const collection = db.collection("delegates");
+    const collection = db.collection("users");
 
-    // Insert the new delegate document
+    // Insert the new profile document
+    // console.log("Inserting profile document...");
     const result = await collection.insertOne({
       address,
       image,
-      isDelegate,
       displayName,
+      description,
       emailId,
       isEmailVisible,
       socialHandles,
-      networks,
     });
 
     client.close();
 
     if (result.insertedId) {
-      // Retrieve the inserted document using the insertedId
       const insertedDocument = await collection.findOne({
         _id: result.insertedId,
       });
@@ -161,7 +86,7 @@ export async function POST(
       );
     }
   } catch (error) {
-    console.error("Error storing delegate:", error);
+    console.error("Error storing profile:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -171,100 +96,69 @@ export async function POST(
 
 export async function PUT(
   req: NextRequest,
-  res: NextApiResponse<DelegateResponseBody>
+  res: NextApiResponse<ProfileResponseBody>
 ) {
   const {
     address,
     image,
-    isDelegate,
     displayName,
+    description,
     emailId,
     isEmailVisible,
     socialHandles,
-    networks,
-  }: DelegateRequestBody = await req.json();
+  }: ProfileRequestBody = await req.json();
 
   try {
     // Connect to your MongoDB database
+    console.log("Connecting to MongoDB...");
     const client = await connectDB();
+    console.log("Connected to MongoDB");
 
     // Access the collection
     const db = client.db();
-    const collection = db.collection("delegates");
-    const documents = await collection
-      .find({ address: { $regex: `^${address}$`, $options: "i" } })
-      .toArray();
+    const collection = db.collection("users");
 
     // Prepare update fields
     const updateFields: any = {};
     if (image !== undefined) updateFields.image = image;
-    if (isDelegate !== undefined) updateFields.isDelegate = isDelegate;
     if (displayName !== undefined) updateFields.displayName = displayName;
+    if (description !== undefined) updateFields.description = description;
     if (emailId !== undefined) updateFields.emailId = emailId;
+    if (isEmailVisible !== undefined) updateFields.isEmailVisible = isEmailVisible;
     if (socialHandles !== undefined) updateFields.socialHandles = socialHandles;
-    if (networks !== undefined) {
-      if (documents.length > 0) {
-        const document = documents[0];
-        if (document.networks?.length > 0) {
-          const existingNetworkIndex = document.networks.findIndex(
-            (item: any) => item.dao_name === networks[0].dao_name
-          );
-          if (existingNetworkIndex !== -1) {
-            const updateQuery = {
-              $set: {
-                [`networks.${existingNetworkIndex}`]: networks[0],
-              },
-            };
-            await collection.updateOne(
-              { address: document.address },
-              updateQuery
-            );
-          } else {
-            const updateQuery = {
-              $push: {
-                networks: networks[0],
-              },
-            };
-            await collection.updateOne(
-              { address: document.address },
-              /* @ts-ignore */
-              updateQuery
-            );
-          }
-        } else {
-          const updateQuery = {
-            $set: {
-              networks: [networks[0]],
-            },
-          };
-          await collection.updateOne(
-            { address: document.address },
-            updateQuery
-          );
-        }
-      }
-    }
 
-    // Update the delegate document
+    // Update the profile document
+    console.log("Updating profile document...");
     const result = await collection.updateOne(
       { address: address },
       { $set: updateFields }
     );
+    console.log("Profile document updated:", result);
+
+    if (cacheWrapper.isAvailable) {
+      const cacheKey = `profile:${address}`;
+      await cacheWrapper.delete(cacheKey);
+    }
 
     client.close();
+    console.log("MongoDB connection closed");
 
     if (result.modifiedCount > 0) {
       // If at least one document was modified
       return NextResponse.json({ success: true }, { status: 200 });
     } else {
       // If no document was modified
-      return NextResponse.json(
-        { error: "No document found to update" },
-        { status: 404 }
-      );
+      if (result.acknowledged) {
+        return NextResponse.json({ success: true }, { status: 200 });
+      } else {
+        return NextResponse.json(
+          { error: "No document found to update" },
+          { status: 404 }
+        );
+      }
     }
   } catch (error) {
-    console.error("Error updating delegate:", error);
+    console.error("Error updating profile:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

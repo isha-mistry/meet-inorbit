@@ -354,31 +354,31 @@ export default function Component({ params }: { params: { roomId: string } }) {
             myHeaders.append("Authorization", `Bearer ${token}`);
           }
 
-          const raw = JSON.stringify({
-            address: walletAddress,
-            role: role,
-          });
+          // const raw = JSON.stringify({
+          //   address: walletAddress,
+          //   role: role,
+          // });
 
-          const requestOptions: any = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow",
-          };
+          // const requestOptions: any = {
+          //   method: "POST",
+          //   headers: myHeaders,
+          //   body: raw,
+          //   redirect: "follow",
+          // };
 
-          const response = await fetchApi(
-            "/feedback/get-feedback-status",
-            requestOptions
-          );
+          // const response = await fetchApi(
+          //   "/feedback/get-feedback-status",
+          //   requestOptions
+          // );
 
-          const result = await response.json();
+          // const result = await response.json();
 
-          if (result.data) {
-            setShowFeedbackPopups(false);
-            handlePopupRedirection();
-          } else {
-            setShowFeedbackPopups(true);
-          }
+          handlePopupRedirection();
+          // if (result.data) {
+          //   setShowFeedbackPopups(false);
+          // } else {
+          //   setShowFeedbackPopups(true);
+          // }
 
           // if (role === "host") {
           //   setTimeout(async () => {
@@ -404,10 +404,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
     },
   });
 
-  const handleFeedbackPopupsClose = async () => {
-    setShowFeedbackPopups(false);
-    await handlePopupRedirection();
-  };
+  // const handleFeedbackPopupsClose = async () => {
+  //   setShowFeedbackPopups(false);
+  //   await handlePopupRedirection();
+  // };
 
   const handlePopupRedirection = async () => {
     if (role === "host") {
@@ -1517,7 +1517,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         </>
       )}
 
-      {role !== null && walletAddress !== undefined && showFeedbackPopups && (
+      {/* {role !== null && walletAddress !== undefined && showFeedbackPopups && (
         <PopupSlider
           role={role}
           address={walletAddress ? walletAddress : ""}
@@ -1525,7 +1525,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           meetingId={params.roomId}
           onClose={handleFeedbackPopupsClose}
         />
-      )}
+      )} */}
 
       {role === "host" && isRecording !== true && (
         <MeetingRecordingModal
