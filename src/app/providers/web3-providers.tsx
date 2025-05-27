@@ -39,7 +39,7 @@ import { WagmiProvider, createConfig } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider, signIn } from "next-auth/react";
 import { http } from 'viem';
-import { mainnet,optimism, arbitrum,arbitrumSepolia } from 'viem/chains';
+import { mainnet, optimism, arbitrum, arbitrumSepolia } from 'viem/chains';
 // import { SiweMessage } from 'siwe';
 import { getCsrfToken } from "next-auth/react";
 import { useWalletClient } from "wagmi";
@@ -95,7 +95,7 @@ interface Web3ProviderProps {
 // const projectId = "c52f63cb512b7b43a8724eae05cb5130";
 
 // const wagmiConfig = getDefaultConfig({
-//   appName: "Chora Club",
+//   appName: "Arbitrum University",
 //   projectId: projectId,
 //   chains: [optimism, arbitrum, arbitrumSepolia],
 //   ssr: true, // If your dApp uses server side rendering (SSR)
@@ -115,12 +115,12 @@ interface Web3ProviderProps {
 
 // Wagmi configuration
 const wagmiConfig = createConfig({
-  chains: [optimism, arbitrum,arbitrumSepolia],
+  chains: [optimism, arbitrum, arbitrumSepolia],
   transports: {
     [optimism.id]: http(),
     [arbitrum.id]: http(),
-    [arbitrumSepolia.id]:http(),
-  
+    [arbitrumSepolia.id]: http(),
+
   },
 });
 
@@ -144,7 +144,7 @@ const privyConfig: PrivyClientConfig = {
       "detected_wallets"
     ],
   },
-  defaultChain:optimism,
+  defaultChain: optimism,
 };
 
 
@@ -170,22 +170,22 @@ export default function Web3Provider({ children }: Web3ProviderProps) {
   //     }`,
   //   };
   // }, [referrer]);  
-  
 
-  return (  
+
+  return (
     <PrivyProvider
-    appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
-    config={privyConfig}
-  >
-    <QueryClientProvider client={queryClient}>
-      <PrivyAuthHandler/>
-      <SessionProvider>
-        <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
-          {children}
-        </WagmiProvider>
-      </SessionProvider>
-    </QueryClientProvider>
-  </PrivyProvider>
-);
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
+      config={privyConfig}
+    >
+      <QueryClientProvider client={queryClient}>
+        <PrivyAuthHandler />
+        <SessionProvider>
+          <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
+            {children}
+          </WagmiProvider>
+        </SessionProvider>
+      </QueryClientProvider>
+    </PrivyProvider>
+  );
 
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Poppins } from "next/font/google";
+import { Poppins, Tektur } from "next/font/google";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import { Suspense } from "react";
 import RootProviders from "./providers/root-providers";
@@ -13,27 +13,24 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-const quanty = localFont({
-  src: [
-    {
-      path: "./fonts/quanty.ttf",
-    },
-  ],
-  variable: "--font-quanty",
+const tektur = Tektur({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-tektur",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://app.chora.club/"),
-  title: "Chora Club",
+  metadataBase: new URL("https://stylus-university.vercel.app/"),
+  title: "Arbitrum University",
   description: "Discover. Learn. Engage.",
   icons: {
     icon: ["/favicon.png"],
   },
   openGraph: {
-    title: "Chora Club",
+    title: "Arbitrum University",
     description: "Discover. Learn. Engage.",
-    url: "https://app.chora.club/",
-    siteName: "Chora Club",
+    url: "https://stylus-university.vercel.app/",
+    siteName: "Arbitrum University",
     images: [
       {
         url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
@@ -60,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${quanty.variable} ${poppins.variable} antialiased`}>
+      <body className={`${tektur.variable} ${poppins.variable} antialiased`}>
         <ProgressBarProvider>
           <Suspense>
             <RootProviders>

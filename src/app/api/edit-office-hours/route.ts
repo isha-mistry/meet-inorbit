@@ -1,7 +1,7 @@
 import { connectDB } from "@/config/connectDB";
 import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
 import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
-import { Attendee, OfficeHoursProps } from "@/types/OfficeHoursTypes";
+import { Attendee, Meeting, OfficeHoursProps } from "@/types/OfficeHoursTypes";
 import { cacheWrapper } from "@/utils/cacheWrapper";
 import {
   formatSlotDateAndTime,
@@ -13,14 +13,12 @@ import { io } from "socket.io-client";
 async function sendMeetingStartNotification({
   db,
   title,
-  dao_name,
   startTime,
   host_address,
   additionalData,
 }: {
   db: any;
   title: string;
-  dao_name: string;
   startTime: string;
   host_address: string;
   additionalData: any;
@@ -49,7 +47,7 @@ async function sendMeetingStartNotification({
 
     // Create base notification object
     const baseNotification = {
-      content: `Office hours "${title}" for ${dao_name}, hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
+      content: `Office hours "${title}", hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
       createdAt: Date.now(),
       read_status: false,
       notification_name: "officeHoursStarted",
@@ -58,7 +56,6 @@ async function sendMeetingStartNotification({
       additionalData: {
         ...additionalData,
         host_address,
-        dao_name,
       },
     };
 
@@ -116,7 +113,7 @@ async function sendMeetingStartNotification({
           try {
             await sendMail({
               to: emailId,
-              name: "Chora Club",
+              name: "Arbitrum University",
               subject: "Office Hours Have Started",
               body: compileBookedSessionTemplate(
                 "Office Hours Have Started - Join Now",
@@ -140,8 +137,9 @@ async function sendMeetingStartNotification({
 
 export async function PUT(req: Request) {
   try {
+    const walletAddress = req.headers.get("x-wallet-address");
     const updateData: OfficeHoursProps = await req.json();
-    const { host_address, dao_name, reference_id, attendees, ...updateFields } =
+    const { host_address, reference_id, attendees, ...updateFields } =
       updateData;
 
     if (cacheWrapper.isAvailable) {
@@ -149,14 +147,23 @@ export async function PUT(req: Request) {
       await cacheWrapper.delete(cacheKey);
     }
 
-    if (!host_address || !dao_name || !reference_id) {
+    if (!host_address || !reference_id) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Missing required fields: host_address, dao_name, or reference_id",
+          error: "Missing required field: host_address or reference_id",
         },
         { status: 400 }
+      );
+    }
+
+    if (!walletAddress) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
       );
     }
 
@@ -165,13 +172,29 @@ export async function PUT(req: Request) {
     const collection = db.collection("office_hours");
     const delegatesCollection = db.collection("users");
 
+    // Find the document containing the meeting with the specified reference_id
     const existingDoc = await collection.findOne({
-      host_address,
-      "dao.name": dao_name,
-      "dao.meetings.reference_id": reference_id,
+      host_address: walletAddress,
+      "meetings.reference_id": reference_id,
     });
 
     if (!existingDoc) {
+      await client.close();
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Meeting not found or you are not authorized to edit it",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Find the specific meeting within the document
+    const existingMeeting = existingDoc.meetings.find(
+      (meeting: Meeting) => meeting.reference_id === reference_id
+    );
+
+    if (!existingMeeting) {
       await client.close();
       return NextResponse.json(
         {
@@ -182,30 +205,12 @@ export async function PUT(req: Request) {
       );
     }
 
-    const existingDAO = existingDoc.dao.find(
-      (dao: any) => dao.name === dao_name
-    );
-    const existingMeeting = existingDAO?.meetings.find(
-      (meeting: any) => meeting.reference_id === reference_id
-    );
-
-    if (!existingMeeting) {
-      await client.close();
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Meeting not found in the specified DAO",
-        },
-        { status: 404 }
-      );
-    }
-
     const fieldsToUpdate: { [key: string]: any } = {};
 
     const addFieldIfChanged = (
       fieldName: string,
       value: any,
-      prefix = "dao.$[daoElem].meetings.$[meetingElem]."
+      prefix = "meetings.$[meetingElem]."
     ) => {
       if (value !== undefined && value !== existingMeeting[fieldName]) {
         fieldsToUpdate[`${prefix}${fieldName}`] = value;
@@ -221,7 +226,7 @@ export async function PUT(req: Request) {
     addFieldIfChanged("video_uri", updateFields.video_uri);
     addFieldIfChanged("thumbnail_image", updateFields.thumbnail_image);
     addFieldIfChanged("isMeetingRecorded", updateFields.isMeetingRecorded);
-    addFieldIfChanged("host_uid", updateFields.uid_host);
+    addFieldIfChanged("uid_host", updateFields.uid_host);
     addFieldIfChanged("onchain_host_uid", updateFields.onchain_host_uid);
     addFieldIfChanged("nft_image", updateFields.nft_image);
     addFieldIfChanged(
@@ -236,17 +241,19 @@ export async function PUT(req: Request) {
     ) {
       addFieldIfChanged("onchain_host_uid", updateFields.onchain_host_uid);
 
+      // Update host's onchain counts (without DAO-specific tracking)
       await delegatesCollection.findOneAndUpdate(
-        { address: host_address },
+        { address: walletAddress },
         {
           $inc: {
-            [`meetingRecords.${dao_name}.officeHoursHosted.onchainCounts`]: 1,
+            "meetingRecords.officeHoursHosted.onchainCounts": 1,
           },
-        }
+        },
+        { upsert: true }
       );
 
       if (cacheWrapper.isAvailable) {
-        const cacheKey = `profile:${host_address}`;
+        const cacheKey = `profile:${walletAddress}`;
         await cacheWrapper.delete(cacheKey);
       }
     }
@@ -263,7 +270,6 @@ export async function PUT(req: Request) {
           await sendMeetingStartNotification({
             db,
             title: existingMeeting.title,
-            dao_name,
             startTime: existingMeeting.startTime,
             host_address,
             additionalData: existingMeeting,
@@ -285,19 +291,14 @@ export async function PUT(req: Request) {
       if (isCompletedStatus && wasNotCompletedStatus) {
         // Update host's counts
         await delegatesCollection.findOneAndUpdate(
-          { address: host_address },
+          { address: walletAddress },
           {
             $inc: {
-              [`meetingRecords.${dao_name}.officeHoursHosted.totalHostedOfficeHours`]: 1,
+              "meetingRecords.officeHoursHosted.totalHostedOfficeHours": 1,
             },
           },
           { upsert: true }
         );
-
-        if (cacheWrapper.isAvailable) {
-          const cacheKey = `profile:${host_address}`;
-          await cacheWrapper.delete(cacheKey);
-        }
 
         // Update attendees' counts
         if (existingMeeting.attendees && existingMeeting.attendees.length > 0) {
@@ -307,7 +308,7 @@ export async function PUT(req: Request) {
                 { address: attendee.attendee_address },
                 {
                   $inc: {
-                    [`meetingRecords.${dao_name}.officeHoursAttended.totalAttendedOfficeHours`]: 1,
+                    "meetingRecords.officeHoursAttended.totalAttendedOfficeHours": 1,
                   },
                 },
                 { upsert: true }
@@ -323,7 +324,6 @@ export async function PUT(req: Request) {
               cacheKeys.map((key: string) => cacheWrapper.delete(key))
             );
           }
-
           await Promise.all(updatePromises);
         }
       }
@@ -359,9 +359,11 @@ export async function PUT(req: Request) {
           // Add new attendee
           currentAttendees.push({
             attendee_address: newAttendee.attendee_address,
-            ...(newAttendee.attendee_uid && { uid: newAttendee.attendee_uid }),
+            ...(newAttendee.attendee_uid && {
+              attendee_uid: newAttendee.attendee_uid,
+            }),
             ...(newAttendee.attendee_onchain_uid && {
-              onchain_uid: newAttendee.attendee_onchain_uid,
+              attendee_onchain_uid: newAttendee.attendee_onchain_uid,
             }),
           });
 
@@ -377,7 +379,7 @@ export async function PUT(req: Request) {
               { address: newAttendee.attendee_address },
               {
                 $inc: {
-                  [`meetingRecords.${dao_name}.officeHoursAttended.totalAttendedOfficeHours`]: 1,
+                  "meetingRecords.officeHoursAttended.totalAttendedOfficeHours": 1,
                 },
               },
               { upsert: true }
@@ -389,34 +391,34 @@ export async function PUT(req: Request) {
         ) {
           // Update existing attendee
           if (newAttendee.attendee_uid) {
-            currentAttendees[existingIndex].uid = newAttendee.attendee_uid;
+            currentAttendees[existingIndex].attendee_uid =
+              newAttendee.attendee_uid;
           }
           if (
             newAttendee.attendee_onchain_uid &&
-            !currentAttendees[existingIndex].onchain_uid
+            !currentAttendees[existingIndex].attendee_onchain_uid
           ) {
-            currentAttendees[existingIndex].onchain_uid =
+            currentAttendees[existingIndex].attendee_onchain_uid =
               newAttendee.attendee_onchain_uid;
             newOnchainUids.add(newAttendee.attendee_address);
           }
         }
       });
 
-      // Update onchain counts for attendees
+      // Update onchain counts for attendees (without DAO-specific tracking)
       for (const attendeeAddress of newOnchainUids) {
         await delegatesCollection.findOneAndUpdate(
           { address: attendeeAddress },
           {
             $inc: {
-              [`meetingRecords.${dao_name}.officeHoursAttended.onchainCounts`]: 1,
+              "meetingRecords.officeHoursAttended.onchainCounts": 1,
             },
           },
           { upsert: true }
         );
       }
 
-      fieldsToUpdate["dao.$[daoElem].meetings.$[meetingElem].attendees"] =
-        currentAttendees;
+      fieldsToUpdate["meetings.$[meetingElem].attendees"] = currentAttendees;
     }
 
     if (Object.keys(fieldsToUpdate).length === 0) {
@@ -435,33 +437,26 @@ export async function PUT(req: Request) {
 
     const result = await collection.updateOne(
       {
-        host_address,
-        "dao.name": dao_name,
-        "dao.meetings.reference_id": reference_id,
+        host_address: walletAddress,
+        "meetings.reference_id": reference_id,
       },
       { $set: fieldsToUpdate },
       {
-        arrayFilters: [
-          { "daoElem.name": dao_name },
-          { "meetingElem.reference_id": reference_id },
-        ],
+        arrayFilters: [{ "meetingElem.reference_id": reference_id }],
       }
     );
 
-    if (result.acknowledged) {
-      if (cacheWrapper.isAvailable) {
-        const cacheKey = `office-hours-all`;
-        await cacheWrapper.delete(cacheKey);
-      }
-    }
-
     const updatedDocument = await collection.findOne({
-      host_address,
-      "dao.name": dao_name,
-      "dao.meetings.reference_id": reference_id,
+      host_address: walletAddress,
+      "meetings.reference_id": reference_id,
     });
 
     await client.close();
+
+    if (cacheWrapper.isAvailable) {
+      const hostCacheKey = `profile:${walletAddress}`;
+      await cacheWrapper.delete(hostCacheKey);
+    }
 
     return NextResponse.json(
       {

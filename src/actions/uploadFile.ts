@@ -5,7 +5,6 @@ import { Buffer } from "buffer";
 
 export const uploadFile = async (
   arrayBuffer: ArrayBuffer | any,
-  daoName: string,
   roomId: string | undefined
 ) => {
   // const arrayBuffer = await arrayBuffer.arrayBuffer();
@@ -19,7 +18,7 @@ export const uploadFile = async (
 
     // const file = new File([buffer], "image.png", { type: "image/png" });
     const blob = new Blob([buffer], { type: "image/jpeg" });
-    const file = new File([blob], `${roomId}-${daoName}-nft.jpg`, {
+    const file = new File([blob], `${roomId}-nft.jpg`, {
       type: "image/jpeg",
     });
 

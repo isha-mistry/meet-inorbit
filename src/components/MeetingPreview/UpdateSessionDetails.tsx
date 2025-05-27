@@ -105,7 +105,7 @@ function UpdateSessionDetails({
       if (walletAddress?.toLowerCase() === data.host_address.toLowerCase()) {
         setLoading(true);
 
-        if (collection === "meetings") {
+        if (collection === "sessions") {
           const myHeaders = new Headers();
           const token = await getAccessToken();
           myHeaders.append("Content-Type", "application/json");
@@ -173,7 +173,7 @@ function UpdateSessionDetails({
 
   const handleRedirection = () => {
     console.log("collection", collection);
-    if (collection === "meetings") {
+    if (collection === "sessions") {
       router.push(
         `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
       );
@@ -185,7 +185,7 @@ function UpdateSessionDetails({
   };
 
   return (
-    <div className="font-poppins">
+    <div className="font-tektur">
       {!dataLoading ? (
         walletAddress?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-4 sm:px-6 lg:px-16">
@@ -195,7 +195,7 @@ function UpdateSessionDetails({
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">
-                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "office hours"} on Chora Club</span>
+                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "office hours"} on Arbitrum University</span>
                   <button
                     className="ml-auto rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}

@@ -27,7 +27,7 @@ import {
 } from "@/utils/LobbyApiActions";
 import { APP_BASE_URL } from "@/config/constants";
 import { m } from "framer-motion";
-import { XMarkIcon } from "@heroicons/react/24/outline"; 
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const Lobby = ({ params }: { params: { roomId: string } }) => {
   // State Management
@@ -49,7 +49,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   const [isApiCalling, setIsApiCalling] = useState<boolean>();
   const [isHost, setIsHost] = useState<boolean>();
   const [showConfirmWallet, setShowConfirmWallet] = useState(true);
-   const [buttonText, setButtonText] = useState<string>("Join Meeting");
+  const [buttonText, setButtonText] = useState<string>("Join Meeting");
 
   // Hooks
   const { push } = useRouter();
@@ -75,18 +75,18 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
   //   }
   // }, [isConnected, isPageLoading, isSessionLoading]);
 
-    // Update ButtonText when walletAddress Changes
-    useEffect(() => {
-      if (walletAddress && meetingData) {
-        if (walletAddress === meetingData.host_address) {
-          setIsHost(true);
-          setButtonText("Start Meeting");
-        } else {
-          setIsHost(false);
-          setButtonText("Join Meeting");
-        }
+  // Update ButtonText when walletAddress Changes
+  useEffect(() => {
+    if (walletAddress && meetingData) {
+      if (walletAddress === meetingData.host_address) {
+        setIsHost(true);
+        setButtonText("Start Meeting");
+      } else {
+        setIsHost(false);
+        setButtonText("Join Meeting");
       }
-    }, [walletAddress, meetingData]);
+    }
+  }, [walletAddress, meetingData]);
 
   useEffect(() => {
     if (!walletAddress) {
@@ -209,7 +209,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const ensName = await fetchEnsName(walletAddress);
           setName(
             ensName?.ensName ||
-              truncateAddress(walletAddress ? walletAddress : "")
+            truncateAddress(walletAddress ? walletAddress : "")
           );
         }
       } catch (error) {
@@ -356,49 +356,49 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     <>
       {isAllowToEnter === true && (
         <div className="min-h-screen bg-[#0a0a0a] relative">
-              {showConfirmWallet && (
-        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-40">
-          {" "}
-          {/* Semi-transparent overlay */}
-          <div className="relative bg-[#1a1a1a] border border-[#333] p-8 rounded-xl shadow-lg w-full max-w-md text-white flex items-center flex-col">
-            {" "}
-            {/* Darker background, subtle border */}
-            <button
-              onClick={handleCloseConfirmWallet}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-            <h2 className="text-2xl font-semibold mb-4 text-center text-blue-300">
-              Confirm Your Wallet
-            </h2>{" "}
-            {/* More prominent title */}
-            <p className="mb-4 text-gray-400 text-center">
-              You're currently connected with:
-            </p>{" "}
-            {/* Subdued description */}
-            <ConnectWalletWithENS showPopup={true} />
-            <p className="text-red-500 text-center mt-4 font-semibold">
-              If this is not the wallet address you used to host or wish to join
-              with, please switch to a different wallet.
-            </p>{" "}
-            {/* Improved warning text */}
-            <button
-              onClick={handleContinue}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-full mt-6 hover:from-blue-500 hover:to-blue-300 transition duration-300"
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-      )}
+          {showConfirmWallet && (
+            <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-40">
+              {" "}
+              {/* Semi-transparent overlay */}
+              <div className="relative bg-[#1a1a1a] border border-[#333] p-8 rounded-xl shadow-lg w-full max-w-md text-white flex items-center flex-col">
+                {" "}
+                {/* Darker background, subtle border */}
+                <button
+                  onClick={handleCloseConfirmWallet}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-300"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+                <h2 className="text-2xl font-semibold mb-4 text-center text-blue-300">
+                  Confirm Your Wallet
+                </h2>{" "}
+                {/* More prominent title */}
+                <p className="mb-4 text-gray-400 text-center">
+                  You're currently connected with:
+                </p>{" "}
+                {/* Subdued description */}
+                <ConnectWalletWithENS showPopup={true} />
+                <p className="text-red-500 text-center mt-4 font-semibold">
+                  If this is not the wallet address you used to host or wish to join
+                  with, please switch to a different wallet.
+                </p>{" "}
+                {/* Improved warning text */}
+                <button
+                  onClick={handleContinue}
+                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-full mt-6 hover:from-blue-500 hover:to-blue-300 transition duration-300"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
           <main className="flex min-h-screen flex-col text-white font-poppins"
-           style={{
-            filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
-            pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
-          }}>
+            style={{
+              filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
+              pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
+            }}>
             <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
-              <div className="text-4xl font-semibold font-quanty tracking-wide">
+              <div className="text-4xl font-semibold font-tektur tracking-wide">
                 <span className="text-white">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
               </div>
@@ -472,16 +472,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
                   <button
                     className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
-                  ${
-                    isLoadingProfile
-                      ? "bg-gray-700"
-                      : "bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700"
-                  }
-                  ${
-                    isLoadingProfile || isJoining
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer"
-                  }
+                  ${isLoadingProfile
+                        ? "bg-gray-700"
+                        : "bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700"
+                      }
+                  ${isLoadingProfile || isJoining
+                        ? "cursor-not-allowed"
+                        : "cursor-pointer"
+                      }
                   transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}
                     onClick={handleStartSpaces}

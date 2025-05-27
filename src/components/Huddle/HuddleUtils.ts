@@ -89,7 +89,6 @@ export const handleCloseMeeting = async (
   token: string | null,
   meetingCategory: string,
   roomId: string | undefined,
-  daoName: string,
   hostAddress: string,
   meetingData: SessionInterface | undefined,
   isRecording: boolean | null
@@ -117,7 +116,6 @@ export const handleCloseMeeting = async (
       body: JSON.stringify({
         roomId: roomId,
         meetingType: meetingType,
-        dao_name: daoName,
         hostAddress: hostAddress,
         token: token,
       }),

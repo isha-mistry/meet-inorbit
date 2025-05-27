@@ -209,7 +209,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           const ensName = await fetchEnsName(walletAddress);
           setName(
             ensName?.ensName ||
-              truncateAddress(walletAddress ? walletAddress : "")
+            truncateAddress(walletAddress ? walletAddress : "")
           );
         }
       } catch (error) {
@@ -388,16 +388,15 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       )}
 
       <main
-        className="flex min-h-screen flex-col text-white font-poppins"
+        className="flex min-h-screen flex-col text-white font-tektur"
         style={{
           filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
           pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
         }}
       >
         <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
-          <div className="text-4xl font-semibold font-quanty tracking-wide">
-            <span className="text-white">Chora</span>
-            <span className="text-blue-shade-100">Club</span>
+          <div className="text-4xl font-semibold font-tektur tracking-wide">
+            <span className="text-white">Arbitrum University</span>
           </div>
           <ConnectWalletWithENS />
         </div>
@@ -469,15 +468,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
               <button
                 className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
-                  ${
-                    isLoadingProfile
-                      ? "bg-gray-700"
-                      : "bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700"
+                  ${isLoadingProfile
+                    ? "bg-gray-700"
+                    : "bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700"
                   }
-                  ${
-                    isLoadingProfile || isJoining
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer"
+                  ${isLoadingProfile || isJoining
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer"
                   }
                   transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}

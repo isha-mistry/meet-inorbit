@@ -197,7 +197,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         router.push(url);
       }
     };
-    
+
     handleRouting();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated]); // Empty dependency array to run only once
@@ -217,7 +217,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       const position = { x: 0, y: 0 };
       const interactable = interact(draggableRef.current).draggable({
         listeners: {
-          start(event) {},
+          start(event) { },
           move(event) {
             position.x += event.dx;
             position.y += event.dy;
@@ -497,7 +497,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "cam",
         });
         if (stream) {
-          await enableVideo({customVideoStream:stream});
+          await enableVideo({ customVideoStream: stream });
         }
       };
       changeVideo();
@@ -513,7 +513,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           mediaDeviceKind: "mic",
         });
         if (stream) {
-          enableAudio({customAudioStream:stream});
+          enableAudio({ customAudioStream: stream });
         }
       };
       changeAudio();
@@ -785,10 +785,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {isAllowToEnter ? (
         <div
           className={clsx(
-            `flex flex-col h-screen font-poppins bg-contain bg-center bg-no-repeat ${
-              daoName === "optimism"
-                ? "bg-op-profile"
-                : daoName === "arbitrum"
+            `flex flex-col h-screen font-poppins bg-contain bg-center bg-no-repeat ${daoName === "optimism"
+              ? "bg-op-profile"
+              : daoName === "arbitrum"
                 ? "bg-arb-profile"
                 : null
             }`
@@ -797,7 +796,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           <div className="bg-[#0a0a0a] flex flex-col h-screen">
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
-                <div className="text-3xl font-semibold tracking-wide font-quanty">
+                <div className="text-3xl font-semibold tracking-wide font-tektur">
                   <span className="text-white">Chora</span>
                   <span className="text-blue-shade-100">Club</span>
                 </div>
@@ -878,35 +877,34 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   >
                     {((shareStream && isFullScreen) ||
                       (shareStream && isSmallScreen)) && (
-                      <div
-                        ref={draggableRef}
-                        className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
-                        style={{
-                          transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
-                        }}
-                      >
-                        {metadata?.avatarUrl && (
-                          <div className=" rounded-full w-20 h-20">
-                            <Image
-                              alt="image"
-                              src={metadata?.avatarUrl}
-                              className="maskAvatar object-cover object-center"
-                              width={100}
-                              height={100}
-                            />
-                          </div>
-                        )}
-                        <span className="absolute bottom-2 left-2 text-white">
-                          You
-                        </span>
-                      </div>
-                    )}
+                        <div
+                          ref={draggableRef}
+                          className={`absolute bottom-4 left-4 bg-[#131212] bg-opacity-80 rounded-lg flex items-center justify-center min-w-[150px] min-h-[150px] z-20 cursor-move touch-none`}
+                          style={{
+                            transform: `translate(${draggablePosition.x}px, ${draggablePosition.y}px)`,
+                          }}
+                        >
+                          {metadata?.avatarUrl && (
+                            <div className=" rounded-full w-20 h-20">
+                              <Image
+                                alt="image"
+                                src={metadata?.avatarUrl}
+                                className="maskAvatar object-cover object-center"
+                                width={100}
+                                height={100}
+                              />
+                            </div>
+                          )}
+                          <span className="absolute bottom-2 left-2 text-white">
+                            You
+                          </span>
+                        </div>
+                      )}
                     <div
-                      className={`relative flex flex-col lg:flex-row w-full h-full ${
-                        isRemoteFullScreen && isScreenShared && isFullScreen
+                      className={`relative flex flex-col lg:flex-row w-full h-full ${isRemoteFullScreen && isScreenShared && isFullScreen
                           ? "bg-[#202020] rounded-lg justify-center"
                           : ""
-                      } `}
+                        } `}
                     >
                       {shareStream && (
                         <div className={`w-full `}>
@@ -974,38 +972,33 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
                       <section
                         ref={firstSlideRef}
-                        className={`${
-                          !isScreenShared
+                        className={`${!isScreenShared
                             ? "grid "
-                            : `${
-                                isRemoteFullScreen && isScreenShared
-                                  ? "hidden"
-                                  : `${
-                                      isFullScreen && isScreenShared
-                                        ? "hidden"
-                                        : "hidden lg:grid"
-                                    }`
+                            : `${isRemoteFullScreen && isScreenShared
+                              ? "hidden"
+                              : `${isFullScreen && isScreenShared
+                                ? "hidden"
+                                : "hidden lg:grid"
                               }`
-                        } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${
-                          isScreenShared
+                            }`
+                          } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${isScreenShared
                             ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
                             : peerIds.length === 0
-                            ? "grid-cols-1"
-                            : peerIds.length === 1
-                            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
-                            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
-                        }
+                              ? "grid-cols-1"
+                              : peerIds.length === 1
+                                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 "
+                                : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2"
+                          }
                       `}
                       >
                         {role !== Role.BOT && (
                           <>
                             <div
                               className={`relative 
-                            ${
-                              isAudioOn
-                                ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-                                : "bg-[#202020] bg-opacity-80"
-                            }
+                            ${isAudioOn
+                                  ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
+                                  : "bg-[#202020] bg-opacity-80"
+                                }
                           rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
                             >
                               <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
@@ -1051,13 +1044,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                       showArrow
                                     >
                                       <div
-                                        className={`pl-2 pt-[2px] cursor-pointer  ${
-                                          animatingButtons[
+                                        className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
                                             metadata?.walletAddress || ""
                                           ]
                                             ? "text-blue-500"
                                             : "text-[#3E3D3D]"
-                                        }`}
+                                          }`}
                                       >
                                         <IoCopy
                                           onClick={() =>
@@ -1188,11 +1180,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
                         {role !== Role.BOT && (
                           <div
                             className={`relative w-full flex-1
-                            ${
-                              isAudioOn
+                            ${isAudioOn
                                 ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
                                 : "bg-[#202020] bg-opacity-80"
-                            }
+                              }
                           rounded-lg flex ${getPeerWidthClass()}   min-h-[150px]  max-h-[100%] overflow-hidden`}
                           >
                             <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
@@ -1238,13 +1229,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                     showArrow
                                   >
                                     <div
-                                      className={`pl-2 pt-[2px] cursor-pointer  ${
-                                        animatingButtons[
+                                      className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
                                           metadata?.walletAddress || ""
                                         ]
                                           ? "text-blue-500"
                                           : "text-[#3E3D3D]"
-                                      }`}
+                                        }`}
                                     >
                                       <IoCopy
                                         onClick={() =>
@@ -1307,7 +1297,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
               )}
             </div>
             <BottomBar
-              daoName={daoName}
+              // daoName={daoName}
               hostAddress={hostAddress}
               // meetingStatus={meetingRecordingStatus}
               // currentRecordingStatus={currentRecordingState}
@@ -1375,7 +1365,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
       {((role === "speaker" || role === "listener" || role === "coHost") &&
         modalOpen) ||
-      (role === "host" && hostModalOpen) ? (
+        (role === "host" && hostModalOpen) ? (
         <AttestationModal
           isOpen={role === "host" ? hostModalOpen : modalOpen}
           onClose={handleModalClose}

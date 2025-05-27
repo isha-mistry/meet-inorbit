@@ -68,7 +68,7 @@ const config: Config = {
         "gradient-end": "#06b6d4", // cyan-500
       },
       fontFamily: {
-        quanty: ["var(--font-quanty)"],
+        tektur: ["var(--font-tektur)"],
         poppins: ["var(--font-poppins)"],
       },
       keyframes: {

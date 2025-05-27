@@ -3,25 +3,20 @@ import { connectDB } from "@/config/connectDB";
 import { cacheWrapper } from "@/utils/cacheWrapper";
 
 export async function PUT(req: NextRequest, res: NextResponse) {
-  const {
-    meetingId,
-    meetingType,
-    recordedStatus,
-    meetingStatus,
-    nft_image,
-  } = await req.json();
+  const { meetingId, meetingType, recordedStatus, meetingStatus, nft_image } =
+    await req.json();
 
   try {
     // Connect to MongoDB database
     const client = await connectDB();
 
     // const collectionName =
-    //   meetingType === "session" ? "meetings" : "office_hours";
+    //   meetingType === "session" ? "sessions" : "office_hours";
     const db = client.db();
     const collection = db.collection("sessions");
 
     if (cacheWrapper.isAvailable) {
-      await cacheWrapper.delete("meetings");
+      await cacheWrapper.delete("sessions");
     }
 
     // if (collectionName === "office_hours") {
@@ -38,7 +33,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     //   client.close();
 
     //   return NextResponse.json(officeHours, { status: 200 });
-    // } else if (collectionName === "meetings") {
+    // } else if (collectionName === "sessions") {
     const sessions = await collection.findOneAndUpdate(
       { meetingId },
       {

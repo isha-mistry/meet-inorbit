@@ -307,7 +307,7 @@ function WatchSession({
                   className="w-5 h-5"
                 />
                 <div className="text-[#1E1E1E]">
-                  {collection === "meetings"
+                  {collection === "sessions"
                     ? formatTimeAgo(data.slot_time)
                     : collection === "office_hours"
                       ? formatTimeAgo(data.startTime ?? "")

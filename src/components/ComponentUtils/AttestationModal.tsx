@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import img from "@/assets/images/daos/attestation.png";
 import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
-import Link from "next/link";
-import { FaArrowRight } from "react-icons/fa6";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 import { useAccount } from "wagmi";
@@ -32,7 +30,7 @@ function AttestationModal({
   const [feedbackStored, setFeedbackStored] = useState(false);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const { address } = useAccount();
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("meetingData");
@@ -52,11 +50,11 @@ function AttestationModal({
   };
 
   const shareOnTwitter = () => {
-    const url = encodeURIComponent(`https://app.chora.club/`);
+    const url = encodeURIComponent(`https://stylus-university.vercel.app/`);
     const text = encodeURIComponent(
-      `Just attended an amazing session on #Web3 in @ChoraClub! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
+      `Just attended an amazing session on #Web3! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
         url
-      )}\n\n#choraclub #session #growth`
+      )}\n\n #session #growth`
     );
 
     // Twitter share URL
@@ -123,7 +121,7 @@ function AttestationModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center font-poppins">
           <div
             className="absolute inset-0 bg-[#0a0a0a]"
-            // onClick={toggleModal}
+          // onClick={toggleModal}
           ></div>
           <div className="z-50 bg-white rounded-3xl max-w-7xl mx-3">
             <Confetti recycle={false} />

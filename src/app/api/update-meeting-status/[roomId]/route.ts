@@ -22,7 +22,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     const client = await connectDB();
 
     const collectionName =
-      meetingType === "session" ? "meetings" : "office_hours";
+      meetingType === "session" ? "sessions" : "office_hours";
     const db = client.db();
     const collection = db.collection(collectionName);
 
@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       client.close();
 
       return NextResponse.json(officeHours, { status: 200 });
-    } else if (collectionName === "meetings") {
+    } else if (collectionName === "sessions") {
       if (sessionType === "session") {
         const userENSNameOrAddress = await getDisplayNameOrAddr(
           attendeeAddress

@@ -112,8 +112,10 @@ export async function POST(req: NextRequest) {
 
     if (meetingType === "session") {
       const meeting = await db
-        .collection("meetings")
+        .collection("sessions")
         .findOne({ meetingId: roomId });
+
+      console.log("meeting: ",meeting);
 
       if (!meeting) {
         return createResponse(false, "Meeting does not exist", null, 404);

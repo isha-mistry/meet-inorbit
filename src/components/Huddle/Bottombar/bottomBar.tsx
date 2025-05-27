@@ -45,14 +45,12 @@ import MobileMenuDropdown from "./MobileMenuDropdown";
 import { updateOfficeHoursData } from "@/utils/LobbyApiActions";
 
 const BottomBar = ({
-  daoName,
   hostAddress,
   // meetingStatus,
   // currentRecordingStatus,
   meetingData,
   meetingCategory,
 }: {
-  daoName: string;
   hostAddress: string;
   // meetingStatus: boolean | undefined;
   // currentRecordingStatus: boolean | undefined;
@@ -165,7 +163,6 @@ const BottomBar = ({
         } else if (meetingCategory === "officehours") {
           const requestBody = {
             host_address: hostAddress,
-            dao_name: daoName,
             reference_id: meetingData.reference_id,
             video_uri: videoUri,
           };
@@ -298,7 +295,6 @@ const BottomBar = ({
         token,
         meetingCategory,
         roomId,
-        daoName,
         hostAddress,
         meetingData,
         isRecording
@@ -326,7 +322,7 @@ const BottomBar = ({
       // Set a timeout for image generation
       const imageResponse = (await Promise.race([
         fetch(
-          `${BASE_URL}/api/images/og/nft?daoName=${daoName}&meetingId=${roomId}`,
+          `${BASE_URL}/api/images/og/nft?meetingId=${roomId}`,
           requestOptions
         ),
         new Promise((_, reject) =>
@@ -335,7 +331,7 @@ const BottomBar = ({
       ])) as Response;
 
       const arrayBuffer = await imageResponse.arrayBuffer();
-      const result = await uploadFile(arrayBuffer, daoName, roomId);
+      const result = await uploadFile(arrayBuffer, roomId);
       return `ipfs://` + result.Hash;
     } catch (error) {
       console.error("Error in generating/uploading NFT image:", error);
@@ -364,7 +360,6 @@ const BottomBar = ({
           recordedStatus: isRecording,
           meetingStatus: isRecording === true ? "Recorded" : "Finished",
           nft_image: nft_image,
-          daoName: daoName,
         }),
       };
 
@@ -373,7 +368,6 @@ const BottomBar = ({
       } else if (meetingCategory === "officehours") {
         const requestBody = {
           host_address: hostAddress,
-          dao_name: daoName,
           reference_id: meetingData.reference_id,
           meeting_status: isRecording === true ? "Recorded" : "Finished",
           nft_image: nft_image,
@@ -390,7 +384,7 @@ const BottomBar = ({
   };
 
   const handleCopyInviteLink = () => {
-    const meetingLink = `${window.location.origin}/${daoName}/spaces/${roomId}`;
+    const meetingLink = `${window.location.origin}/spaces/${roomId}`;
     navigator.clipboard.writeText(meetingLink);
     toast.success("Meeting link copied to clipboard!");
   };
@@ -399,7 +393,27 @@ const BottomBar = ({
     <>
       <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-[#0a0a0a] lg:bg-transparent z-10">
         <div className="lg:flex-1">
-          <QuickLinks daoName={daoName} />
+          {role === "host" && (
+            <Button
+              className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+              onClick={() =>
+                handleRecording(
+                  roomId,
+                  walletAddress ?? "",
+                  privypass,
+                  isRecording,
+                  setIsRecording,
+                  meetingRecordingStatus,
+                  setMeetingRecordingStatus
+                )
+              }
+            >
+              {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
+              <span className="hidden lg:block">
+                {meetingRecordingStatus ? "Stop Recording" : "Record"}
+              </span>
+            </Button>
+          )}
         </div>
 
         <div
@@ -446,10 +460,10 @@ const BottomBar = ({
                   isScreenShared && shareStream !== null
                     ? "Stop Sharing"
                     : shareStream !== null
-                    ? "Stop Sharing"
-                    : isScreenShared
-                    ? "Only one screen share is allowed at a time"
-                    : "Share Screen"
+                      ? "Stop Sharing"
+                      : isScreenShared
+                        ? "Only one screen share is allowed at a time"
+                        : "Share Screen"
                 }
                 onClick={() => {
                   if (isScreenShared && shareStream !== null) {
@@ -465,8 +479,7 @@ const BottomBar = ({
                   }
                 }}
                 className={clsx(
-                  `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
-                    (shareStream !== null || isScreenShared) && "bg-gray-500/80"
+                  `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${(shareStream !== null || isScreenShared) && "bg-gray-500/80"
                   }`
                 )}
               >
@@ -485,8 +498,7 @@ const BottomBar = ({
               });
             }}
             className={clsx(
-              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${
-                metadata?.isHandRaised && "bg-gray-500/80"
+              `hidden lg:block bg-[#202020] hover:bg-gray-500/50 ${metadata?.isHandRaised && "bg-gray-500/80"
               }`
             )}
           >
@@ -601,27 +613,6 @@ const BottomBar = ({
         </div>
 
         <div className="hidden lg:flex lg:flex-1 justify-end space-x-3">
-          {role === "host" && (
-            <Button
-              className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
-              onClick={() =>
-                handleRecording(
-                  roomId,
-                  walletAddress ?? "",
-                  privypass,
-                  isRecording,
-                  setIsRecording,
-                  meetingRecordingStatus,
-                  setMeetingRecordingStatus
-                )
-              }
-            >
-              {isUploading ? BasicIcons.spin : BasicIcons.record}{" "}
-              <span className="hidden lg:block">
-                {meetingRecordingStatus ? "Stop Recording" : "Record"}
-              </span>
-            </Button>
-          )}
 
           {role === "listener" && (
             <OutlineButton

@@ -12,7 +12,6 @@ const POLLING_INTERVAL = 60000; // Poll every minute
 export async function pollMeetingTimes(
   roomId: string,
   apiKey: string,
-  dao_name: string,
   hostAddress: string,
   token: string
 ): Promise<void> {
@@ -60,7 +59,6 @@ export async function pollMeetingTimes(
             body: JSON.stringify({
               roomId,
               meetingType: 2,
-              dao_name: dao_name,
               hostAddress: hostAddress,
             }),
           }

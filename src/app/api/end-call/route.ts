@@ -37,13 +37,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const {
       roomId,
       meetingType,
-      dao_name,
       hostAddress,
       token,
     }: {
       roomId: string;
       meetingType: number;
-      dao_name: string;
       hostAddress: string;
       token: string;
     } = await req.json();
@@ -109,7 +107,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       pollMeetingTimes(
         roomId,
         process.env.NEXT_PUBLIC_API_KEY ?? "",
-        dao_name,
         hostAddress,
         token
       ).catch((error) => console.error("Error initiating polling:", error));
@@ -250,7 +247,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       endTime: Math.floor(latestEndTime / 1000),
       meetingType: meetingTypeName,
       attestation: "pending",
-      dao_name: dao_name,
       timeUpdateStatus: "complete",
     };
 
@@ -271,7 +267,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         startTime: Math.floor(earliestStartTime / 1000),
         endTime: Math.floor(latestEndTime / 1000),
         meetingType: meetingTypeName,
-        dao_name: dao_name,
         timeUpdateStatus: "complete",
       },
       { status: 200 }

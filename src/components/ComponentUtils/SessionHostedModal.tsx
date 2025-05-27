@@ -76,7 +76,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
   };
 
   const handleRedirection = () => {
-    if (collection === "meetings") {
+    if (collection === "sessions") {
       router.push(
         `${APP_BASE_URL}/profile/${data.host_address}?active=sessions&session=hosted`
       );
@@ -92,12 +92,12 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
       <Confetti
         width={windowSize.width}
         height={windowSize.height}
-        recycle={true} 
+        recycle={true}
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
-          zIndex: 51, 
+          zIndex: 51,
         }}
       />
       <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
@@ -128,9 +128,8 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
                 onClick={handleCopy}
               >
                 <IoCopy
-                  className={`cursor-pointer ${
-                    copySuccess ? "text-blue-shade-200" : ""
-                  }`}
+                  className={`cursor-pointer ${copySuccess ? "text-blue-shade-200" : ""
+                    }`}
                 />
                 Copy URL
               </button>
