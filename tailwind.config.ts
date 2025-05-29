@@ -44,14 +44,25 @@ const config: Config = {
           "linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8)), url('../assets/images/daos/arb.png')",
       },
       colors: {
-        "blue-shade-100": "#004DFF",
-        "blue-shade-200": "#0500FF",
-        "blue-shade-300": "#0238B3",
-        "blue-shade-400": "#F1F6FF",
-        "blue-shade-500": "#C6D7FF",
-        "blue-shade-600": "#DDE7FF",
-        "blue-shade-700": "#F5F5FF",
-        "blue-shade-800": "#0040d4",
+        dark: {
+          primary: "#0A142A",
+          secondary: "#0D1527",
+          tertiary: "#0D1A34",
+          accent: "#171D51",
+          text: {
+            primary: "#ffffff",
+            secondary: "#a0a0a0",
+            tertiary: "#707070",
+          },
+        },
+        "blue-shade-100": "#123099", // Primary blue
+        "blue-shade-200": "#171D51", // Secondary blue
+        "blue-shade-300": "#02052E", // Dark blue
+        "blue-shade-400": "#050B1A", // Very dark blue
+        "blue-shade-500": "#0D1A34", // Medium blue
+        "blue-shade-600": "#0D1527", // Light blue
+        "blue-shade-700": "#0A142A", // Lightest blue
+        "blue-shade-800": "#02052E", // Dark blue for borders
         "black-shade-100": "#7C7C7C",
         "black-shade-200": "#DEDEDE",
         "black-shade-300": "#F6F6F6",

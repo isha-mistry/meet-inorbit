@@ -146,7 +146,7 @@ function WatchSession({
 
   return (
     <div className="">
-      <div className="rounded-3xl border border-[#CCCCCC] bg-[#F2F2F2]">
+      <div className="rounded-3xl border border-[#CCCCCC] bg-blue-shade-500">
         <div
           className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 ${data.description.length > 0 ? "border-b" : ""
             }  border-[#CCCCCC]`}
@@ -177,7 +177,7 @@ function WatchSession({
                     className="w-5 h-5 rounded-full"
                     priority
                   />
-                  <div className="text-[#292929] font-semibold ">
+                  <div className="text-[#dbdbdb] font-semibold ">
                     {ensHostName}
                   </div>
                 </div>
@@ -293,7 +293,7 @@ function WatchSession({
             <div className="flex gap-6">
               <div className="flex items-center gap-1">
                 <IoMdEye size={20} />
-                <div className="text-[#1E1E1E]">
+                <div className="text-[#dbdbdb]">
                   {formatViews(data?.views ?? 0)} views
                 </div>
               </div>
@@ -306,7 +306,7 @@ function WatchSession({
                   priority
                   className="w-5 h-5"
                 />
-                <div className="text-[#1E1E1E]">
+                <div className="text-[#dbdbdb]">
                   {collection === "sessions"
                     ? formatTimeAgo(data.slot_time)
                     : collection === "office_hours"
@@ -331,10 +331,10 @@ function WatchSession({
           </div>
           <div>
             <div
-              className="flex items-center border border-[#8E8E8E] bg-white w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
+              className="flex items-center border border-[#8E8E8E] bg-[#2f3b5f] w-fit rounded-md px-3 font-medium py-1 gap-2 cursor-pointer"
               onClick={() => setShowPopup(!showPopup)}
             >
-              <div className="text-[#292929] text-sm">Guest</div>
+              <div className=" text-sm">Guest</div>
               <div
                 className={
                   showPopup
@@ -464,14 +464,14 @@ function WatchSession({
 
         {sessionDetails.description.length > 0 ? (
           <div
-            className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E] text-xs xs:text-sm `}
+            className={`px-3 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-[#212c4c] text-[#bebebe] text-xs xs:text-sm `}
           >
             {sessionDetails.description}
           </div>
         ) : (
           data.description.length > 0 && (
             <div
-              className={`px-4 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-white text-[#1E1E1E] text-xs xs:text-sm `}
+              className={`px-4 sm:px-6 xl:px-8 pt-4 pb-4 rounded-b-3xl bg-[#212c4c] text-[#bebebe] text-xs xs:text-sm `}
             >
               <>
                 <div

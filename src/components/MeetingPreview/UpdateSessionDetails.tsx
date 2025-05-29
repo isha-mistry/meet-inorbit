@@ -191,7 +191,7 @@ function UpdateSessionDetails({
           <div className="py-5 px-4 sm:px-6 lg:px-16">
             {showPopup && (
               <div
-                className=" mx-auto transition-all duration-300 ease-in-out bg-white text-black px-2 xm:px-4 py-3 rounded-lg w-fit mb-4"
+                className=" mx-auto transition-all duration-300 ease-in-out bg-[#c2defd22] text-gray-200 px-2 xm:px-4 py-3 rounded-lg w-fit mb-4"
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">

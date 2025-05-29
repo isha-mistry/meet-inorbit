@@ -395,7 +395,7 @@ const BottomBar = ({
         <div className="lg:flex-1">
           {role === "host" && (
             <Button
-              className="flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
+              className="hidden lg:flex gap-2 bg-red-500 hover:bg-red-400 text-white text-md font-semibold"
               onClick={() =>
                 handleRecording(
                   roomId,

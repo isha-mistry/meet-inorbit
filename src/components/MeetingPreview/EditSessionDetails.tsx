@@ -59,7 +59,7 @@ function EditSessionDetails({
     <div className="relative">
       <div>
         <div className="">
-          <div className="text-xl font-semibold mb-2 text-blue-shade-100 font-poppins flex flex-col gap-3 xm:gap-0 xm:flex-row-reverse xm:justify-between">
+          <div className="text-xl font-semibold mb-2 text-gray-200 font-poppins flex flex-col gap-3 xm:gap-0 xm:flex-row-reverse xm:justify-between">
             <Button
               className="border-blue-shade-100 text-blue-shade-100 border rounded-full font-poppins font-semibold text-xs bg-white w-fit ml-auto"
               onClick={() => toast("Coming Soon! 🚀")}
@@ -96,7 +96,7 @@ function EditSessionDetails({
               )}
             </div>
             <div className="flex items-end">
-              <div className="flex bg-[#EEF8FF] items-center gap-2 xm:gap-4 rounded-lg p-3">
+              <div className="flex items-center gap-2 xm:gap-4 rounded-lg p-3">
                 <label className="bg-[#EEF8FF]  text-blue-shade-100 font-medium text-xs xm:text-sm py-[11px] xm:py-3 px-4 rounded-full border cursor-pointer border-blue-shade-100 cursor-point flex gap-2 items-center ">
                   <CgAttachment className="size-4" />
                   <span className="flex gap-1">
@@ -122,13 +122,13 @@ function EditSessionDetails({
           </div>
         </div>
         <div className="py-3 font-poppins">
-          <div className="text-xl mb-2 font-semibold text-blue-shade-100 font-poppins">
+          <div className="text-xl mb-2 font-semibold text-gray-200 font-poppins">
             Session Title
           </div>
-          <div className="flex flex-col-reverse xs:flex-row items-center justify-between w-full border bg-[#F9F9F9] py-3 px-4 rounded-lg  xs:gap-4">
+          <div className="flex flex-col-reverse xs:flex-row items-center justify-between w-full border bg-[#212c4c] py-3 px-4 rounded-lg  xs:gap-4">
             <input
               type="text"
-              className=" text-xs xs:text-sm w-full bg-[#F9F9F9] xm:p-1 rounded-lg outline-none "
+              className=" text-xs xs:text-sm bg-[#212c4c] w-full xm:p-1 rounded-lg outline-none "
               placeholder="Enter a descriptive title for your session"
               value={sessionDetails.title}
               onChange={handleTitleChange}
@@ -142,7 +142,7 @@ function EditSessionDetails({
         <div className="py-3">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <div className="text-xl font-semibold text-blue-shade-100 font-poppins">
+              <div className="text-xl font-semibold text-gray-200 font-poppins">
                 Session Description
               </div>
             </div>
@@ -160,10 +160,10 @@ function EditSessionDetails({
               {getDescriptionStatus(sessionDetails.description.length)}
             </div>
           </div>
-          <div className="flex flex-col-reverse items-start justify-between w-full border bg-[#F9F9F9] py-3 px-4 rounded-lg">
+          <div className="flex flex-col-reverse items-start justify-between w-full border bg-[#212c4c] py-3 px-4 rounded-lg">
             <textarea
               rows={8}
-              className=" bg-[#F9F9F9] w-full xm:p-4 text-xs xs:text-sm rounded-lg outline-none"
+              className=" bg-[#212c4c] w-full xm:p-4 text-xs xs:text-sm rounded-lg outline-none"
               placeholder="Briefly describe what your session covers"
               value={sessionDetails.description}
               onChange={handleDescriptionChange}

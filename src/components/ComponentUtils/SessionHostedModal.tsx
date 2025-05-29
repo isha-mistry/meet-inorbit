@@ -103,20 +103,19 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
       <div className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden">
         <div className="absolute inset-0 backdrop-blur-md"></div>
 
-        <div className="px-8 pb-14 pt-20 border z-50 rounded-[30px] bg-white flex flex-col items-center text-center gap-3 relative w-[56%]">
+        <div className="px-8 pb-14 pt-20 border z-50 rounded-[30px] bg-slate-950 flex flex-col items-center text-center gap-3 relative w-[56%]">
           {/* <Confetti recycle={true} className="size-[100%]" /> */}
           <IoClose
             className="text-white cursor-pointer font-semibold bg-black size-5 rounded-full absolute top-8 right-8"
             onClick={() => handleRedirection()}
           />
-          <h2 className="text-[40px] font-bold mb-4 text-blue-shade-200">
+          <h2 className="text-[40px] font-bold mb-4 text-white">
             Congratulations for taking the Session!
           </h2>
-          <p className="mb-1 text-base">
-            Your session is now live and can be viewed by everyone on the Chora
-            Club Platform.
+          <p className="mb-1 text-base text-gray-300">
+            Your session is now live and can be viewed by everyone on the Arbitrum University.
           </p>
-          <p className="mb-8 text-base">
+          <p className="mb-8 text-base text-gray-300">
             Share the video URL with your audience to maximize its reach. If
             viewers enjoy your session, they can mint NFTs for it directly on
             the platform.

@@ -19,6 +19,12 @@
   border-radius: 50%;
 }
 
+body {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #02052e, #0D1A34);
+  color: #ffffff;
+}
+
 body::-webkit-scrollbar {
   width: 0.5em;
 }
