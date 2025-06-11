@@ -396,7 +396,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       >
         <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
           <div className="text-4xl font-semibold font-tektur tracking-wide">
-            <span className="text-white">Arbitrum University</span>
+            <span className="text-white">Inorbit</span>
           </div>
           <ConnectWalletWithENS />
         </div>

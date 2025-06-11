@@ -20,31 +20,31 @@ const tektur = Tektur({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://stylus-university.vercel.app/"),
-  title: "Arbitrum University",
+  metadataBase: new URL("https://inorbit-app.vercel.app/"),
+  title: "Inorbit Meet",
   description: "Discover. Learn. Engage.",
   icons: {
     icon: ["/favicon.png"],
   },
   openGraph: {
-    title: "Arbitrum University",
+    title: "Inorbit",
     description: "Discover. Learn. Engage.",
-    url: "https://stylus-university.vercel.app/",
-    siteName: "Arbitrum University",
-    images: [
-      {
-        url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
-        width: 800,
-        height: 600,
-        alt: "img",
-      },
-      {
-        url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
-        width: 1800,
-        height: 1600,
-        alt: "img",
-      },
-    ],
+    url: "https://inorbit-app.vercel.app/",
+    siteName: "Inorbit",
+    // images: [
+    //   {
+    //     url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
+    //     width: 800,
+    //     height: 600,
+    //     alt: "img",
+    //   },
+    //   {
+    //     url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",
+    //     width: 1800,
+    //     height: 1600,
+    //     alt: "img",
+    //   },
+    // ],
     locale: "en_US",
     type: "website",
   },

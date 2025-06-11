@@ -1,6 +1,5 @@
 import { connectDB } from "@/config/connectDB";
 import { BASE_URL, SOCKET_BASE_URL } from "@/config/constants";
-import { compileBookedSessionTemplate, sendMail } from "@/lib/mail";
 import { Attendee, Meeting, OfficeHoursProps } from "@/types/OfficeHoursTypes";
 import { cacheWrapper } from "@/utils/cacheWrapper";
 import {
@@ -47,11 +46,11 @@ async function sendMeetingStartNotification({
 
     // Create base notification object
     const baseNotification = {
-      content: `Office hours "${title}", hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
+      content: `Lectures "${title}", hosted by ${hostENSNameOrAddress}, have now started! 📢 This session is scheduled for ${localSlotTime} UTC. Join now to connect, ask questions, and gain valuable insights!`,
       createdAt: Date.now(),
       read_status: false,
       notification_name: "officeHoursStarted",
-      notification_title: "Office Hours Started",
+      notification_title: "Lectures Started",
       notification_type: "officeHours",
       additionalData: {
         ...additionalData,
@@ -106,26 +105,6 @@ async function sendMeetingStartNotification({
       socket.on("error", (err) => {
         console.error("WebSocket error:", err);
       });
-
-      for (const document of allUsers) {
-        const emailId = document.emailId;
-        if (emailId && emailId !== "" && emailId !== undefined) {
-          try {
-            await sendMail({
-              to: emailId,
-              name: "Arbitrum University",
-              subject: "Office Hours Have Started",
-              body: compileBookedSessionTemplate(
-                "Office Hours Have Started - Join Now",
-                baseNotification.content,
-                `${BASE_URL}/meeting/officehours/${additionalData.meetingId}/lobby`
-              ),
-            });
-          } catch (error) {
-            console.error("Error sending mail:", error);
-          }
-        }
-      }
     }
 
     return notificationResults;

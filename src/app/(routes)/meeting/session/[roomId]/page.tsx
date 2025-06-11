@@ -795,7 +795,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
                 <div className="text-3xl font-semibold tracking-wide font-tektur">
-                  <span className="text-white">Arbitrum University</span>
+                  <span className="text-white">Inorbit</span>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-4">
@@ -902,8 +902,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       )}
                     <div
                       className={`relative flex flex-col lg:flex-row w-full h-full ${isRemoteFullScreen && isScreenShared && isFullScreen
-                          ? "bg-[#202020] rounded-lg justify-center"
-                          : ""
+                        ? "bg-[#202020] rounded-lg justify-center"
+                        : ""
                         } `}
                     >
                       {shareStream && (
@@ -973,14 +973,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       <section
                         ref={firstSlideRef}
                         className={`${!isScreenShared
-                            ? "grid "
-                            : `${isRemoteFullScreen && isScreenShared
+                          ? "grid "
+                          : `${isRemoteFullScreen && isScreenShared
+                            ? "hidden"
+                            : `${isFullScreen && isScreenShared
                               ? "hidden"
-                              : `${isFullScreen && isScreenShared
-                                ? "hidden"
-                                : "hidden lg:grid"
-                              }`
+                              : "hidden lg:grid"
                             }`
+                          }`
                           } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${isScreenShared
                             ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
                             : peerIds.length === 0
@@ -1045,10 +1045,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                     >
                                       <div
                                         className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
-                                            metadata?.walletAddress || ""
-                                          ]
-                                            ? "text-blue-500"
-                                            : "text-[#3E3D3D]"
+                                          metadata?.walletAddress || ""
+                                        ]
+                                          ? "text-blue-500"
+                                          : "text-[#3E3D3D]"
                                           }`}
                                       >
                                         <IoCopy
@@ -1390,10 +1390,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   >
                                     <div
                                       className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
-                                          metadata?.walletAddress || ""
-                                        ]
-                                          ? "text-blue-500"
-                                          : "text-[#3E3D3D]"
+                                        metadata?.walletAddress || ""
+                                      ]
+                                        ? "text-blue-500"
+                                        : "text-[#3E3D3D]"
                                         }`}
                                     >
                                       <IoCopy

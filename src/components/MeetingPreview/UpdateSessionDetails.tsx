@@ -195,7 +195,7 @@ function UpdateSessionDetails({
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">
-                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "office hours"} on Arbitrum University</span>
+                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "lecture"} on Inorbit</span>
                   <button
                     className="ml-auto rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}
@@ -229,7 +229,7 @@ function UpdateSessionDetails({
               <div
                 className={`text-[13px] xs:text-sm sm:text-base xl:text-lg transition-all duration-300 ease-in-out`}
               >
-                Please add a title and description for your {meetingType === "session" ? "session" : "office hours"} so that
+                Please add a title and description for your {meetingType === "session" ? "session" : "lecture"} so that
                 other users can easily understand what it&apos;s about before
                 watching. You can edit this information later if needed.
               </div>

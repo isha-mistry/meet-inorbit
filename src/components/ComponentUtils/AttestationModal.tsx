@@ -23,14 +23,6 @@ function AttestationModal({
   meetingId: string;
   role: string;
 }) {
-  // const [modalOpen, setModalOpen] = useState(props);
-
-  const [rating, setRating] = useState<number | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [feedbackStored, setFeedbackStored] = useState(false);
-  const [hoverRating, setHoverRating] = useState<number>(0);
-  const { address } = useAccount();
-  const { walletAddress } = useWalletAddress();
 
   useEffect(() => {
     const storedStatus = sessionStorage.getItem("meetingData");
@@ -43,14 +35,11 @@ function AttestationModal({
   }, []);
 
   const toggleModal = () => {
-    // if (rating !== null && !feedbackStored) {
-    //   storeUserFeedback();
-    // }
     onClose();
   };
 
   const shareOnTwitter = () => {
-    const url = encodeURIComponent(`https://stylus-university.vercel.app/`);
+    const url = encodeURIComponent(`https://inorbit-app.vercel.app/`);
     const text = encodeURIComponent(
       `Just attended an amazing session on #Web3! Learned so much and got a deeper understanding of ecosystem. Feeling inspired and ready to dive in!🚀 \n👉 ${decodeURIComponent(
         url
@@ -62,58 +51,7 @@ function AttestationModal({
 
     // Open Twitter share dialog
     window.open(twitterUrl, "_blank");
-
-    // if (rating !== null && !feedbackStored) {
-    //   storeUserFeedback();
-    // }
   };
-
-  const handleRatingClick = (value: number) => {
-    setRating(value);
-  };
-
-  // const storeUserFeedback = async () => {
-  //   try {
-  //     const myHeaders = new Headers();
-  //     const token=await getAccessToken();
-  //     myHeaders.append("Content-Type", "application/json");
-
-  //     const raw = JSON.stringify({
-  //       address: hostAddress,
-  //       role: role,
-  //       feedbackType: "feedbackReceived",
-  //       data: {
-  //         guestAddress: walletAddress,
-  //         meetingId: meetingId,
-  //         ratings: rating,
-  //       },
-  //     });
-
-  //     if (walletAddress) {
-  //       myHeaders.append("x-wallet-address", walletAddress);
-  //       myHeaders.append("Authorization",`Bearer ${token}`);
-  //     }
-
-  //     const requestOptions: any = {
-  //       method: "POST",
-  //       headers: myHeaders,
-  //       body: raw,
-  //       redirect: "follow",
-  //     };
-
-  //     const response = await fetchApi(
-  //       "/feedback/store-feedback",
-  //       requestOptions
-  //     );
-
-  //     const result = await response.json();
-  //     if (result.success) {
-  //       setFeedbackStored(true);
-  //     }
-  //   } catch (e) {
-  //     console.log("Error: ", e);
-  //   }
-  // };
 
   return (
     <div>
@@ -156,7 +94,7 @@ function AttestationModal({
                     Your attestation will be on its way shortly. 📜✨
                   </div>
                 </div>
-                {role === "guest" && (
+                {/* {role === "guest" && (
                   <div className="py-2 text-gray-900">
                     <div>
                       <h3 className="text-xl font-bold text-center">
@@ -173,7 +111,7 @@ function AttestationModal({
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
                 <div className="flex-col md:flex-row flex items-center text-blue-shade-100 mb-6 sm:mb-0 sm:mt-6 gap-2 sm:gap-0">
                   {/* <div className="flex items-center">
                     <FaArrowRight size={10} className="mt-1 mr-1" />

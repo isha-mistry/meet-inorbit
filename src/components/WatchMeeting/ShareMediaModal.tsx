@@ -32,7 +32,7 @@ function ShareMediaModal({
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const { address } = useAccount();
-  const {walletAddress}=useWalletAddress();
+  const { walletAddress } = useWalletAddress();
 
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function ShareMediaModal({
   const text = encodeURIComponent(
     `${data.title} ${decodeURIComponent(
       url
-    )} via @ChoraClub\n\n#choraclub #session #growth`
+    )} via Inorbit\n\n#arbitrum #session #growth`
   );
 
   const shareOnTwitter = () => {
@@ -153,9 +153,8 @@ function ShareMediaModal({
           >
             <p className="text-sm font-light ">{link}</p>
             <IoCopy
-              className={`cursor-pointer ${
-                copySuccess ? "text-blue-shade-100" : ""
-              }`}
+              className={`cursor-pointer ${copySuccess ? "text-blue-shade-100" : ""
+                }`}
               onClick={handleCopy}
             />
           </div>

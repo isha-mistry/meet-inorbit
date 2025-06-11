@@ -52,9 +52,9 @@ function SessionHostedModal({ data, collection }: any) {
     //   )} via @ChoraClub\n\n#choraclub #session #growth`
     // );
     const text = encodeURIComponent(
-      `Just wrapped up an incredible session in @ChoraClub! 🎉 Thrilled to share my knowledge and help new users dive into the Web3 ecosystem.
+      `Just wrapped up an incredible session on Inorbit 🎉 Thrilled to share my knowledge and help new users dive into the Web3 ecosystem.
 Check out the session here:👇\n ${decodeURIComponent(url)}
-#Web3 #ChoraClub`
+#Web3 #arbitrum`
     );
 
     // Twitter share URL
@@ -113,7 +113,7 @@ Check out the session here:👇\n ${decodeURIComponent(url)}
             Congratulations for taking the Session!
           </h2>
           <p className="mb-1 text-base text-gray-300">
-            Your session is now live and can be viewed by everyone on the Arbitrum University.
+            Your session is now live and can be viewed by everyone on the Inorbit.
           </p>
           <p className="mb-8 text-base text-gray-300">
             Share the video URL with your audience to maximize its reach. If
