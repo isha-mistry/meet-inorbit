@@ -21,16 +21,16 @@ const tektur = Tektur({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inorbit-app.vercel.app/"),
-  title: "Inorbit Meet",
+  title: "Xcan Meet",
   description: "Discover. Learn. Engage.",
   icons: {
     icon: ["/favicon.png"],
   },
   openGraph: {
-    title: "Inorbit",
+    title: "Xcan",
     description: "Discover. Learn. Engage.",
     url: "https://inorbit-app.vercel.app/",
-    siteName: "Inorbit",
+    siteName: "Xcan",
     // images: [
     //   {
     //     url: "https://gateway.lighthouse.storage/ipfs/QmZmWxpdhQZnag8HZtwZPLR5wtK2jjfgsTBMpNpmijtZ5x",

@@ -21,7 +21,6 @@ import Strip from "../sidebars/participantsSidebar/Peers/PeerRole/Strip";
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken } from "@privy-io/react-auth";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { opBlock, arbBlock } from "@/config/staticDataUtils";
@@ -70,7 +69,6 @@ const BottomBar = ({
   const { chain } = useAccount();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address } = useAccount();
-  const { walletAddress } = useWalletAddress();
   const [privypass, setPrivyToken] = useState("");
   const {
     role,
@@ -122,7 +120,7 @@ const BottomBar = ({
     };
 
     fetchToken();
-  }, [walletAddress]); // Empty dependency array ensures this runs only once.
+  }, [address]); // Empty dependency array ensures this runs only once.
 
   useDataMessage({
     async onMessage(payload, from, label) {
@@ -134,8 +132,8 @@ const BottomBar = ({
         const myHeaders = new Headers();
         const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
-        if (walletAddress) {
-          myHeaders.append("x-wallet-address", walletAddress);
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
           myHeaders.append("Authorization", `Bearer ${token}`);
         }
 
@@ -167,8 +165,8 @@ const BottomBar = ({
             video_uri: videoUri,
           };
 
-          walletAddress &&
-            (await updateOfficeHoursData(walletAddress, token, requestBody));
+          address &&
+            (await updateOfficeHoursData(address, token, requestBody));
         }
       }
     },
@@ -238,7 +236,7 @@ const BottomBar = ({
         await Promise.race([
           handleStopRecording(
             roomId,
-            walletAddress ?? "",
+            address ?? "",
             privypass,
             setIsRecording
           ),
@@ -291,7 +289,7 @@ const BottomBar = ({
 
       // First handle critical closing operations
       await handleCloseMeeting(
-        walletAddress ?? "",
+        address ?? "",
         token,
         meetingCategory,
         roomId,
@@ -302,8 +300,8 @@ const BottomBar = ({
 
       // Then generate NFT image and update meeting status with the result
       // Using the IPFS hash in the update
-      const nft_image = await generateAndUploadNFTImage();
-      await updateMeetingStatus(nft_image);
+      // const nft_image = await generateAndUploadNFTImage();
+      await updateMeetingStatus();
     } catch (error) {
       console.error("Background host operations failed:", error);
     }
@@ -340,14 +338,14 @@ const BottomBar = ({
   };
 
   // Update meeting status in background
-  const updateMeetingStatus = async (nft_image: string | null) => {
+  const updateMeetingStatus = async (nft_image?: string | null) => {
     try {
       const myHeaders = new Headers();
       const token = await getAccessToken();
       myHeaders.append("Content-Type", "application/json");
 
-      if (walletAddress) {
-        myHeaders.append("x-wallet-address", walletAddress);
+      if (address) {
+        myHeaders.append("x-wallet-address", address);
         myHeaders.append("Authorization", `Bearer ${token}`);
       }
 
@@ -374,8 +372,8 @@ const BottomBar = ({
           isMeetingRecorded: isRecording,
         };
 
-        if (walletAddress) {
-          await updateOfficeHoursData(walletAddress, token, requestBody);
+        if (address) {
+          await updateOfficeHoursData(address, token, requestBody);
         }
       }
     } catch (error) {
@@ -399,7 +397,7 @@ const BottomBar = ({
               onClick={() =>
                 handleRecording(
                   roomId,
-                  walletAddress ?? "",
+                  address ?? "",
                   privypass,
                   isRecording,
                   setIsRecording,
@@ -494,7 +492,7 @@ const BottomBar = ({
                 displayName: metadata?.displayName || "",
                 avatarUrl: metadata?.avatarUrl || "",
                 isHandRaised: !metadata?.isHandRaised,
-                walletAddress: metadata?.walletAddress || walletAddress || "",
+                walletAddress: metadata?.walletAddress || address || "",
               });
             }}
             className={clsx(
@@ -598,7 +596,7 @@ const BottomBar = ({
             onClick={() =>
               handleRecording(
                 roomId,
-                walletAddress ?? "",
+                address ?? "",
                 privypass,
                 isRecording,
                 setIsRecording,

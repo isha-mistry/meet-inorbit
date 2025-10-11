@@ -48,11 +48,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 404 }
       );
     }
-    let token = "";
+    // let token = "";
     
-    if(data){
-      token=daoConfigs[data.dao_name].tokenSymbol;
-    }
+    // if(data){
+    //   token=daoConfigs[data.dao_name].tokenSymbol;
+    // }
 
     // if (data.dao_name === "optimism") {
     //   token = "OP";
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         attestationPromises.push(
           delegateAndSetAttestation(
             address,
-            `${roomId}/${token}`,
+            `${roomId}`,
             meetingTypeCode,
             data?.startTime,
             data?.endTime,

@@ -38,7 +38,6 @@ import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
 import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { RotatingLines } from "react-loader-spinner";
 import Link from "next/link";
@@ -150,23 +149,20 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [isAllowToEnter, setIsAllowToEnter] = useState<boolean>();
   const [notAllowedMessage, setNotAllowedMessage] = useState<string>();
   const [videoStreamTrack, setVideoStreamTrack] = useState<any>("");
-  const [showFeedbackPopups, setShowFeedbackPopups] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
-  const { walletAddress } = useWalletAddress();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isRemoteFullScreen, setIsRemoteFullScreen] = useState(false);
-
   const draggableRef = useRef(null);
   const [draggablePosition, setDraggablePosition] = useState({ x: 0, y: 0 });
   const [tooltipContent, setTooltipContent] = useState("Copy");
   const [animatingButtons, setAnimatingButtons] = useState<{
     [key: string]: boolean;
   }>({});
-
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 1024);
@@ -180,21 +176,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     };
   }, []);
 
-  useEffect(() => {
-    // Only run this once when the component mounts
-    const handleRouting = async () => {
-      if (!authenticated) {
-        login();
-      } else if (authenticated && walletAddress != null && !window.location.pathname.includes('/lobby')) {
-        // Only redirect if we're not already in the lobby path
-        const url = `${BASE_URL}${path}/lobby`;
-        router.push(url);
-      }
-    };
-
-    handleRouting();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authenticated]); // Empty dependency array to run only once
+ 
 
 
   const firstSlideRef = useRef<HTMLElement>(null);
@@ -205,6 +187,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       setIsRemoteFullScreen(false);
     }
   });
+
   useEffect(() => {
     if (draggableRef.current) {
       const position = { x: 0, y: 0 };
@@ -314,7 +297,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
     let currentGroup: string[] = [];
 
     // Always add local peer to the first screen.
-
     for (let i = 0; i < peerIds.length; i++) {
       currentGroup.push(peerIds[i]);
       if (currentGroup.length === peersPerScreen) {
@@ -322,11 +304,9 @@ export default function Component({ params }: { params: { roomId: string } }) {
         currentGroup = [];
       }
     }
-
     if (currentGroup.length > 0) {
       groups.push(currentGroup);
     }
-
     return groups;
   };
 
@@ -349,50 +329,12 @@ export default function Component({ params }: { params: { roomId: string } }) {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
 
-          if (walletAddress) {
-            myHeaders.append("x-wallet-address", walletAddress);
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
             myHeaders.append("Authorization", `Bearer ${token}`);
           }
 
-          // const raw = JSON.stringify({
-          //   address: walletAddress,
-          //   role: role,
-          // });
-
-          // const requestOptions: any = {
-          //   method: "POST",
-          //   headers: myHeaders,
-          //   body: raw,
-          //   redirect: "follow",
-          // };
-
-          // const response = await fetchApi(
-          //   "/feedback/get-feedback-status",
-          //   requestOptions
-          // );
-
-          // const result = await response.json();
-
           handlePopupRedirection();
-          // if (result.data) {
-          //   setShowFeedbackPopups(false);
-          // } else {
-          //   setShowFeedbackPopups(true);
-          // }
-
-          // if (role === "host") {
-          //   setTimeout(async () => {
-          //     await handleCloseMeeting(
-          //       address,
-          //       meetingCategory,
-          //       params.roomId,
-          //       daoName,
-          //       hostAddress,
-          //       meetingData,
-          //       isRecording
-          //     );
-          //   }, 10000);
-          // }
           setIsRecording(false);
         } else {
           router.push(`/meeting/session/${params.roomId}/lobby`);
@@ -403,11 +345,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     },
   });
-
-  // const handleFeedbackPopupsClose = async () => {
-  //   setShowFeedbackPopups(false);
-  //   await handlePopupRedirection();
-  // };
 
   const handlePopupRedirection = async () => {
     if (role === "host") {
@@ -519,13 +456,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handleModalClose = () => {
     setModalOpen(false);
-    if (walletAddress === hostAddress) {
+    if (address === hostAddress) {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=hosted`
+        `${APP_BASE_URL}/profile/${address}?active=sessions&session=hosted`
       );
     } else {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=sessions&session=attended`
+        `${APP_BASE_URL}/profile/${address}?active=sessions&session=attended`
       );
     }
   };
@@ -537,8 +474,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
         const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
 
-        if (walletAddress) {
-          myHeaders.append("x-wallet-address", walletAddress);
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
           myHeaders.append("Authorization", `Bearer ${token}`);
         }
         const raw = JSON.stringify({
@@ -588,10 +525,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     }
 
-    if (authenticated && walletAddress != null) {
+    if (authenticated && address != null) {
       verifyMeetingId();
     }
-  }, [params.roomId, isAllowToEnter, notAllowedMessage, walletAddress]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, address]);
 
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
@@ -602,7 +539,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
-        walletAddress: walletAddress || "",
+        walletAddress: address || "",
       });
     }
   }, [isAllowToEnter, state]);
@@ -648,7 +585,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         startRecording(
           params.roomId,
           setIsRecording,
-          walletAddress ? walletAddress : "",
+          address ? address : "",
           token ? token : ""
         );
       }
@@ -795,7 +732,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
                 <div className="text-3xl font-semibold tracking-wide font-tektur">
-                  <span className="text-white">Inorbit</span>
+                  <span className="text-white">Xcan</span>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-4">
@@ -808,7 +745,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       </div>
                     }
                     placement="left"
-                    className="rounded-md bg-opacity-90 max-w-96"
+                    className="rounded-md bg-opacity-90 max-w-96 bg-[#1c2634] text-gray-100"
                     closeDelay={1}
                   >
                     <span>
@@ -1167,166 +1104,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   </main>
                 </SwiperSlide>
 
-                {/* {isScreenShared && isSmallScreen && (
-                  <>
-                    {Array.from({
-                      length: Math.ceil((peerIds.length - 3) / 4) + 1,
-                    }).map((_, i) => (
-                      <SwiperSlide key={i}>
-                        <main
-                          className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
-                        >
-                          <div
-                            className={`relative flex flex-col lg:flex-row w-full h-full`}
-                          >
-                            <section
-                              className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2 `}
-                            >
-                              {i === 0 && role !== Role.BOT && (
-                                <>
-                                  <div
-                                    className={`relative 
-                            ${
-                              isAudioOn
-                                ? "p-[3px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg"
-                                : "bg-[#202020] bg-opacity-80"
-                            }
-                          rounded-lg flex min-w-[150px] min-h-[150px] overflow-hidden`}
-                                  >
-                                    <div className="bg-[#202020] flex flex-col rounded-md w-full h-full items-center justify-center">
-                                      <div className="absolute left-4 top-4 text-3xl z-10">
-                                        {reaction}
-                                      </div>
-                                      {metadata?.isHandRaised && (
-                                        <span className="absolute top-4 right-4 text-4xl text-gray-200 font-medium z-10">
-                                          ✋
-                                        </span>
-                                      )}
-                                      {stream && (
-                                        <span className="absolute top-0 bottom-0 right-0 left-0">
-                                          <Camera
-                                            stream={stream}
-                                            name={
-                                              metadata?.displayName ?? "guest"
-                                            }
-                                          />
-                                        </span>
-                                      )}
-
-                                      {!stream && (
-                                        <div className="flex w-24 h-24 rounded-full">
-                                          {metadata?.avatarUrl && (
-                                            <div className=" rounded-full w-24 h-24">
-                                              <Image
-                                                alt="image"
-                                                src={metadata?.avatarUrl}
-                                                className="maskAvatar object-cover object-center"
-                                                width={100}
-                                                height={100}
-                                              />
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                      <span className="absolute bottom-4 left-4 text-white font-medium">
-                                        <div className="flex">
-                                          {`${metadata?.displayName} (You)`}
-                                          <Tooltip
-                                            content={tooltipContent}
-                                            placement="right"
-                                            closeDelay={1}
-                                            showArrow
-                                          >
-                                            <div
-                                              className={`pl-2 pt-[2px] cursor-pointer  ${
-                                                animatingButtons[
-                                                  metadata?.walletAddress || ""
-                                                ]
-                                                  ? "text-blue-500"
-                                                  : "text-[#3E3D3D]"
-                                              }`}
-                                            >
-                                              <IoCopy
-                                                onClick={() =>
-                                                  handleAddrCopy(
-                                                    `${metadata?.walletAddress}`
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                          </Tooltip>
-                                        </div>
-                                      </span>
-                                      <span className="absolute bottom-4 right-4">
-                                        {isAudioOn
-                                          ? NestedPeerListIcons.active.mic
-                                          : NestedPeerListIcons.inactive.mic}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                              {i === 0
-                                ? peerIds
-                                    .slice(0, 3)
-                                    .map((peerId) => (
-                                      <RemotePeer
-                                        key={peerId}
-                                        peerId={peerId}
-                                      />
-                                    ))
-                                : peerIds
-                                    .slice(3 + (i - 1) * 4, 3 + (i - 1) * 4 + 4)
-                                    .map((peerId) => (
-                                      <RemotePeer
-                                        key={peerId}
-                                        peerId={peerId}
-                                      />
-                                    ))}
-                            </section>
-                          </div>
-                        </main>
-                      </SwiperSlide>
-                    ))}
-                  </>
-                )}
-                {!(isFullScreen || isRemoteFullScreen) &&
-                  peerIds.length > 2 &&
-                  ((isSmallScreen && !isScreenShared) || !isSmallScreen) && (
-                    <>
-                      {Array.from({
-                        length: Math.ceil((peerIds.length - 2) / 4),
-                      }).map((_, i) => {
-                        // Calculate the peers for this slide
-                        const slidePeers = peerIds.slice(
-                          3 + i * 4,
-                          3 + i * 4 + 4
-                        );
-
-                        // Only render the slide if there are peers to show
-                        return slidePeers.length > 0 ? (
-                          <SwiperSlide key={i}>
-                            <main
-                              className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
-                            >
-                              <div
-                                className={`relative flex flex-col lg:flex-row w-full h-full`}
-                              >
-                                <section
-                                  className={`py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 1.5xl:grid-cols-2`}
-                                >
-                                  {slidePeers.map((peerId) => (
-                                    <RemotePeer key={peerId} peerId={peerId} />
-                                  ))}
-                                </section>
-                              </div>
-                            </main>
-                          </SwiperSlide>
-                        ) : null;
-                      })}
-                    </>
-                  )} */}
-
                 <SwiperSlide>
                   <main
                     className={`relative transition-all ease-in-out flex items-center justify-center flex-1 duration-300 w-full h-full`}
@@ -1478,7 +1255,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </div>
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
-                  href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
+                  href={`${APP_BASE_URL}/profile/${address}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile

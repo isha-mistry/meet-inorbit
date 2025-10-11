@@ -48,7 +48,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const currentDAO = daoConfigs[requestData.daoName];
 
   try {
-    const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
+    // const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
+    const atstUrl = ATTESTATION_ARB_URL;
     // requestData.daoName === "optimism"
     //   ? ATTESTATION_OP_URL
     //   : requestData.daoName === "arbitrum"

@@ -5,7 +5,6 @@ import { RxCross2 } from "react-icons/rx";
 import Confetti from "react-confetti";
 import { BsTwitterX } from "react-icons/bs";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken } from "@privy-io/react-auth";
 import StarRating from "../FeedbackPopup/RatingTypes/StarRating";
 import { fetchApi } from "@/utils/api";

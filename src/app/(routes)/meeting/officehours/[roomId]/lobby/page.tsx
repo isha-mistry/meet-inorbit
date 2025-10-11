@@ -6,7 +6,6 @@ import { useRouter } from "next-nprogress-bar";
 import { Toaster, toast } from "react-hot-toast";
 import { useHuddle01, useRoom, useLocalPeer } from "@huddle01/react/hooks";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 // import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Role } from "@huddle01/server-sdk/auth";
@@ -61,7 +60,6 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     useConnection();
   const { state, joinRoom } = useRoom();
   const { name, setName, avatarUrl, setAvatarUrl } = useStudioState();
-  const { walletAddress } = useWalletAddress();
 
   // Connection Management
   // useEffect(() => {
@@ -77,8 +75,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
   // Update ButtonText when walletAddress Changes
   useEffect(() => {
-    if (walletAddress && meetingData) {
-      if (walletAddress === meetingData.host_address) {
+    if (address && meetingData) {
+      if (address === meetingData.host_address) {
         setIsHost(true);
         setButtonText("Start Meeting");
       } else {
@@ -86,13 +84,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         setButtonText("Join Meeting");
       }
     }
-  }, [walletAddress, meetingData]);
+    }, [address, meetingData]);
 
   useEffect(() => {
-    if (!walletAddress) {
+    if (!address) {
       login();
     }
-  }, [authenticated, walletAddress]);
+  }, [authenticated, address]);
 
   // Verify Meeting ID
   useEffect(() => {
@@ -103,8 +101,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         const myHeaders = new Headers();
         const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
-        if (walletAddress) {
-          myHeaders.append("x-wallet-address", walletAddress);
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
           myHeaders.append("Authorization", `Bearer ${token}`);
         }
 
@@ -121,7 +119,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
         if (result.success) {
           const { data } = result;
-          if (walletAddress === data.host_address) {
+          if (address === data.host_address) {
             setIsHost(true);
             setButtonText("Start Meeting");
           } else {
@@ -167,10 +165,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       }
     };
 
-    if (authenticated && walletAddress != null) {
+    if (authenticated && address != null) {
       verifyMeetingId();
     }
-  }, [params.roomId, walletAddress, authenticated]);
+  }, [params.roomId, address, authenticated]);
 
   // Fetch Profile Details
   useEffect(() => {
@@ -180,14 +178,14 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       try {
         setIsLoadingProfile(true);
         const token = await getAccessToken();
-        const response = await fetchApi(`/profile/${walletAddress}`, {
+        const response = await fetchApi(`/profile/${address}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-wallet-address": walletAddress ? walletAddress : "",
+            "x-wallet-address": address ? address : "",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ walletAddress }),
+          body: JSON.stringify({ walletAddress: address }),
         });
 
         const { data } = await response.json();
@@ -206,10 +204,10 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           }
 
           // Set name from ENS or truncated address
-          const ensName = await fetchEnsName(walletAddress);
+          const ensName = await fetchEnsName(address);
           setName(
             ensName?.ensName ||
-            truncateAddress(walletAddress ? walletAddress : "")
+            truncateAddress(address ? address : "")
           );
         }
       } catch (error) {
@@ -221,7 +219,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
     };
 
     fetchProfileDetails();
-  }, [walletAddress, authenticated, isAllowToEnter]);
+  }, [address, authenticated, isAllowToEnter]);
 
   // Handle Room State Change
   useEffect(() => {
@@ -237,7 +235,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
     try {
       setIsJoining(true);
-      const role = walletAddress === hostAddress ? "host" : "listener";
+        const role = address === hostAddress ? "host" : "listener";
       const privyToken = await getAccessToken();
 
       // Get room token
@@ -245,8 +243,8 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(walletAddress && {
-            "x-wallet-address": walletAddress,
+          ...(address && {
+            "x-wallet-address": address,
             Authorization: `Bearer ${privyToken}`,
           }),
         },
@@ -254,7 +252,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           roomId: params.roomId,
           role,
           displayName: name,
-          address: walletAddress,
+          address: address,
           meetingType: "officehours",
         }),
       });
@@ -278,7 +276,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         };
 
         await updateOfficeHoursData(
-          walletAddress ?? "",
+          address ?? "",
           privyToken,
           requestBody
         );
@@ -291,11 +289,11 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
           dao_name: daoName,
           reference_id: meetingData.reference_id,
           attendees: {
-            attendee_address: walletAddress,
+            attendee_address: address,
           },
         };
         await updateOfficeHoursData(
-          walletAddress ?? "",
+          address ?? "",
           privyToken,
           requestBody
         );
@@ -341,7 +339,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             Oops, {notAllowedMessage}
           </div>
           <Link
-            href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
+            href={`${APP_BASE_URL}/profile/${address}?active=info`}
             className="px-6 py-3 bg-[#2f2f2f] text-white rounded-full shadow-lg hover:bg-[#202020] transition duration-300"
           >
             Back to Profile

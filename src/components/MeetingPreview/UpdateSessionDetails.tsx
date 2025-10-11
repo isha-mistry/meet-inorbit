@@ -6,7 +6,6 @@ import SessionPreview from "./SessionPreview";
 import { Time } from "@internationalized/date";
 import { ThreeDots } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken } from "@privy-io/react-auth";
 import { useRouter } from "next-nprogress-bar";
 import UpdateSessionDetailsSkeletonLoader from "@/components/SkeletonLoader/UpdateSessionDetailsSkeletonLoader";
@@ -48,8 +47,7 @@ function UpdateSessionDetails({
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const { walletAddress } = useWalletAddress();
-  // const address = "0xc622420AD9dE8E595694413F24731Dd877eb84E1"
+  const { address } = useAccount();
   const router = useRouter();
   const [showPopup, setShowPopup] = useState(true);
   const [showHostPopup, setShowHostPopup] = useState(false);
@@ -102,15 +100,15 @@ function UpdateSessionDetails({
 
   const handleUpdate = async () => {
     try {
-      if (walletAddress?.toLowerCase() === data.host_address.toLowerCase()) {
+      if (address?.toLowerCase() === data.host_address.toLowerCase()) {
         setLoading(true);
 
         if (collection === "sessions") {
           const myHeaders = new Headers();
           const token = await getAccessToken();
           myHeaders.append("Content-Type", "application/json");
-          if (walletAddress) {
-            myHeaders.append("x-wallet-address", walletAddress);
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
             myHeaders.append("Authorization", `Bearer ${token}`);
           }
 
@@ -151,9 +149,9 @@ function UpdateSessionDetails({
             reference_id: data.reference_id,
           };
           const responseData =
-            walletAddress &&
+            address &&
             (await updateOfficeHoursData(
-              walletAddress,
+              address,
               await getAccessToken(),
               requestBody
             ));
@@ -187,7 +185,7 @@ function UpdateSessionDetails({
   return (
     <div className="font-tektur">
       {!dataLoading ? (
-        walletAddress?.toLowerCase() === data?.host_address.toLowerCase() ? (
+          address?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-4 sm:px-6 lg:px-16">
             {showPopup && (
               <div
@@ -195,7 +193,7 @@ function UpdateSessionDetails({
                 style={{ boxShadow: "0px 4px 26.7px 0px rgba(0, 0, 0, 0.10)" }}
               >
                 <div className="flex flex-col-reverse xm:flex-row items-center font-semibold text-sm justify-between gap-1 xm:gap-4">
-                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "lecture"} on Inorbit</span>
+                  <span>🙂 Thank you for taking the {meetingType === "session" ? "session" : "lecture"} on Xcan</span>
                   <button
                     className="ml-auto rounded-full flex items-center"
                     onClick={() => setShowPopup(false)}

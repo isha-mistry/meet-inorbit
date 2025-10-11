@@ -38,7 +38,6 @@ import RemoteScreenShare from "@/components/Huddle/remoteScreenShare";
 import Camera from "@/components/Huddle/Media/Camera";
 import AttestationModal from "@/components/ComponentUtils/AttestationModal";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { RotatingLines } from "react-loader-spinner";
 import Link from "next/link";
@@ -160,7 +159,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
   const [meetingData, setMeetingData] = useState<any>();
   const { sendData } = useDataMessage();
   const meetingCategory = usePathname().split("/")[2];
-  const { walletAddress } = useWalletAddress();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isRemoteFullScreen, setIsRemoteFullScreen] = useState(false);
 
@@ -191,7 +189,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
     const handleRouting = async () => {
       if (!authenticated) {
         login();
-      } else if (authenticated && walletAddress != null && !window.location.pathname.includes('/lobby')) {
+      } else if (authenticated && address != null && !window.location.pathname.includes('/lobby')) {
         // Only redirect if we're not already in the lobby path
         const url = `${BASE_URL}${path}/lobby`;
         router.push(url);
@@ -357,13 +355,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
 
-          if (walletAddress) {
-            myHeaders.append("x-wallet-address", walletAddress);
+          if (address) {
+            myHeaders.append("x-wallet-address", address);
             myHeaders.append("Authorization", `Bearer ${token}`);
           }
 
           // const raw = JSON.stringify({
-          //   address: walletAddress,
+          //   address: address,
           //   role: role,
           // });
 
@@ -522,13 +520,13 @@ export default function Component({ params }: { params: { roomId: string } }) {
 
   const handleModalClose = () => {
     setModalOpen(false);
-    if (walletAddress === hostAddress) {
+    if (address === hostAddress) {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=officeHours&hours=hosted`
+        `${APP_BASE_URL}/profile/${address}?active=officeHours&hours=hosted`
       );
     } else {
       push(
-        `${APP_BASE_URL}/profile/${walletAddress}?active=officeHours&hours=attended`
+        `${APP_BASE_URL}/profile/${address}?active=officeHours&hours=attended`
       );
     }
   };
@@ -540,8 +538,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
         const token = await getAccessToken();
         myHeaders.append("Content-Type", "application/json");
 
-        if (walletAddress) {
-          myHeaders.append("x-wallet-address", walletAddress);
+        if (address) {
+          myHeaders.append("x-wallet-address", address);
           myHeaders.append("Authorization", `Bearer ${token}`);
         }
         const raw = JSON.stringify({
@@ -591,10 +589,10 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     }
 
-    if (authenticated && walletAddress != null) {
+      if (authenticated && address != null) {
       verifyMeetingId();
     }
-  }, [params.roomId, isAllowToEnter, notAllowedMessage, walletAddress]);
+  }, [params.roomId, isAllowToEnter, notAllowedMessage, address]);
 
   useEffect(() => {
     if (state === "idle" && isAllowToEnter) {
@@ -605,7 +603,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         displayName: name,
         avatarUrl: avatarUrl,
         isHandRaised: metadata?.isHandRaised || false,
-        walletAddress: walletAddress || "",
+        walletAddress: address || "",
       });
     }
   }, [isAllowToEnter, state]);
@@ -651,7 +649,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
         startRecording(
           params.roomId,
           setIsRecording,
-          walletAddress ? walletAddress : "",
+          address ? address : "",
           token ? token : ""
         );
       }
@@ -1042,6 +1040,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                       placement="right"
                                       closeDelay={1}
                                       showArrow
+                                      className="bg-[#1c2634] text-gray-100"
                                     >
                                       <div
                                         className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
@@ -1319,7 +1318,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                 </div>
                 <Link
                   // onClick={() => push(`/profile/${address}?active=info`)}
-                  href={`${APP_BASE_URL}/profile/${walletAddress}?active=info`}
+                  href={`${APP_BASE_URL}/profile/${address}?active=info`}
                   className="px-6 py-3 bg-white text-blue-shade-200 rounded-full shadow-lg hover:bg-blue-shade-200 hover:text-white transition duration-300 ease-in-out"
                 >
                   Back to Profile

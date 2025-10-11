@@ -19,7 +19,6 @@ import { cn } from "@/utils/helpers";
 import { NestedPeerListIcons, PeerListIcons } from "@/utils/PeerListIcons";
 import { useStudioState } from "@/store/studioState";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken } from "@privy-io/react-auth";
 import GuestData from "../PeerRole/GuestData";
 import { IoCopy } from "react-icons/io5";
@@ -62,7 +61,6 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
   } = useLocalAudio();
 
   const { address } = useAccount();
-  const { walletAddress } = useWalletAddress();
 
   // const { peerId: remotePeerIds } = useRemotePeer({ peerId });
 
@@ -90,7 +88,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
     <div className={cn(className, "flex items-center justify-between w-full")}>
       <div className="flex items-center gap-2">
         {metadata?.avatarUrl &&
-        metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
+          metadata.avatarUrl !== "/avatars/avatars/0.png" ? (
           <div className="w-6 h-6">
             <Image
               src={metadata?.avatarUrl}
@@ -114,11 +112,10 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
             showArrow
           >
             <div
-              className={`pl-2 pt-[2px] cursor-pointer  ${
-                animatingButtons[metadata?.walletAddress || ""]
+              className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[metadata?.walletAddress || ""]
                   ? "text-blue-500"
                   : "text-[#3E3D3D]"
-              }`}
+                }`}
             >
               <IoCopy
                 onClick={() => handleAddrCopy(`${metadata?.walletAddress}`)}
@@ -135,7 +132,7 @@ const PeerMetaData: React.FC<PeerMetaDatProps> = ({
               displayName: metadata?.displayName ?? "Guest",
               avatarUrl: metadata?.avatarUrl ?? "/avatars/avatars/0.png",
               isHandRaised: !metadata?.isHandRaised,
-              walletAddress: metadata?.walletAddress || walletAddress || "",
+              walletAddress: metadata?.walletAddress || address || "",
             });
             // }
           }}

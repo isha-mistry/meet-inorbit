@@ -15,7 +15,7 @@ function MeetingLandingPage() {
               className="h-10 w-10 md:h-12 md:w-12 object-contain animate-float"
             />
             <div className="text-gray-200 text-2xl md:text-3xl font-semibold tracking-wide font-tektur animate-fade-in-right">
-              Inorbit
+              Xcan
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@ function MeetingLandingPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
             <div className="text-center md:text-left space-y-6 animate-fade-in-left">
               <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 animate-gradient-x">
-                Welcome to Inorbit
+                Welcome to Xcan Meet
               </h1>
               <p className="text-lg text-gray-300 max-w-md mx-auto md:mx-0 animate-fade-in-up animate-delay-300">
                 Join our vibrant community for regular expert sessions, lectures, and collaborative sessions.
@@ -37,7 +37,7 @@ function MeetingLandingPage() {
             <div className="flex justify-center md:justify-end animate-fade-in-right">
               <Image
                 src={logo}
-                alt="Inorbit Community"
+                alt="Xcan Community"
                 className="w-64 h-64 md:w-80 md:h-80 object-contain rounded-full shadow-lg transition-transform duration-300 animate-float"
               />
             </div>
@@ -87,7 +87,7 @@ function MeetingLandingPage() {
       {/* Footer */}
       <footer className="bg-gray-800/80 backdrop-blur-sm py-6 px-4 md:px-6 text-center text-gray-400 text-sm shadow-t animate-fade-in-up font-poppins">
         <div className="max-w-7xl mx-auto">
-          © {new Date().getFullYear()} Inorbit. All rights reserved.
+          © {new Date().getFullYear()} Xcan. All rights reserved.
         </div>
       </footer>
     </div>

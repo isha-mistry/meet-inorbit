@@ -3,8 +3,7 @@
 import { useEffect } from "react"
 import { AlertTriangle, RefreshCw, Home,ShieldAlert } from "lucide-react"
 import { APP_BASE_URL } from "@/config/constants"
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
-
+import { useAccount } from "wagmi";
 interface ErrorBoundaryProps {
   error: Error
   reset: () => void
@@ -12,7 +11,7 @@ interface ErrorBoundaryProps {
 
 export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
 
-  const { walletAddress } = useWalletAddress();
+  const { address } = useAccount();
   useEffect(() => {
     // Log the error to an error reporting service
     console.error("Error:", error)
@@ -47,7 +46,7 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
                 <span>Try Again</span>
               </button>
               <button
-                onClick={() => `${APP_BASE_URL}/profile/${walletAddress}?active=info`}
+                onClick={() => `${APP_BASE_URL}/profile/${address}?active=info`}
                 data-testid="home-button"
                 className="w-full bg-gray-200 text-gray-700 px-4 py-3 rounded-md hover:bg-gray-300 transition-colors flex items-center justify-center space-x-2"
               >

@@ -12,7 +12,6 @@ import { FaFacebook, FaTelegram } from "react-icons/fa";
 import { FaXTwitter, FaWhatsapp } from "react-icons/fa6";
 import { RiTwitterXLine } from "react-icons/ri";
 import { useAccount } from "wagmi";
-import { useWalletAddress } from "@/app/hooks/useWalletAddress";
 import { getAccessToken } from "@privy-io/react-auth";
 import { SiFarcaster } from "react-icons/si";
 
@@ -32,12 +31,10 @@ function ShareMediaModal({
   const [link, setLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const { address } = useAccount();
-  const { walletAddress } = useWalletAddress();
-
 
   useEffect(() => {
-    setLink(`${window.location.href}${walletAddress ? `?referrer=${walletAddress}` : ""}`);
-  }, [walletAddress]);
+    setLink(`${window.location.href}${address ? `?referrer=${address}` : ""}`);
+  }, [address]);
 
   useEffect(() => {
     // Lock scrolling when the modal is open
@@ -67,7 +64,7 @@ function ShareMediaModal({
   const text = encodeURIComponent(
     `${data.title} ${decodeURIComponent(
       url
-    )} via Inorbit\n\n#arbitrum #session #growth`
+    )} via Xcan\n\n#arbitrum #session #growth`
   );
 
   const shareOnTwitter = () => {
