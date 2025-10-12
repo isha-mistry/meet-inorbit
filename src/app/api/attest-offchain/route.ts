@@ -46,6 +46,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   // Your validation logic here
 
   const currentDAO = daoConfigs[requestData.daoName];
+  // const currentDAO = daoConfigs["arbitrum"];
 
   try {
     // const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
@@ -354,21 +355,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const socket = io(`${SOCKET_BASE_URL}`, {
       withCredentials: true,
     });
-    socket.on("connect", () => {
-      socket.emit("received_offchain_attestation", {
-        receiver_address,
-        dataToSend,
-      });
-      socket.disconnect();
-    });
+    // socket.on("connect", () => {
+    //   socket.emit("received_offchain_attestation", {
+    //     receiver_address,
+    //     dataToSend,
+    //   });
+    //   socket.disconnect();
+    // });
 
-    socket.on("connect_error", (err) => {
-      console.error("WebSocket connection error:", err);
-    });
+    // socket.on("connect_error", (err) => {
+    //   console.error("WebSocket connection error:", err);
+    // });
 
-    socket.on("error", (err) => {
-      console.error("WebSocket error:", err);
-    });
+    // socket.on("error", (err) => {
+    //   console.error("WebSocket error:", err);
+    // });
     await client.close();
 
     return NextResponse.json(

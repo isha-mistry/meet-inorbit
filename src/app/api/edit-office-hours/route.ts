@@ -84,27 +84,27 @@ async function sendMeetingStartNotification({
         withCredentials: true,
       });
 
-      socket.on("connect", () => {
-        console.log("Connected to WebSocket server from API");
+      // socket.on("connect", () => {
+      //   console.log("Connected to WebSocket server from API");
 
-        socket.emit("officehours_started", {
-          notifications: insertedNotifications.map((notification: any) => ({
-            ...notification,
-            _id: notification._id.toString(),
-          })),
-        });
+      //   socket.emit("officehours_started", {
+      //     notifications: insertedNotifications.map((notification: any) => ({
+      //       ...notification,
+      //       _id: notification._id.toString(),
+      //     })),
+      //   });
 
-        console.log("Bulk notifications sent from API to socket server");
-        socket.disconnect();
-      });
+      //   console.log("Bulk notifications sent from API to socket server");
+      //   socket.disconnect();
+      // });
 
-      socket.on("connect_error", (err) => {
-        console.error("WebSocket connection error:", err);
-      });
+      // socket.on("connect_error", (err) => {
+      //   console.error("WebSocket connection error:", err);
+      // });
 
-      socket.on("error", (err) => {
-        console.error("WebSocket error:", err);
-      });
+      // socket.on("error", (err) => {
+      //   console.error("WebSocket error:", err);
+      // });
     }
 
     return notificationResults;
