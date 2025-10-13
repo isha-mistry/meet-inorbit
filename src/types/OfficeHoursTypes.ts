@@ -1,18 +1,19 @@
 export interface Meeting {
-  reference_id?: string;
+  reference_id: string;
   title: string;
   description: string;
   startTime: string;
   endTime: string;
-  meeting_status?: string;
+  meeting_status: string;
+  status: string;
+  thumbnail_image: string;
+  created_at: Date;
   meetingId?: string;
   video_uri?: string;
-  thumbnail_image?: string;
   isMeetingRecorded?: boolean;
   uid_host?: string;
   onchain_host_uid?: string;
   attendees?: Attendee[];
-  created_at?: Date;
 }
 
 export interface Attendee {
@@ -21,11 +22,10 @@ export interface Attendee {
   attendee_onchain_uid?: string;
 }
 export interface OfficeHoursDocument {
+  _id?: string;
   host_address: string;
-  dao: {
-    name: string;
-    meetings: Meeting[];
-  }[];
+  dao_name: string;
+  meetings: Meeting[];
   created_at: Date;
   updated_at: Date;
 }

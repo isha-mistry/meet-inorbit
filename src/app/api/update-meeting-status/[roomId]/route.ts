@@ -28,8 +28,8 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     if (collectionName === "office_hours") {
       const officeHours = await collection.findOneAndUpdate(
-        { meetingId },
-        { $set: { meeting_status: "ongoing" } }
+        { "meetings.meetingId": meetingId },
+        { $set: { "meetings.$.meeting_status": "ongoing" } }
       );
 
       client.close();
@@ -86,21 +86,21 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             const socket = io(`${SOCKET_BASE_URL}`, {
               withCredentials: true,
             });
-            socket.on("connect", () => {
-              socket.emit("session_started_by_host", {
-                attendeeAddress,
-                dataToSendGuest,
-              });
-              socket.disconnect();
-            });
+            // socket.on("connect", () => {
+            //   socket.emit("session_started_by_host", {
+            //     attendeeAddress,
+            //     dataToSendGuest,
+            //   });
+            //   socket.disconnect();
+            // });
 
-            socket.on("connect_error", (err) => {
-              console.error("WebSocket connection error:", err);
-            });
+            // socket.on("connect_error", (err) => {
+            //   console.error("WebSocket connection error:", err);
+            // });
 
-            socket.on("error", (err) => {
-              console.error("WebSocket error:", err);
-            });
+            // socket.on("error", (err) => {
+            //   console.error("WebSocket error:", err);
+            // });
           }
           client.close();
           return NextResponse.json(sessions, { status: 200 });
@@ -150,19 +150,19 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             const socket = io(`${SOCKET_BASE_URL}`, {
               withCredentials: true,
             });
-            socket.on("connect", () => {
-              console.log("Connected to WebSocket server from API");
-              socket.emit("session_started_by_guest", {
-                hostAddress,
-                dataToSendHost,
-              });
-              console.log("Message sent from API to socket server");
-              socket.disconnect();
-            });
+            // socket.on("connect", () => {
+            //   console.log("Connected to WebSocket server from API");
+            //   socket.emit("session_started_by_guest", {
+            //     hostAddress,
+            //     dataToSendHost,
+            //   });
+            //   console.log("Message sent from API to socket server");
+            //   socket.disconnect();
+            // });
 
-            socket.on("connect_error", (err) => {
-              console.error("WebSocket connection error:", err);
-            });
+            // socket.on("connect_error", (err) => {
+            //   console.error("WebSocket connection error:", err);
+            // });
 
             socket.on("error", (err) => {
               console.error("WebSocket error:", err);

@@ -38,10 +38,10 @@ class RedisCacheWrapper implements CacheWrapper {
     this.isAvailable = false;
     this.redis?.disconnect();
     this.redis = null;
-    console.log(
-      "Redis connection failed, falling back to direct database access",
-      err
-    );
+    // console.log(
+    //   "Redis connection failed, falling back to direct database access",
+    //   err
+    // );
   }
 
   async get(key: string): Promise<string | null> {

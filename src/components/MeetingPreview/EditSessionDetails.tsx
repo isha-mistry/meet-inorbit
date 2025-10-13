@@ -163,7 +163,7 @@ function EditSessionDetails({
           <div className="flex flex-col-reverse items-start justify-between w-full border bg-[#212c4c] py-3 px-4 rounded-lg">
             <textarea
               rows={8}
-              className=" bg-[#212c4c] w-full xm:p-4 text-xs xs:text-sm rounded-lg outline-none"
+              className=" bg-[#212c4c] w-full text-xs xs:text-sm rounded-lg outline-none"
               placeholder="Briefly describe what your session covers"
               value={sessionDetails.description}
               onChange={handleDescriptionChange}

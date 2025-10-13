@@ -88,13 +88,11 @@ const getMeetingStatusResponse = (status: string): MeetingStatusResponse => {
 
 // Helper function to flatten office hours meetings
 const getFlattenedMeetings = (officeHours: OfficeHoursDocument) => {
-  return officeHours.dao.flatMap((dao) =>
-    dao.meetings.map((meeting) => ({
-      ...meeting,
-      host_address: officeHours.host_address,
-      dao_name: dao.name,
-    }))
-  );
+  return officeHours.meetings.map((meeting) => ({
+    ...meeting,
+    host_address: officeHours.host_address,
+    dao_name: officeHours.dao_name,
+  }));
 };
 
 export async function POST(req: NextRequest) {
@@ -115,8 +113,6 @@ export async function POST(req: NextRequest) {
         .collection("sessions")
         .findOne({ meetingId: roomId });
 
-      console.log("meeting: ",meeting);
-
       if (!meeting) {
         return createResponse(false, "Meeting does not exist", null, 404);
       }
@@ -133,7 +129,7 @@ export async function POST(req: NextRequest) {
     } else if (meetingType === "office_hours") {
       const officeHours = await db
         .collection<OfficeHoursDocument>("office_hours")
-        .findOne({ "dao.meetings.meetingId": roomId });
+        .findOne({ "meetings.meetingId": roomId });
 
       if (!officeHours) {
         return createResponse(false, "Meeting does not exist", null, 404);
@@ -150,7 +146,7 @@ export async function POST(req: NextRequest) {
       }
 
       const { success, message, status, includeData } =
-        getMeetingStatusResponse(meeting.meeting_status!);
+        getMeetingStatusResponse(meeting.meeting_status);
 
       return createResponse(
         success,

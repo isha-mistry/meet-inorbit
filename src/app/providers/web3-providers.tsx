@@ -24,7 +24,7 @@ interface Web3ProviderProps {
 
 // Wagmi configuration
 const wagmiConfig = createConfig({
-  chains: [optimism, arbitrum, arbitrumSepolia, optimismSepolia, mainnet],
+  chains: [arbitrum, arbitrumSepolia],
   transports: {
     [mainnet.id]: http(),
     [optimism.id]: http(),

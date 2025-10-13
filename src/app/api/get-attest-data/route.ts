@@ -39,6 +39,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const collection = db.collection("attestation");
 
     const data = await collection.findOne({ roomId });
+    console.log("data: ", data);
 
     await client.close();
 

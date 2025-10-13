@@ -84,27 +84,27 @@ async function sendMeetingStartNotification({
         withCredentials: true,
       });
 
-      socket.on("connect", () => {
-        console.log("Connected to WebSocket server from API");
+      // socket.on("connect", () => {
+      //   console.log("Connected to WebSocket server from API");
 
-        socket.emit("officehours_started", {
-          notifications: insertedNotifications.map((notification: any) => ({
-            ...notification,
-            _id: notification._id.toString(),
-          })),
-        });
+      //   socket.emit("officehours_started", {
+      //     notifications: insertedNotifications.map((notification: any) => ({
+      //       ...notification,
+      //       _id: notification._id.toString(),
+      //     })),
+      //   });
 
-        console.log("Bulk notifications sent from API to socket server");
-        socket.disconnect();
-      });
+      //   console.log("Bulk notifications sent from API to socket server");
+      //   socket.disconnect();
+      // });
 
-      socket.on("connect_error", (err) => {
-        console.error("WebSocket connection error:", err);
-      });
+      // socket.on("connect_error", (err) => {
+      //   console.error("WebSocket connection error:", err);
+      // });
 
-      socket.on("error", (err) => {
-        console.error("WebSocket error:", err);
-      });
+      // socket.on("error", (err) => {
+      //   console.error("WebSocket error:", err);
+      // });
     }
 
     return notificationResults;
@@ -120,6 +120,8 @@ export async function PUT(req: Request) {
     const updateData: OfficeHoursProps = await req.json();
     const { host_address, reference_id, attendees, ...updateFields } =
       updateData;
+
+    console.log("updateData: ", walletAddress, updateData);
 
     if (cacheWrapper.isAvailable) {
       const cacheKey = `office-hours-all`;
@@ -153,7 +155,7 @@ export async function PUT(req: Request) {
 
     // Find the document containing the meeting with the specified reference_id
     const existingDoc = await collection.findOne({
-      host_address: walletAddress,
+      host_address: host_address,
       "meetings.reference_id": reference_id,
     });
 
@@ -232,7 +234,7 @@ export async function PUT(req: Request) {
       );
 
       if (cacheWrapper.isAvailable) {
-        const cacheKey = `profile:${walletAddress}`;
+        const cacheKey = `office-hours-all`;
         await cacheWrapper.delete(cacheKey);
       }
     }
@@ -416,7 +418,7 @@ export async function PUT(req: Request) {
 
     const result = await collection.updateOne(
       {
-        host_address: walletAddress,
+        host_address: host_address,
         "meetings.reference_id": reference_id,
       },
       { $set: fieldsToUpdate },
@@ -426,15 +428,15 @@ export async function PUT(req: Request) {
     );
 
     const updatedDocument = await collection.findOne({
-      host_address: walletAddress,
+      host_address: host_address,
       "meetings.reference_id": reference_id,
     });
 
     await client.close();
 
     if (cacheWrapper.isAvailable) {
-      const hostCacheKey = `profile:${walletAddress}`;
-      await cacheWrapper.delete(hostCacheKey);
+      const cacheKey = `office-hours-all` ;
+      await cacheWrapper.delete(cacheKey);
     }
 
     return NextResponse.json(

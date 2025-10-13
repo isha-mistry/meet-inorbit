@@ -176,8 +176,6 @@ export default function Component({ params }: { params: { roomId: string } }) {
     };
   }, []);
 
- 
-
 
   const firstSlideRef = useRef<HTMLElement>(null);
 

@@ -104,6 +104,7 @@ export const updateOfficeHoursData = async (
   requestBody: any
 ) => {
   try {
+    console.log("requestBody: ", requestBody, userAddress, privyToken);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     if (userAddress) {

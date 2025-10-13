@@ -247,6 +247,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       endTime: Math.floor(latestEndTime / 1000),
       meetingType: meetingTypeName,
       attestation: "pending",
+      dao_name: "arbitrum",
       timeUpdateStatus: "complete",
     };
 
@@ -267,6 +268,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         startTime: Math.floor(earliestStartTime / 1000),
         endTime: Math.floor(latestEndTime / 1000),
         meetingType: meetingTypeName,
+        dao_name: "arbitrum",
         timeUpdateStatus: "complete",
       },
       { status: 200 }

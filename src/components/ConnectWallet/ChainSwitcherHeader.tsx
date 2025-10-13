@@ -119,8 +119,8 @@ const ChainSwitcherHeader: React.FC<ChainSwitcherHeaderProps> = ({
                 onClick={() => switchChain?.({ chainId: dao.chainId })}
                 className={`flex items-center text-sm px-2 py-1.5 rounded-md mb-1 transition-colors duration-200 ${
                   dao.chainId === currentChainId
-                    ? "bg-blue-100 cursor-not-allowed"
-                    : "hover:bg-blue-200 cursor-pointer"
+                    ? "bg-[#acd1fd] text-gray-900 cursor-not-allowed"
+                    : "hover:bg-blue-200 text-gray-800 cursor-pointer"
                 }`}
               >
                 <Image

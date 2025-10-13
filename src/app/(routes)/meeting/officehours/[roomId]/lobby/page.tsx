@@ -84,7 +84,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         setButtonText("Join Meeting");
       }
     }
-    }, [address, meetingData]);
+  }, [address, meetingData]);
 
   useEffect(() => {
     if (!address) {
@@ -116,6 +116,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         });
 
         const result = await response.json();
+        console.log("result: ", result);
 
         if (result.success) {
           const { data } = result;
@@ -235,7 +236,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
 
     try {
       setIsJoining(true);
-        const role = address === hostAddress ? "host" : "listener";
+      const role = address === hostAddress ? "host" : "listener";
       const privyToken = await getAccessToken();
 
       // Get room token
@@ -267,7 +268,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
       });
 
       // Update meeting status
-      if (Role.HOST) {
+      if (role === "host") {
         const requestBody = {
           host_address: hostAddress,
           dao_name: daoName,
@@ -292,6 +293,9 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
             attendee_address: address,
           },
         };
+
+        console.log("request body for listener: ", requestBody)
+        
         await updateOfficeHoursData(
           address ?? "",
           privyToken,

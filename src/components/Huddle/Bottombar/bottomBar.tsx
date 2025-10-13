@@ -412,6 +412,16 @@ const BottomBar = ({
               </span>
             </Button>
           )}
+
+          {role === "listener" && (
+            <OutlineButton
+              className="flex items-center justify-between gap-3"
+              onClick={() => setPromptView("request-to-speak")}
+            >
+              {BasicIcons.requestToSpeak}
+              <div className="text-white">Request to speak</div>
+            </OutlineButton>
+          )}
         </div>
 
         <div
@@ -612,15 +622,7 @@ const BottomBar = ({
 
         <div className="hidden lg:flex lg:flex-1 justify-end space-x-3">
 
-          {role === "listener" && (
-            <OutlineButton
-              className="flex items-center justify-between gap-3"
-              onClick={() => setPromptView("request-to-speak")}
-            >
-              {BasicIcons.requestToSpeak}
-              <div className="text-white">Request to speak</div>
-            </OutlineButton>
-          )}
+
           <ButtonWithIcon
             content="Participants"
             onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}

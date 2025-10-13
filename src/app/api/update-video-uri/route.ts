@@ -11,8 +11,13 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
 
     const officeHoursCollection = db.collection("office_hours");
     const officeHoursMeeting = await officeHoursCollection.findOneAndUpdate(
-      { meetingId },
-      { $set: { video_uri, meeting_status: "inactive" } }
+      { "meetings.meetingId": meetingId },
+      {
+        $set: {
+          "meetings.$.video_uri": video_uri,
+          "meetings.$.meeting_status": "inactive",
+        },
+      }
     );
 
     const meetingsCollection = db.collection("sessions");

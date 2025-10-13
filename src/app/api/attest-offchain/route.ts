@@ -45,7 +45,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
 
+  console.log("requestData: ", requestData);
+
   const currentDAO = daoConfigs[requestData.daoName];
+  // const currentDAO = "arbitrum";
+  console.log(
+    "daoConfigs[requestData.daoName]: ",
+    daoConfigs[requestData.daoName]
+  );
 
   try {
     // const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
@@ -225,10 +232,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const collection = db.collection("office_hours");
 
         await collection.findOneAndUpdate(
-          { meetingId: requestData.meetingId.split("/")[0] },
+          { "meetings.meetingId": requestData.meetingId.split("/")[0] },
           {
             $set: {
-              uid_host: responseData.offchainAttestationId,
+              "meetings.$.uid_host": responseData.offchainAttestationId,
             },
           }
         );
@@ -256,12 +263,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         await collection.findOneAndUpdate(
           {
-            meetingId: requestData.meetingId.split("/")[0],
-            "attendees.attendee_address": requestData.recipient,
+            "meetings.meetingId": requestData.meetingId.split("/")[0],
+            "meetings.attendees.attendee_address": requestData.recipient,
           },
           {
             $set: {
-              "attendees.$.attendee_uid": responseData.offchainAttestationId,
+              "meetings.$.attendees.$.attendee_uid":
+                responseData.offchainAttestationId,
             },
           }
         );
@@ -354,21 +362,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const socket = io(`${SOCKET_BASE_URL}`, {
       withCredentials: true,
     });
-    socket.on("connect", () => {
-      socket.emit("received_offchain_attestation", {
-        receiver_address,
-        dataToSend,
-      });
-      socket.disconnect();
-    });
+    // socket.on("connect", () => {
+    //   socket.emit("received_offchain_attestation", {
+    //     receiver_address,
+    //     dataToSend,
+    //   });
+    //   socket.disconnect();
+    // });
 
-    socket.on("connect_error", (err) => {
-      console.error("WebSocket connection error:", err);
-    });
+    // socket.on("connect_error", (err) => {
+    //   console.error("WebSocket connection error:", err);
+    // });
 
-    socket.on("error", (err) => {
-      console.error("WebSocket error:", err);
-    });
+    // socket.on("error", (err) => {
+    //   console.error("WebSocket error:", err);
+    // });
     await client.close();
 
     return NextResponse.json(
