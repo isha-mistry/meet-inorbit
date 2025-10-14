@@ -164,9 +164,9 @@ export async function PUT(req: NextRequest, res: NextResponse) {
             //   console.error("WebSocket connection error:", err);
             // });
 
-            socket.on("error", (err) => {
-              console.error("WebSocket error:", err);
-            });
+            // socket.on("error", (err) => {
+            //   console.error("WebSocket error:", err);
+            // });
           }
           client.close();
           return NextResponse.json(sessions, { status: 200 });

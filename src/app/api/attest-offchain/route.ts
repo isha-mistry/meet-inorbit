@@ -53,6 +53,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     "daoConfigs[requestData.daoName]: ",
     daoConfigs[requestData.daoName]
   );
+  // const currentDAO = daoConfigs["arbitrum"];
 
   try {
     // const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";

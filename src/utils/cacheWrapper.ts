@@ -48,11 +48,11 @@ class RedisCacheWrapper implements CacheWrapper {
     if (!this.isAvailable || !this.redis) {
       return null;
     }
-  
+
     // Add environment prefix to key
-    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const redisPrefix = process.env.REDIS_PREFIX || "prod";
     const prefixedKey = `${redisPrefix}:${key}`;
-  
+
     try {
       return await this.redis.get(prefixedKey);
     } catch (err) {
@@ -60,16 +60,16 @@ class RedisCacheWrapper implements CacheWrapper {
       return null;
     }
   }
-  
+
   async set(key: string, value: string, expireSeconds?: number): Promise<void> {
     if (!this.isAvailable || !this.redis) {
       return;
     }
-  
+
     // Add environment prefix to key
-    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const redisPrefix = process.env.REDIS_PREFIX || "prod";
     const prefixedKey = `${redisPrefix}:${key}`;
-  
+
     try {
       await this.redis.set(prefixedKey, value);
       if (expireSeconds) {
@@ -80,16 +80,15 @@ class RedisCacheWrapper implements CacheWrapper {
     }
   }
 
-
   async delete(key: string) {
     if (!this.isAvailable || !this.redis) {
       return;
     }
-    
+
     // Add environment prefix to key
-    const redisPrefix = process.env.REDIS_PREFIX || 'prod';
+    const redisPrefix = process.env.REDIS_PREFIX || "prod";
     const prefixedKey = `${redisPrefix}:${key}`;
-    
+
     try {
       await this.redis.del(prefixedKey);
     } catch (err) {

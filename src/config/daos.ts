@@ -48,34 +48,34 @@ export const daoConfigs: { [key: string]: DAOConfig } = {
     alchemyAttestationUrl: process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL || "",
     offchainAttestationUrl: "https://arbitrum.easscan.org",
     attestationUrl: "https://arbitrum.easscan.org/offchain/attestation/view",
-    attestationView:"https://optimism.easscan.org/attestation/view",
+    attestationView: "https://arbitrum.easscan.org/attestation/view",
     eascontracAddress: "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458",
     blocks: [
-        {
-          title: "Forum",
-          link: "https://forum.arbitrum.foundation",
-        },
-        {
-          title: "Website",
-          link: "https://arbitrum.io",
-        },
-        {
-          title: "Arbitrum Foundation Website",
-          link: "https://arbitrum.foundation",
-        },
-        {
-          title: "Block Explorer",
-          link: "https://arbiscan.io",
-        },
-        {
-          title: "Arbitrum Twitter Profile",
-          link: "https://twitter.com/arbitrum",
-        },
-        {
-          title: "Arbitrum DAO Twitter Profile",
-          link: "https://x.com/arbitrumdao_gov",
-        },
-      ],
+      {
+        title: "Forum",
+        link: "https://forum.arbitrum.foundation",
+      },
+      {
+        title: "Website",
+        link: "https://arbitrum.io",
+      },
+      {
+        title: "Arbitrum Foundation Website",
+        link: "https://arbitrum.foundation",
+      },
+      {
+        title: "Block Explorer",
+        link: "https://arbiscan.io",
+      },
+      {
+        title: "Arbitrum Twitter Profile",
+        link: "https://twitter.com/arbitrum",
+      },
+      {
+        title: "Arbitrum DAO Twitter Profile",
+        link: "https://x.com/arbitrumdao_gov",
+      },
+    ],
   },
   arbitrumSepolia: {
     name: "Arbitrum Sepolia",
