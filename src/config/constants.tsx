@@ -35,8 +35,8 @@ export const APP_BASE_URL =
 
 // export const SCHEMA_ID =
 //   process.env.NODE_ENV == "development"
-//     ? "0xbaeab565ea1cf3cd3808b75fef04b811606b2c0d6f57a39c6abb60ee642fdcc0"
-//     : "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d";
+//     ? "0x928ec245ee5678b4f18ef6b93f91a949b9178c13891abbe1f215c223495ee3b5"
+//     : "0x928ec245ee5678b4f18ef6b93f91a949b9178c13891abbe1f215c223495ee3b5";
 
 // export const OFFCHAIN_OP_ATTESTATION_BASE_URL =
 //   process.env.NODE_ENV == "development"
@@ -58,11 +58,17 @@ export const APP_BASE_URL =
 //     ? process.env.NEXT_PUBLIC_SEPOLIA_ATTESTATION_URL
 //     : process.env.NEXT_PUBLIC_ARB_ATTESTATION_URL;
 
+// //development testing
+// export const SCHEMA_ID =
+//   process.env.NODE_ENV == "development"
+//     ? "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d"
+//     : "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d";
+
 //development testing
 export const SCHEMA_ID =
   process.env.NODE_ENV == "development"
-    ? "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d"
-    : "0xf9e214a80b66125cad64453abe4cef5263be3a7f01760d0cc72789236fca2b5d";
+    ? "0x1e7a1d1627d7ae5d324aa0fd78c5b42474e926dcca73c31365444fd716ff025e"
+    : "0x1e7a1d1627d7ae5d324aa0fd78c5b42474e926dcca73c31365444fd716ff025e";
 
 export const OFFCHAIN_OP_ATTESTATION_BASE_URL =
   process.env.NODE_ENV == "development"
