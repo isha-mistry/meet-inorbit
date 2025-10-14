@@ -44,16 +44,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
   // const requestData = await req.json();
   const requestData = (await req.json()) as AttestOffchainRequestBody;
   // Your validation logic here
-
-  console.log("requestData: ", requestData);
-
-  const currentDAO = daoConfigs[requestData.daoName];
-  // const currentDAO = "arbitrum";
-  console.log(
-    "daoConfigs[requestData.daoName]: ",
-    daoConfigs[requestData.daoName]
-  );
-  // const currentDAO = daoConfigs["arbitrum"];
+  console.log("requestData::::", requestData);
+  // const currentDAO = daoConfigs[requestData.daoName];
+  const currentDAO = daoConfigs["arbitrum"];
 
   try {
     // const atstUrl = currentDAO ? currentDAO.alchemyAttestationUrl : "";
@@ -69,7 +62,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
     const privateKey = process.env.PVT_KEY ?? "";
     const signer = new ethers.Wallet(privateKey, provider);
-
+    console.log("signer::::", signer);
     const EASContractAddress = currentDAO ? currentDAO.eascontracAddress : "";
     // requestData.daoName === "optimism"
     //   ? "0x4200000000000000000000000000000000000021"
@@ -77,13 +70,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
     //   ? "0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458"
     //   : "";
     const eas = new EAS(EASContractAddress);
-
+    console.log("eas::::", eas);
     eas.connect(signer);
     // Your initialization code remains the same
     const offchain = await eas.getOffchain();
     const schemaEncoder = new SchemaEncoder(
       "bytes32 MeetingId,uint8 MeetingType,uint32 StartTime,uint32 EndTime"
     );
+    console.log("schemaEncoder::::", schemaEncoder);
+    console.log("Encoding data with values:", {
+      meetingId: requestData.meetingId,
+      meetingType: requestData.meetingType,
+      startTime: requestData.startTime,
+      endTime: requestData.endTime,
+    });
 
     const encodedData = schemaEncoder.encodeData([
       {
@@ -96,9 +96,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { name: "EndTime", value: requestData.endTime, type: "uint32" },
     ]);
 
+    console.log("Encoded data:", encodedData);
+
     const expirationTime = BigInt(0);
     const currentTime = BigInt(Math.floor(Date.now() / 1000));
-
+    console.log("currentTime::::", currentTime);
     const offchainAttestation = await offchain.signOffchainAttestation(
       {
         schema: SCHEMA_ID,
@@ -112,7 +114,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
       signer
     );
-
+    console.log("offchainAttestation::::", offchainAttestation);
     const pkg = {
       sig: offchainAttestation,
       signer: await signer.getAddress(),
@@ -121,7 +123,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     let baseUrl = "";
 
     baseUrl = currentDAO.offchainAttestationUrl;
-
+    console.log("baseUrl::::", baseUrl);
     // if (requestData.daoName === "optimism") {
     //   baseUrl = OFFCHAIN_OP_ATTESTATION_BASE_URL;
     // } else if (requestData.daoName) {
@@ -129,19 +131,48 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // }
 
     const url = baseUrl + createOffchainURL(pkg);
+    console.log("url::::", url);
+
+    function convertBigIntToString(obj: any): any {
+      if (obj === null || obj === undefined) {
+        return obj;
+      }
+
+      if (typeof obj === "bigint") {
+        return obj.toString();
+      }
+
+      if (typeof obj === "boolean" || typeof obj === "number") {
+        return obj; // Keep booleans and numbers as-is
+      }
+
+      if (Array.isArray(obj)) {
+        return obj.map(convertBigIntToString);
+      }
+
+      if (typeof obj === "object") {
+        const converted: any = {};
+        for (const key in obj) {
+          converted[key] = convertBigIntToString(obj[key]);
+        }
+        return converted;
+      }
+
+      return obj;
+    }
+    const convertedPkg = convertBigIntToString(pkg);
+    const data = {
+      filename: `eas.txt`,
+      textJson: JSON.stringify(convertedPkg),
+    };
 
     // const data = {
     //   filename: `eas.txt`,
-    //   textJson: JSON.stringify(pkg),
+    //   textJson: JSON.stringify(pkg, (key, value) =>
+    //     typeof value === "bigint" ? value.toString() : value
+    //   ),
     // };
-
-    const data = {
-      filename: `eas.txt`,
-      textJson: JSON.stringify(pkg, (key, value) =>
-        typeof value === "bigint" ? value.toString() : value
-      ),
-    };
-
+    console.log("data::::", data);
     let uploadstatus = false;
     try {
       const response = await fetch(`${baseUrl}/offchain/store`, {
@@ -151,7 +182,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
         body: JSON.stringify(data),
       });
-
+      console.log("response::::", response);
       // if (!response.ok) {
       //   throw new Error(`Failed to upload data: ${response.statusText}`);
       // }
@@ -160,7 +191,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
       if (responseData.offchainAttestationId) {
         uploadstatus = true;
       }
-
+      console.log("responseData::::", responseData);
+      console.log("uploadstatus::::", uploadstatus);
       if (requestData.meetingType === 1) {
         const client = await connectDB();
 
