@@ -17,3 +17,8 @@
   /* margin-top: auto;
   margin-bottom: auto; */
 }
+
+.vjs-poster{
+  background-color: #000000 !important;
+  border-radius: 1.2rem !important;
+}

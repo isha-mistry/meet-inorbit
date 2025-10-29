@@ -209,7 +209,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
-          { address: requestData.recipient },
+          { address: RegExp(`^${requestData.recipient}$`, "i") },
           {
             $inc: {
               [`meetingRecords.${requestData.daoName}.sessionHosted.offchainCounts`]: 1,
@@ -244,7 +244,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const usersCollection = db.collection("users");
         await usersCollection.findOneAndUpdate(
-          { address: requestData.recipient },
+          { address: RegExp(`^${requestData.recipient}$`, "i") },
           {
             $inc: {
               [`meetingRecords.${requestData.daoName}.sessionAttended.offchainCounts`]: 1,

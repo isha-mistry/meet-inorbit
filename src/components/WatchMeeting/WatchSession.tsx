@@ -186,7 +186,7 @@ function WatchSession({
                     <Tooltip
                       showArrow
                       content={
-                        <div className="font-poppins">Offchain Attestation</div>
+                        <div className="font-robotoMono">Offchain Attestation</div>
                       }
                       placement="top"
                       className="rounded-md bg-opacity-90 max-w-96"
@@ -231,7 +231,7 @@ function WatchSession({
                   <Tooltip
                     showArrow
                     content={
-                      <div className="font-poppins">Onchain Attestation</div>
+                      <div className="font-robotoMono">Onchain Attestation</div>
                     }
                     placement="top"
                     className="rounded-md bg-opacity-90 max-w-96"
@@ -382,7 +382,7 @@ function WatchSession({
                         <Tooltip
                           showArrow
                           content={
-                            <div className="font-poppins">
+                            <div className="font-robotoMono">
                               Offchain Attestation
                             </div>
                           }
@@ -419,7 +419,7 @@ function WatchSession({
                         <Tooltip
                           showArrow
                           content={
-                            <div className="font-poppins">
+                            <div className="font-robotoMono">
                               Onchain Attestation
                             </div>
                           }

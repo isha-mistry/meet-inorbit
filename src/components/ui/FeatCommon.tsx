@@ -21,7 +21,7 @@ const FeatCommon = ({ onClose, children, className }: Props) => {
     <div
       ref={menuRef}
       className={
-        "bg-gray-100 absolute top-1/2 -right-5  z-50 h-fit w-[16rem] lg:w-[28rem] -translate-y-[30%] translate-x-full rounded-3xl border  border-slate-700 py-4 text-center text-white shadow-xl font-poppins" +
+        "bg-gray-100 absolute top-1/2 -right-5  z-50 h-fit w-[16rem] lg:w-[28rem] -translate-y-[30%] translate-x-full rounded-3xl border  border-slate-700 py-4 text-center text-white shadow-xl font-robotoMono" +
         className
       }
     >

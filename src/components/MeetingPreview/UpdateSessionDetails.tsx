@@ -183,9 +183,9 @@ function UpdateSessionDetails({
   };
 
   return (
-    <div className="font-tektur">
+    <div className="font-robotoMono">
       {!dataLoading ? (
-          address?.toLowerCase() === data?.host_address.toLowerCase() ? (
+        address?.toLowerCase() === data?.host_address.toLowerCase() ? (
           <div className="py-5 px-4 sm:px-6 lg:px-16">
             {showPopup && (
               <div

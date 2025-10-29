@@ -589,7 +589,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       }
     }
 
-      if (authenticated && address != null) {
+    if (authenticated && address != null) {
       verifyMeetingId();
     }
   }, [params.roomId, isAllowToEnter, notAllowedMessage, address]);
@@ -783,7 +783,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {isAllowToEnter ? (
         <div
           className={clsx(
-            `flex flex-col h-screen font-poppins bg-contain bg-center bg-no-repeat ${daoName === "optimism"
+            `flex flex-col h-screen font-robotoMono bg-contain bg-center bg-no-repeat ${daoName === "optimism"
               ? "bg-op-profile"
               : daoName === "arbitrum"
                 ? "bg-arb-profile"
@@ -794,7 +794,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           <div className="bg-[#0a0a0a] flex flex-col h-screen">
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
-                <div className="text-3xl font-semibold tracking-wide font-tektur">
+                <div className="text-3xl font-semibold tracking-wide font-robotoMono">
                   <span className="text-white">Chora</span>
                   <span className="text-blue-shade-100">Club</span>
                 </div>
@@ -804,7 +804,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   <Tooltip
                     showArrow
                     content={
-                      <div className="font-poppins">
+                      <div className="font-robotoMono">
                         This meeting is being recorded
                       </div>
                     }
@@ -900,8 +900,8 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       )}
                     <div
                       className={`relative flex flex-col lg:flex-row w-full h-full ${isRemoteFullScreen && isScreenShared && isFullScreen
-                          ? "bg-[#202020] rounded-lg justify-center"
-                          : ""
+                        ? "bg-[#202020] rounded-lg justify-center"
+                        : ""
                         } `}
                     >
                       {shareStream && (
@@ -913,6 +913,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   <Tooltip
                                     content={tooltipContent}
                                     placement="bottom"
+                                    className="bg-[#1c2634] text-gray-100"
                                     closeDelay={1}
                                     showArrow
                                   >
@@ -971,14 +972,14 @@ export default function Component({ params }: { params: { roomId: string } }) {
                       <section
                         ref={firstSlideRef}
                         className={`${!isScreenShared
-                            ? "grid "
-                            : `${isRemoteFullScreen && isScreenShared
+                          ? "grid "
+                          : `${isRemoteFullScreen && isScreenShared
+                            ? "hidden"
+                            : `${isFullScreen && isScreenShared
                               ? "hidden"
-                              : `${isFullScreen && isScreenShared
-                                ? "hidden"
-                                : "hidden lg:grid"
-                              }`
+                              : "hidden lg:grid"
                             }`
+                          }`
                           } py-6 lg:px-4 gap-2 w-full h-[calc(100vh-135px)] m-auto overflow-y-auto scrollbar-thin scrollbar-track-gray-700 scrollbar-thumb-blue-600 first-slide ${isScreenShared
                             ? "lg:grid-cols-1 lg:w-[40%]" // Show single column if screen is shared
                             : peerIds.length === 0
@@ -1038,16 +1039,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                     <Tooltip
                                       content={tooltipContent}
                                       placement="right"
+                                      className="bg-[#1c2634] text-gray-100"
                                       closeDelay={1}
                                       showArrow
-                                      className="bg-[#1c2634] text-gray-100"
                                     >
                                       <div
                                         className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
-                                            metadata?.walletAddress || ""
-                                          ]
-                                            ? "text-blue-500"
-                                            : "text-[#3E3D3D]"
+                                          metadata?.walletAddress || ""
+                                        ]
+                                          ? "text-blue-500"
+                                          : "text-[#3E3D3D]"
                                           }`}
                                       >
                                         <IoCopy
@@ -1224,15 +1225,16 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   <Tooltip
                                     content={tooltipContent}
                                     placement="right"
+                                    className="bg-[#1c2634] text-gray-100"
                                     closeDelay={1}
                                     showArrow
                                   >
                                     <div
                                       className={`pl-2 pt-[2px] cursor-pointer  ${animatingButtons[
-                                          metadata?.walletAddress || ""
-                                        ]
-                                          ? "text-blue-500"
-                                          : "text-[#3E3D3D]"
+                                        metadata?.walletAddress || ""
+                                      ]
+                                        ? "text-blue-500"
+                                        : "text-[#3E3D3D]"
                                         }`}
                                     >
                                       <IoCopy
@@ -1310,7 +1312,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       ) : (
         <>
           {notAllowedMessage ? (
-            <div className="flex justify-center items-center h-screen font-poppins">
+            <div className="flex justify-center items-center h-screen font-robotoMono">
               <div className="text-center">
                 <div className="text-6xl mb-6">☹️</div>
                 <div className="text-lg font-semibold mb-8">

@@ -288,6 +288,7 @@ const BottomBar = ({
       const token = await getAccessToken();
 
       // First handle critical closing operations
+      await updateMeetingStatus();
       await handleCloseMeeting(
         address ?? "",
         token,
@@ -301,7 +302,6 @@ const BottomBar = ({
       // Then generate NFT image and update meeting status with the result
       // Using the IPFS hash in the update
       // const nft_image = await generateAndUploadNFTImage();
-      await updateMeetingStatus();
     } catch (error) {
       console.error("Background host operations failed:", error);
     }
@@ -389,7 +389,7 @@ const BottomBar = ({
 
   return (
     <>
-      <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-poppins bg-[#0a0a0a] lg:bg-transparent z-10">
+      <footer className="flex items-center justify-center lg:justify-between pl-2 pr-4 sm:px-4 py-2 font-robotoMono bg-[#0a0a0a] lg:bg-transparent z-10">
         <div className="lg:flex-1">
           {role === "host" && (
             <Button

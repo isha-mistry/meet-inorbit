@@ -14,14 +14,14 @@ function MeetingLandingPage() {
               alt="logo"
               className="h-10 w-10 md:h-12 md:w-12 object-contain animate-float"
             />
-            <div className="text-gray-200 text-2xl md:text-3xl font-semibold tracking-wide font-tektur animate-fade-in-right">
+            <div className="text-gray-200 text-2xl md:text-3xl font-semibold tracking-wide font-robotoMono animate-fade-in-right">
               Xcan
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-grow px-4 py-12 font-poppins">
+      <main className="flex-grow px-4 py-12 font-robotoMono">
         <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
@@ -85,7 +85,7 @@ function MeetingLandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800/80 backdrop-blur-sm py-6 px-4 md:px-6 text-center text-gray-400 text-sm shadow-t animate-fade-in-up font-poppins">
+      <footer className="bg-gray-800/80 backdrop-blur-sm py-6 px-4 md:px-6 text-center text-gray-400 text-sm shadow-t animate-fade-in-up font-robotoMono">
         <div className="max-w-7xl mx-auto">
           © {new Date().getFullYear()} Xcan. All rights reserved.
         </div>

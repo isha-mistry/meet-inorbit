@@ -118,6 +118,7 @@ const RemotePeer = ({ peerId, className }: RemotePeerProps) => {
             <Tooltip
               content={tooltipContent}
               placement="right"
+              className="bg-[#1c2634] text-gray-100"
               closeDelay={1}
               showArrow
             >

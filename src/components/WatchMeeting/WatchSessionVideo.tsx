@@ -131,7 +131,7 @@ function WatchSessionVideo({
   }
   return (
     <div>
-      <div className="rounded-3xl">
+      <div className="rounded-3xl object-cover">
         <VideoJs options={videoJsOptions} onReady={handlePlayerReady} />
       </div>
     </div>

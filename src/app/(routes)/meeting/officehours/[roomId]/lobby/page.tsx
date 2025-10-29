@@ -295,7 +295,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
         };
 
         console.log("request body for listener: ", requestBody)
-        
+
         await updateOfficeHoursData(
           address ?? "",
           privyToken,
@@ -394,13 +394,13 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
               </div>
             </div>
           )}
-          <main className="flex min-h-screen flex-col text-white font-poppins"
+          <main className="flex min-h-screen flex-col text-white font-robotoMono"
             style={{
               filter: showConfirmWallet ? "blur(5px)" : "none", // Apply blur if popup is visible
               pointerEvents: showConfirmWallet ? "none" : "auto", // Disable interactions if popup is visible
             }}>
             <div className="flex justify-between px-4 md:px-6 lg:px-16 pt-4">
-              <div className="text-4xl font-semibold font-tektur tracking-wide">
+              <div className="text-4xl font-semibold font-robotoMono tracking-wide">
                 <span className="text-white">Chora</span>
                 <span className="text-blue-shade-100">Club</span>
               </div>
@@ -471,7 +471,7 @@ const Lobby = ({ params }: { params: { roomId: string } }) => {
                 </div>
 
                 {/* Start Button */}
-                <div className="flex items-center w-full sm:w-2/3 lg:w-1/2 px-4 sm:px-0">
+                <div className="flex items-center w-full sm:w-2/3 px-4 sm:px-0">
                   <button
                     className={`flex items-center justify-center w-full py-3 sm:py-4 px-4 sm:px-6 mt-4 text-white font-bold text-lg rounded-full transition-all duration-300
                   ${isLoadingProfile

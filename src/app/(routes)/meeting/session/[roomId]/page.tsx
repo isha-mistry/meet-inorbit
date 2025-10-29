@@ -718,7 +718,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       {isAllowToEnter ? (
         <div
           className={clsx(
-            `flex flex-col h-screen font-poppins bg-contain bg-center bg-no-repeat ${daoName === "optimism"
+            `flex flex-col h-screen font-robotoMono bg-contain bg-center bg-no-repeat ${daoName === "optimism"
               ? "bg-op-profile"
               : daoName === "arbitrum"
                 ? "bg-arb-profile"
@@ -729,7 +729,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
           <div className="bg-[#0a0a0a] flex flex-col h-screen">
             <header className="flex items-center justify-between pt-4 px-4 md:px-6">
               <div className="flex items-center py-2 space-x-2">
-                <div className="text-3xl font-semibold tracking-wide font-tektur">
+                <div className="text-3xl font-semibold tracking-wide font-robotoMono">
                   <span className="text-white">Xcan</span>
                 </div>
               </div>
@@ -738,7 +738,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                   <Tooltip
                     showArrow
                     content={
-                      <div className="font-poppins">
+                      <div className="font-robotoMono">
                         This meeting is being recorded
                       </div>
                     }
@@ -850,6 +850,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   <Tooltip
                                     content={tooltipContent}
                                     placement="bottom"
+                                    className="bg-[#1c2634] text-gray-100"
                                     closeDelay={1}
                                     showArrow
                                   >
@@ -975,6 +976,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                     <Tooltip
                                       content={tooltipContent}
                                       placement="right"
+                                      className="bg-[#1c2634] text-gray-100"
                                       closeDelay={1}
                                       showArrow
                                     >
@@ -1160,6 +1162,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
                                   <Tooltip
                                     content={tooltipContent}
                                     placement="right"
+                                    className="bg-[#1c2634] text-gray-100"
                                     closeDelay={1}
                                     showArrow
                                   >
@@ -1245,7 +1248,7 @@ export default function Component({ params }: { params: { roomId: string } }) {
       ) : (
         <>
           {notAllowedMessage ? (
-            <div className="flex justify-center items-center h-screen font-poppins">
+            <div className="flex justify-center items-center h-screen font-robotoMono">
               <div className="text-center">
                 <div className="text-6xl mb-6">☹️</div>
                 <div className="text-lg font-semibold mb-8">

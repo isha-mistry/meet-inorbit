@@ -1,23 +1,17 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Poppins, Tektur } from "next/font/google";
+import { Roboto_Mono } from "next/font/google";
 import ProgressBarProvider from "@/components/ProgressBarProvider/ProgressBarProvider";
 import { Suspense } from "react";
 import RootProviders from "./providers/root-providers";
 import HuddleContextProvider from "@/context/HuddleContextProvider";
 
-const poppins = Poppins({
+const robotoMono = Roboto_Mono({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-});
-
-const tektur = Tektur({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-tektur",
-});
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  variable: "--font-roboto-mono",
+}); 
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://inorbit-app.vercel.app/"),
@@ -57,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${tektur.variable} ${poppins.variable} antialiased`}>
+      <body className={`${robotoMono.variable} antialiased`}>
         <ProgressBarProvider>
           <Suspense>
             <RootProviders>
